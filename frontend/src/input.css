@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+    html {
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline-width: 0;
+}
+
+:root {
+    --secondary: rgba(0,0,0,0.5);
+    --primary: transparent;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: 1;
+    scrollbar-color: var(--secondary) var(--primary);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 10px;
+    margin: 5px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--primary);
+    border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--secondary);
+    border-radius: 14px;
+    background-clip: padding-box;
+    border: 3px solid var(--primary);
+}
