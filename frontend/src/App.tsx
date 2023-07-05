@@ -11,7 +11,7 @@ export default function App() {
   return (
     <div className="flex place-items-center h-screen bg-[#1a1c22] overflow-hidden">
       <Sidebar/>
-      <div className="w-fit h-full bg-[#1a1c22] flex flex-col">
+      <div className="w-fit h-full bg-[#1a1c22] flex flex-col py-3">
         <Calendar/>
         <div className="px-5 pb-3 flex gap-3">
           <p className="text-white">My day starts at:</p>

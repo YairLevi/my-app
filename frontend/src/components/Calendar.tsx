@@ -1,5 +1,6 @@
 import { PropsWithChildren, useState } from "react";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const ROW_COUNT = 6
@@ -157,12 +158,20 @@ function Calendar() {
 
   return (
     <>
-      {/*<p>{getMonthAndYear()}</p>*/}
-      {/*<div className="flex justify-between">*/}
-      {/*  <button onClick={previousMonth}>Previous</button>*/}
-      {/*  <button onClick={getToToday}>Today</button>*/}
-      {/*  <button onClick={nextMonth}>Next</button>*/}
-      {/*</div>*/}
+      <div className="flex px-4 justify-between">
+        <p className="text-white">{getMonthAndYear()}</p>
+        <div className="flex gap-1 [&_*]:text-gray-300 [&_*]:text-sm [&_*]:bg-[#222222] [&_*]:rounded-md">
+          <button className="w-7 h-7" onClick={previousMonth}>
+            <FontAwesomeIcon icon={faChevronLeft}/>
+          </button>
+          <button className="px-2" onClick={getToToday}>
+            Today
+          </button>
+          <button className="w-7 h-7" onClick={nextMonth}>
+            <FontAwesomeIcon icon={faChevronRight}/>
+          </button>
+        </div>
+      </div>
       <div className="grid grid-cols-7 gap-y-1 gap-x-3 p-3 min-w-[16rem]">
         {
           days.map((day, i) => (
