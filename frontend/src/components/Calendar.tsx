@@ -1,4 +1,5 @@
 import { PropsWithChildren, useState } from "react";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const ROW_COUNT = 6
@@ -60,8 +61,8 @@ function Tile({ className, children, blurred, date, selected, onClick }: Props) 
     <div
       className={`
     ${isSelected() && 'bg-[#81c5fc] bg-opacity-50'}
-    ${blurred && 'opacity-25'}
-    py-1.5 text-gray-700 text-sm font-medium w-8 flex flex-col items-center justify-center 
+    ${blurred && '!text-gray-500'}
+    py-1.5 text-gray-300 text-sm w-8 flex flex-col items-center justify-center 
     select-none hover:cursor-pointer rounded-md px-2 relative
     ${className}`}
       onClick={() => onClick && onClick()}
@@ -162,10 +163,10 @@ function Calendar() {
       {/*  <button onClick={getToToday}>Today</button>*/}
       {/*  <button onClick={nextMonth}>Next</button>*/}
       {/*</div>*/}
-      <div className="grid grid-cols-7 gap-1 shadow-md rounded-md p-3 pb-4 min-w-[16rem]">
+      <div className="grid grid-cols-7 gap-y-1 gap-x-3 p-3 min-w-[16rem]">
         {
           days.map((day, i) => (
-            <p key={i} className="text-gray-600 text-[0.6rem] font-bold text-center">
+            <p key={i} className="text-gray-400 text-[0.6rem] font-bold text-center mb-2">
               {day}
             </p>
           ))
