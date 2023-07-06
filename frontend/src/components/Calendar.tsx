@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -70,22 +70,10 @@ function Tile({ className, children, blurred, date, selected, onClick }: Props) 
     >
       {children}
       <div className="flex gap-0.5 absolute bottom-0.5">
-        {/*{*/}
-        {/*  [1,2,3].map((val, i) => {*/}
-        {/*    const rand = getRandomColor()*/}
-        {/*    const col = darkenColor(rand, 150)*/}
-        {/*    return (*/}
-        {/*      <div key={i} className={`rounded-full w-[0.2rem] h-[0.2rem] text-transparent`}*/}
-        {/*           style={{*/}
-        {/*             backgroundColor: col*/}
-        {/*           }}*/}
-        {/*      >i</div>*/}
-        {/*    )*/}
-        {/*  })*/}
-        {/*}*/}
-        {/*<div className="rounded-full bg-green-600 w-[0.25rem] h-[0.25rem] text-transparent">i</div>*/}
-        {/*<div className="rounded-full bg-blue-600 w-[0.25rem] h-[0.25rem] text-transparent">i</div>*/}
-        {/*<div className="rounded-full bg-red-600 w-[0.25rem] h-[0.25rem] text-transparent">i</div>*/}
+        <div className="rounded-full bg-green-600 w-1 h-1 text-transparent">i</div>
+        <div className="rounded-full bg-blue-600 w-1 h-1 text-transparent">i</div>
+        <div className="rounded-full bg-red-600 w-1 h-1 text-transparent">i</div>
+        {/*<div className="rounded-full text-[0.5rem] h-1 flex items-center pb-0.5">+</div>*/}
       </div>
     </div>
   )
@@ -95,6 +83,11 @@ function Calendar() {
   const [monthIdx, setMonthIdx] = useState(new Date().getMonth())
   const [year, setYear] = useState(new Date().getFullYear())
   const [selectedDate, setSelectedDate] = useState(new Date())
+
+  useEffect(() => {
+    console.log("year:", year, "\nmonth:", monthIdx)
+
+  }, [monthIdx, year])
 
   function clickOnDayPreviousMonth(day: number) {
     const _year = year - (monthIdx == 0 ? 1 : 0)
@@ -112,16 +105,20 @@ function Calendar() {
 
   function nextMonth() {
     if (monthIdx == 11) {
-      setYear(year + 1)
+      setYear(year => year + 1)
+      setMonthIdx(0)
+    } else {
+      setMonthIdx((monthIdx + 1) % 12)
     }
-    setMonthIdx((monthIdx + 1) % 12)
   }
 
   function previousMonth() {
     if (monthIdx == 0) {
-      setYear(year - 1)
+      setYear(year => year - 1)
+      setMonthIdx(11)
+    } else {
+      setMonthIdx((monthIdx - 1) % 12)
     }
-    setMonthIdx((monthIdx - 1) % 12)
   }
 
   function getFirstDayOfMonth() {
@@ -157,8 +154,8 @@ function Calendar() {
   const nextMonthDays = [...Array(daysToFill).keys()].map(i => i + 1)
 
   return (
-    <>
-      <div className="flex px-4 justify-between">
+    <div className="flex flex-col min-w-[5rem]">
+      <div className="flex px-4 justify-between [&>*]:whitespace-nowrap">
         <p className="text-white">{getMonthAndYear()}</p>
         <div className="flex gap-1 [&_*]:text-gray-300 [&_*]:text-sm [&_*]:bg-[#222222] [&_*]:rounded-md">
           <button className="w-7 h-7" onClick={previousMonth}>
@@ -172,7 +169,7 @@ function Calendar() {
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-7 gap-y-1 gap-x-3 p-3 min-w-[16rem]">
+      <div className="grid grid-cols-7 gap-y-1 gap-x-3 p-3">
         {
           days.map((day, i) => (
             <p key={i} className="text-gray-400 text-[0.6rem] font-bold text-center mb-2">
@@ -210,7 +207,7 @@ function Calendar() {
             ))
         }
       </div>
-    </>
+    </div>
   )
 }
 
