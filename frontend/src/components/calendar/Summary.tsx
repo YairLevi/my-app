@@ -21,7 +21,7 @@ export function Summary() {
           [...Array(24).keys()].map((v, i) => {
             const col = getRandomColor()
             return (
-              <div key={i} className="flex mb-2 gap-2">
+              <div key={`summary-item${i}`} className="flex mb-2 gap-2">
                 <div className="[&_*]:text-gray-500">
                   <div className="w-8 text-right">
                     <p className="font-semibold text-xs">{getHourOfDay(i)}</p>

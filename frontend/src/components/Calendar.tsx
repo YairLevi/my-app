@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren, useState } from "react";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -79,15 +79,10 @@ function Tile({ className, children, blurred, date, selected, onClick }: Props) 
   )
 }
 
-function Calendar() {
+export function Calendar() {
   const [monthIdx, setMonthIdx] = useState(new Date().getMonth())
   const [year, setYear] = useState(new Date().getFullYear())
   const [selectedDate, setSelectedDate] = useState(new Date())
-
-  useEffect(() => {
-    console.log("year:", year, "\nmonth:", monthIdx)
-
-  }, [monthIdx, year])
 
   function clickOnDayPreviousMonth(day: number) {
     const _year = year - (monthIdx == 0 ? 1 : 0)
@@ -210,5 +205,3 @@ function Calendar() {
     </div>
   )
 }
-
-export default Calendar

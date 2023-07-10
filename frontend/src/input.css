@@ -48,3 +48,12 @@
     background-clip: padding-box;
     border: 3px solid var(--primary);
 }
+
+
+/**
+    Stuff for the React Grid Layout library.
+ */
+.react-grid-placeholder {
+    background-color: gray !important;
+    opacity: 20% !important;
+}
