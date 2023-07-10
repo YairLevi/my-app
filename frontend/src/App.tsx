@@ -2,7 +2,6 @@ import './input.css'
 import {Sidebar} from "@/components/Sidebar";
 import Calendar from "@/components/Calendar";
 import {Summary} from "@/components/calendar/Summary";
-import '@/components/style.css'
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import {Responsive, WidthProvider} from 'react-grid-layout';
@@ -32,6 +31,10 @@ function getByAMPM(number: number, offset = 0) {
   return `${hour} ${suffix}`
 }
 
+function prefixZero(num: number): string {
+  return num < 10 ? `0${num}` : `${num}`
+}
+
 export default function App() {
   const onLayoutChange = (newLayout: any) => {
     // Handle layout changes here if needed
@@ -47,18 +50,25 @@ export default function App() {
   const rowHeightInRem = 2.5;
   const rowHeightInPixels = remToPixels(rowHeightInRem);
 
+  const startHour = new Date(2020, 1, 1).getHours()
+  const startMinute = new Date(2020, 1, 1).getMinutes()
 
   return (
     <div className="flex h-screen bg-[#1a1c22] overflow-hidden">
       <Sidebar/>
       <div className="h-full w-full overflow-auto flex [&_*]:text-sm [&_*]:text-white">
-        <div className="h-fit">
-          <div className="px-4 py-2 bg-slate-800 text-center w-20">Hour</div>
+        <div className="h-fit pt-2">
+          <div className="px-4 py-2 text-center w-20 !text-transparent">empty</div>
           {
             [...new Array(24).keys()].map((val, i) => (
-              <div key={i} className={`px-4 py-2 h-10 bg-slate-800 text-center ${i == 0 && 'bg-red-950'}`}>
-                {getByAMPM(i)}
-              </div>
+              <>
+                <div key={i} className="h-8 text-center !text-xs">
+                  {prefixZero(startHour + val)}:{prefixZero(startMinute)}
+                </div>
+                <div key={i} className="h-8 !text-gray-600 text-center !text-xs">
+                  {prefixZero(startHour + val)}:{prefixZero(startMinute + 30)}
+                </div>
+              </>
             ))
           }
         </div>
@@ -66,18 +76,21 @@ export default function App() {
           <div className="flex w-full h-full">
             {
               daysFullNames.map((val, i) => (
-                <div key={i} className="px-4 py-2 bg-slate-900 text-center min-w-[7rem] w-full">{val}</div>
+                <div key={i} className="px-4 py-2 text-center min-w-[7rem] w-full">{val}</div>
               ))
             }
           </div>
-          <div className="w-full h-full relative">
-            <div className="bg-gray-900 bg-opacity-20 w-full min-h-full absolute">
+          <div className="w-full h-full relative pt-4">
+            <div className="bg-opacity-20 w-full min-h-full absolute">
               {
-                [...new Array(24).keys()].map((val, i) => (
+                [...new Array(24 * 2).keys()].map((val, i) => (
                   <div className="flex">
                     {
-                      [...new Array(7).keys()].map((val, i) => (
-                        <div key={i} className="h-10 min-w-[7rem] w-full border-b border-b-gray-800 border-r border-r-gray-700"/>
+                      [...new Array(7).keys()].map((val, j) => (
+                        <div key={j}
+                             className={`h-8 min-w-[7rem] w-full border-b border-b-gray-800 
+                             border-r border-r-gray-700 ${i == 0 && 'border-t border-t-gray-800'}`}
+                        />
                       ))
                     }
                   </div>
@@ -85,23 +98,23 @@ export default function App() {
               }
             </div>
             <ResponsiveGridLayout
-              className="layout bg-gray-700 bg-opacity-20 h-full w-full min-w-[49rem]"
+              className="layout bg-opacity-20 h-full w-full min-w-[49rem]"
               breakpoints={{lg: 1200}}
               preventCollision={true}
               cols={{'lg': 7}}
-              rowHeight={rowHeightInPixels}
+              rowHeight={rowHeightInPixels * 0.4}
               onLayoutChange={onLayoutChange}
               resizeHandles={['s']}
-              maxRows={24}
+              maxRows={24 * 4}
               verticalCompact={false}
               isBounded={true}
               margin={[0, 0]}
             >
-              <div key="item1" className="bg-red-200 hover:cursor-grab active:cursor-grabbing"
+              <div key="item1" className="bg-black hover:cursor-grab active:cursor-grabbing"
                    data-grid={{w: 1, h: 1, x: 0, y: 0}}>
                 Item 1
               </div>
-              <div key="item2" className="bg-red-200 hover:cursor-grab active:cursor-grabbing"
+              <div key="item2" className="bg-black hover:cursor-grab active:cursor-grabbing"
                    data-grid={{w: 1, h: 2, x: 1, y: 2}}>
                 Item 2
               </div>
@@ -110,7 +123,7 @@ export default function App() {
                 This is the top item, hidden, to stretch the grid.
               </div>
               <div key="item-bottom" className="hidden"
-                   data-grid={{w: 0, h: 0, x: 0, y: 24, isResizable: false, isDraggable: false, static: true}}>
+                   data-grid={{w: 0, h: 0, x: 0, y: 24 * 4, isResizable: false, isDraggable: false, static: true}}>
                 This is the bottom item, hidden, to stretch the grid.
               </div>
             </ResponsiveGridLayout>
