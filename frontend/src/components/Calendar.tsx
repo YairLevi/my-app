@@ -6,32 +6,7 @@ const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const ROW_COUNT = 6
 const COL_COUNT = 7
 
-function darkenColor(color: string, brightnessThreshold: number) {
-  // Remove the "#" symbol and convert the color to RGB
-  const hex = color.substring(1);
-  const red = parseInt(hex.substring(0, 2), 16);
-  const green = parseInt(hex.substring(2, 4), 16);
-  const blue = parseInt(hex.substring(4, 6), 16);
 
-  // Calculate the brightness level using the formula: (0.299 * R) + (0.587 * G) + (0.114 * B)
-  const brightness = (0.299 * red) + (0.587 * green) + (0.114 * blue);
-
-  // Check if the brightness level is above the threshold
-  if (brightness > brightnessThreshold) {
-    // Darken the color by reducing the RGB values
-    const darkenedRed = Math.round(red * 0.8);
-    const darkenedGreen = Math.round(green * 0.8);
-    const darkenedBlue = Math.round(blue * 0.8);
-
-    // Convert the darkened RGB values back to hexadecimal
-    const darkenedHex = `#${darkenedRed.toString(16)}${darkenedGreen.toString(16)}${darkenedBlue.toString(16)}`;
-
-    return darkenedHex;
-  }
-
-  // Return the original color if the brightness is below or equal to the threshold
-  return color;
-}
 
 function getRandomColor() {
   let letters = '0123456789ABCDEF';
@@ -61,15 +36,15 @@ function Tile({ className, children, blurred, date, selected, onClick }: Props) 
   return (
     <div
       className={`
-    ${isSelected() && 'bg-[#81c5fc] bg-opacity-50'}
+    ${isSelected() && 'bg-white bg-opacity-20'}
     ${blurred && '!text-gray-500'}
-    py-1.5 text-gray-300 text-sm w-8 flex flex-col items-center justify-center 
+    py-1.5 text-gray-300 text-xs w-8 flex flex-col items-center justify-center 
     select-none hover:cursor-pointer rounded-md px-2 relative
     ${className}`}
       onClick={() => onClick && onClick()}
     >
       {children}
-      <div className="flex gap-0.5 absolute bottom-0.5">
+      <div className="flex gap-0.5 absolute bottom-0">
         <div className="rounded-full bg-green-600 w-1 h-1 text-transparent">i</div>
         <div className="rounded-full bg-blue-600 w-1 h-1 text-transparent">i</div>
         <div className="rounded-full bg-red-600 w-1 h-1 text-transparent">i</div>
@@ -164,7 +139,7 @@ export function Calendar() {
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-7 gap-y-1 gap-x-3 p-3">
+      <div className="grid grid-cols-7 gap-y-1 p-3 place-items-center">
         {
           days.map((day, i) => (
             <p key={i} className="text-gray-400 text-[0.6rem] font-bold text-center mb-2">

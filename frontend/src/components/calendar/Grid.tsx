@@ -1,27 +1,29 @@
 import { daysFullNames, prefixZero } from "../../time";
 import { Tile } from "@/components/calendar/Tile";
 import { getGridPosition, remToPixels } from "../../grid";
-import { useEffect, useState } from "react";
-import { events } from "../../mock/mockEvents";
+import { Event } from "../../mock/mockEvents";
 import { Responsive, WidthProvider } from "react-grid-layout";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 function getRandomColor() {
-  let letters = '0123456789ABCDEF';
-  let color = '#';
+  let letters = '0123456789ABCDEF'
+  let color = '#'
   for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * letters.length)];
+    color += letters[Math.floor(Math.random() * letters.length)]
   }
-  return color;
+  return color
 }
 
-export function Grid() {
-  const [_events, setEvents] = useState([...events])
+interface Props {
+  events: Event[]
+}
+
+export function Grid({events}: Props) {
 
   const onLayoutChange = (newLayout: any) => {
     // Handle layout changes here if needed
-    // console.log(newLayout);
+    // console.log(newLayout)
   }
 
   const numberOfRowsInRem = 4;
@@ -80,7 +82,7 @@ export function Grid() {
           </div>
           <ResponsiveGridLayout
             className="h-full w-full min-w-[49rem]"
-            breakpoints={{lg: 1200}}
+            breakpoints={{lg: 1200, }}
             width={500}
             preventCollision={true}
             cols={{'lg': 7}}
@@ -91,12 +93,9 @@ export function Grid() {
             compactType={null}
             isBounded={true}
             margin={[0, 0]}
-            onWidthChange={(containerWidth, margin, cols, containerPadding) => {
-              console.table({containerWidth, margin, cols, containerPadding})
-            }}
           >
             {
-              _events.map((event, i) => (
+              events.map((event, i) => (
                 <Tile
                   key={`${i}`}
                   start={event.startDate}

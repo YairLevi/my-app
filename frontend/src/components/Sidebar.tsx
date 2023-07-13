@@ -13,7 +13,9 @@ interface ItemProps {
 function SidebarItem({ text, open, icon }: ItemProps) {
   return (
     <div className={`rounded-lg flex items-center gap-3 hover:bg-white hover:bg-opacity-10 duration-100
-       select-none [&_*]:duration-200 py-1.5 my-1 px-3.5 overflow-hidden hover:cursor-pointer`}
+       select-none [&_*]:duration-200 py-1.5 my-1 px-3.5 overflow-hidden hover:cursor-pointer
+       after:w-10 after:h-10 after:bg-red-200 after:visible after:hidden
+       `}
     >
       {icon && <FontAwesomeIcon icon={icon} className={`${!open && 'ml-[1px]'} duration-200 text-xl`}/>}
       <p className={`${!open && '!text-transparent'} text-sm duration-200`}>{text}</p>
