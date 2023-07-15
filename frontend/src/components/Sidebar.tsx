@@ -27,10 +27,22 @@ export function Sidebar() {
   const [open, setOpen] = useState(true)
   const searchRef = useRef<HTMLInputElement>(null)
   const [openedSearch, setOpenSearch] = useState(false)
-
+  
   useEffect(() => {
     searchRef.current && searchRef.current.focus()
   }, [openedSearch])
+
+  useEffect(() => {
+    const SIDEBAR_ANIMATION_DURATION = 200
+
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'))
+    }, SIDEBAR_ANIMATION_DURATION)
+  }, [open])
+
+  function toggleSidebar() {
+    setOpen(!open)
+  }
 
   return (
     <div
@@ -38,7 +50,7 @@ export function Sidebar() {
       group duration-200 bg-[#0f0f11]  [&_*]:text-[#ceced0] h-screen px-2 py-2 flex flex-col relative group`}>
       <button
         className="absolute z-[-1] bg-[#0f0f11] rounded-md rounded-l-none p-1 px-2 pl-2.5 group-hover:z-20 group-hover:right-[-2rem]"
-        onClick={() => setOpen(!open)}>
+        onClick={toggleSidebar}>
         <FontAwesomeIcon
           icon={open ? faChevronLeft : faChevronRight}
           className={`mx-0.5`}
