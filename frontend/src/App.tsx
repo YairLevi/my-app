@@ -28,7 +28,7 @@ export default function App() {
               Add Event
             </button>
           </div>
-          <Grid events={_events} setEvents={setEvents}/>
+          <Grid />
         </div>
       </div>
       <div className="max-w-fit min-w-fit h-full bg-[#1a1c22] flex flex-col py-3">

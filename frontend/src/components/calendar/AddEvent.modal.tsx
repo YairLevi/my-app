@@ -2,15 +2,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import React, { useRef, useState } from "react";
 import { Event } from "../../mock/mockEvents";
+import { useEvents } from "@/contexts/EventsContext";
 
 interface Props {
   open: boolean
   onClose: () => void
-  addEvent: (event: Event) => void
-  events: Event[]
 }
 
-export function AddEventModal({ open, onClose, addEvent, events }: Props) {
+export function AddEventModal({ open, onClose }: Props) {
+  const { events, addEvent } = useEvents()
+
   const startDateRef = useRef<HTMLInputElement>(null)
   const endDateRef = useRef<HTMLInputElement>(null)
   const titleRef = useRef<HTMLInputElement>(null)
@@ -66,7 +67,7 @@ export function AddEventModal({ open, onClose, addEvent, events }: Props) {
       startDate: start,
       endDate: end,
       color: "0",
-      id: 1
+      id: events.length + 1
     }
 
 

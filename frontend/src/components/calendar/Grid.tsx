@@ -1,24 +1,19 @@
 import { daysFullNames, getWeekDays, prefixZero } from "../../time";
 import { Tile } from "@/components/calendar/Tile";
 import { getGridPosition, rowHeightInPixels } from "../../grid";
-import { Event } from "../../mock/mockEvents";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
-import { useCalendar } from "../../contexts/DateContext";
-import { Dispatch, SetStateAction } from "react";
+import { useCalendar } from "@/contexts/DateContext";
+import { useEvents } from "@/contexts/EventsContext";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-interface Props {
-  events: Event[],
-  setEvents: Dispatch<SetStateAction<Event[]>>
-}
-
-export function Grid({ events, setEvents }: Props) {
+export function Grid() {
   const { date } = useCalendar()
+  const { events, addEvent, updateEvent } = useEvents()
   const weekDays = getWeekDays(date)
 
   const resizeHandler: ItemCallback = (layout, oldItem, newItem, placeholder, event, element) => {
-    const i = newItem.i
+    const i = Number(newItem.i)
     const startHour = Math.floor(newItem.y * 15 / 60) % 24
     const startMinute = (newItem.y % 4) * 15
     let endHour = Math.floor((newItem.y + newItem.h) * 15 / 60) % 24
@@ -30,17 +25,28 @@ export function Grid({ events, setEvents }: Props) {
     }
 
     const day = weekDays[newItem.x]
-    const currEvent = events.find(ev => `${ev.id}` == i)!
+    const currEvent = events.find(ev => ev.id == i)!
 
-    const newEvents = events.filter(ev => `${ev.id}` != i)
-    newEvents.push({
+    const updatedEvent = {
       id: Number(i),
       color: currEvent.color,
       title: currEvent.title,
       startDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), startHour, startMinute),
       endDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), endHour, endMinute),
-    })
-    setEvents(newEvents)
+    }
+
+    updateEvent(i, updatedEvent)
+
+
+    // const newEvents = events.filter(ev => `${ev.id}` != i)
+    // newEvents.push({
+    //   id: Number(i),
+    //   color: currEvent.color,
+    //   title: currEvent.title,
+    //   startDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), startHour, startMinute),
+    //   endDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), endHour, endMinute),
+    // })
+    // setEvents(newEvents)
   }
 
   return (
