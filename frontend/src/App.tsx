@@ -38,8 +38,6 @@ export default function App() {
       <AddEventModal
         open={open}
         onClose={onClose}
-        events={_events}
-        addEvent={(event) => setEvents(p => [...p, event])}
       />
     </div>
   )

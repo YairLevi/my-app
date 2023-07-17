@@ -4,13 +4,35 @@ import { getGridPosition, rowHeightInPixels } from "../../grid";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { useCalendar } from "@/contexts/DateContext";
 import { useEvents } from "@/contexts/EventsContext";
+import { useEffect, useRef, useState } from "react";
+import { Keys, useKeybind } from "../../hooks/useKeybind";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 export function Grid() {
   const { date } = useCalendar()
-  const { events, addEvent, updateEvent } = useEvents()
+  const { events, addEvent, updateEvent, deleteEvent } = useEvents()
   const weekDays = getWeekDays(date)
+
+  // need both ref => for persistence of value in event listeners
+  // and need state => for UI change detection.
+  const selectedRef = useRef<number>(-1)
+  const [selectedId, setSelectedId] = useState(-1)
+
+  useKeybind(() => {
+    if (selectedRef.current != -1) {
+      deleteEvent(selectedRef.current)
+    }
+  }, [Keys.delete], [Keys.backspace])
+
+  useEffect(() => {
+    function onClickHandle() {
+      selectedRef.current = -1
+    }
+
+    window.addEventListener('click', onClickHandle)
+    return () => window.removeEventListener('click', onClickHandle)
+  }, [])
 
   const resizeHandler: ItemCallback = (layout, oldItem, newItem, placeholder, event, element) => {
     const i = Number(newItem.i)
@@ -118,12 +140,19 @@ export function Grid() {
                 .filter(event => weekDays.some(day => day.toDateString() == event.startDate.toDateString()))
                 .map(event => (
                   <Tile
+                    tileId={event.id}
+                    selectedId={selectedId}
                     key={`${event.id}`}
                     start={event.startDate}
                     end={event.endDate}
                     data-grid={getGridPosition(event.startDate, event.endDate)}
                     title={event.title}
                     color={event.color}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      selectedRef.current = event.id
+                      setSelectedId(event.id)
+                    }}
                   />
                 ))
             }

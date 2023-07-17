@@ -5,6 +5,7 @@ type Exports = {
   events: Event[]
   addEvent: (newEvent: Event) => void
   updateEvent: (id: number, updatedEvent: Event) => void
+  deleteEvent: (id: number) => void
 }
 
 const EventsContext = createContext<Exports>({} as Exports)
@@ -26,10 +27,15 @@ export function EventsProvider({ children }: PropsWithChildren) {
     setEvents(newEventList)
   }
 
+  function deleteEvent(id: number) {
+    setEvents(prev => prev.filter(event => event.id != id))
+  }
+
   const value = {
     events,
     addEvent,
-    updateEvent
+    updateEvent,
+    deleteEvent
   }
 
   return (
