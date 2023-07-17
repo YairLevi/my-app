@@ -8,7 +8,6 @@ import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
 import { AddEventModal } from "@/components/calendar/AddEvent.modal";
-import { Button } from "@/components/Button";
 
 
 export default function App() {
@@ -28,9 +27,8 @@ export default function App() {
             >
               Add Event
             </button>
-            <Button onClick={() => console.log('hi')} color={'#ce1717'}>Hello</Button>
           </div>
-          <Grid events={_events}/>
+          <Grid events={_events} setEvents={setEvents}/>
         </div>
       </div>
       <div className="max-w-fit min-w-fit h-full bg-[#1a1c22] flex flex-col py-3">

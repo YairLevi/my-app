@@ -5,6 +5,10 @@ export interface GridPosition {
   h: number
 }
 
+export const numberOfRowsInRem = 4;
+export const rowHeightInRem = 2.5;
+export const rowHeightInPixels = remToPixels(rowHeightInRem);
+
 export function getGridPosition(startDate: Date, endDate: Date) {
   const x = startDate.getDay()
 
@@ -23,7 +27,7 @@ export function getGridPosition(startDate: Date, endDate: Date) {
   return {x, y, w, h}
 }
 
-export const remToPixels = (remValue: number) => {
+export function remToPixels(remValue: number) {
   const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
   return remValue * rootFontSize;
 }
@@ -41,4 +45,13 @@ function calculateY(currentTime: Date) {
   const timeDifferenceMs = currentTime.getTime() - startOfDay.getTime()
   const minutesPassed = Math.floor(timeDifferenceMs / 1000 / 60);
   return Math.floor(minutesPassed / 15)
+}
+
+export function getRandomColor() {
+  let letters = '0123456789ABCDEF'
+  let color = '#'
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * letters.length)]
+  }
+  return color
 }

@@ -16,6 +16,16 @@ export function prefixZero(num: number): string {
   return num < 10 ? `0${num}` : `${num}`
 }
 
+export function getWeekDays(date: Date) {
+  const week = []
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(date)
+    d.setDate(d.getDate() + i - date.getDay())
+    week.push(d)
+  }
+  return week
+}
+
 export const daysFullNames = [
   'Sunday',
   'Monday',

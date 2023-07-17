@@ -61,11 +61,14 @@ export function AddEventModal({ open, onClose, addEvent, events }: Props) {
 
     const start = new Date(startDateRef.current!.value)
     const end = new Date(endDateRef.current!.value)
-    const newEvent = {
+    const newEvent: Event = {
       title: titleRef.current!.value,
       startDate: start,
-      endDate: end
+      endDate: end,
+      color: "0",
+      id: 1
     }
+
 
     if (doesOverlapOtherEvent(newEvent))
       return setError("Overlap detected. Try again")
@@ -81,7 +84,7 @@ export function AddEventModal({ open, onClose, addEvent, events }: Props) {
     >
       <div
         onClick={e => e.stopPropagation()}
-        className={`p-5 bg-[#17191f] shadow-xl rounded-lg w-1/4 min-w-[20rem] h-fit duration-150 ease-out ${open ? 'scale-100' : 'scale-50'} [&_*]:text-gray-200`}
+        className={`p-5 bg-[#17191f] shadow-xl rounded-lg w-1/4 min-w-[20rem] h-fit duration-100 ease-out ${open ? 'scale-100' : 'scale-50'} [&_*]:text-gray-200`}
       >
         <header className="flex justify-between items-center">
           <h1 className="text-lg">New Event</h1>

@@ -1,51 +1,60 @@
-import { daysFullNames, prefixZero } from "../../time";
+import { daysFullNames, getWeekDays, prefixZero } from "../../time";
 import { Tile } from "@/components/calendar/Tile";
-import { getGridPosition, remToPixels } from "../../grid";
+import { getGridPosition, rowHeightInPixels } from "../../grid";
 import { Event } from "../../mock/mockEvents";
-import { Responsive, WidthProvider } from "react-grid-layout";
+import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
+import { useCalendar } from "../../contexts/DateContext";
+import { Dispatch, SetStateAction } from "react";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-function getRandomColor() {
-  let letters = '0123456789ABCDEF'
-  let color = '#'
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * letters.length)]
-  }
-  return color
-}
-
 interface Props {
-  events: Event[]
+  events: Event[],
+  setEvents: Dispatch<SetStateAction<Event[]>>
 }
 
-export function Grid({events}: Props) {
+export function Grid({ events, setEvents }: Props) {
+  const { date } = useCalendar()
+  const weekDays = getWeekDays(date)
 
-  const onLayoutChange = (newLayout: any) => {
-    // Handle layout changes here if needed
-    // console.log(newLayout)
+  const resizeHandler: ItemCallback = (layout, oldItem, newItem, placeholder, event, element) => {
+    const i = newItem.i
+    const startHour = Math.floor(newItem.y * 15 / 60) % 24
+    const startMinute = (newItem.y % 4) * 15
+    let endHour = Math.floor((newItem.y + newItem.h) * 15 / 60) % 24
+    let endMinute = ((newItem.y + newItem.h) % 4) * 15
+
+    if (endHour == 0 && endMinute == 0) {
+      endHour = 23
+      endMinute = 45
+    }
+
+    const day = weekDays[newItem.x]
+    const currEvent = events.find(ev => `${ev.id}` == i)!
+
+    const newEvents = events.filter(ev => `${ev.id}` != i)
+    newEvents.push({
+      id: Number(i),
+      color: currEvent.color,
+      title: currEvent.title,
+      startDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), startHour, startMinute),
+      endDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), endHour, endMinute),
+    })
+    setEvents(newEvents)
   }
-
-  const numberOfRowsInRem = 4;
-  const rowHeightInRem = 2.5;
-  const rowHeightInPixels = remToPixels(rowHeightInRem);
-
-  const startHour = new Date(2020, 1, 1).getHours()
-  const startMinute = new Date(2020, 1, 1).getMinutes()
-
 
   return (
     <div className="h-full w-full overflow-auto flex [&_*]:text-sm [&_*]:text-white">
       <div className="h-fit pt-2">
-        <div className="px-4 py-2 text-center w-20 !text-transparent">empty</div>
+        <div className="px-4 py-2 mt-4 text-center w-20 !text-transparent">empty</div>
         {
           [...new Array(24).keys()].map((val, i) => (
             <>
               <div key={`time${i}`} className="h-8 text-center !text-xs">
-                {prefixZero(startHour + val)}:{prefixZero(startMinute)}
+                {prefixZero(val)}:00
               </div>
               <div key={`time-half${i}`} className="h-8 !text-gray-600 text-center !text-xs">
-                {prefixZero(startHour + val)}:{prefixZero(startMinute + 30)}
+                {prefixZero(val)}:30
               </div>
             </>
           ))
@@ -54,8 +63,11 @@ export function Grid({events}: Props) {
       <div className="h-fit w-full relative">
         <div className="flex w-full h-full">
           {
-            daysFullNames.map((day, i) => (
-              <div key={`day-names${i}`} className="px-4 py-2 text-center min-w-[7rem] w-full">{day}</div>
+            weekDays.map((day, i) => (
+              <div key={`day-names${i}`} className={`px-4 py-2 text-center min-w-[7rem] w-full ${date.getDay() == i && 'bg-gray-700 rounded-lg'}`}>
+                <p className="!text-xs !text-gray-400">{day.toDateString().split(' ')[1]} {day.getDate()}</p>
+                <p>{daysFullNames[day.getDay()]}</p>
+              </div>
             ))
           }
         </div>
@@ -82,29 +94,32 @@ export function Grid({events}: Props) {
           </div>
           <ResponsiveGridLayout
             className="h-full w-full min-w-[49rem]"
-            breakpoints={{lg: 1200, }}
+            breakpoints={{ lg: 1200, }}
             width={500}
             preventCollision={true}
-            cols={{'lg': 7}}
+            cols={{ 'lg': 7 }}
             rowHeight={rowHeightInPixels * 0.4}
-            onLayoutChange={onLayoutChange}
             resizeHandles={['n', 's']}
             maxRows={24 * 4}
             compactType={null}
             isBounded={true}
             margin={[0, 0]}
+            onResize={resizeHandler}
+            onDrag={resizeHandler}
           >
             {
-              events.map((event, i) => (
-                <Tile
-                  key={`${i}`}
-                  start={event.startDate}
-                  end={event.endDate}
-                  data-grid={getGridPosition(event.startDate, event.endDate)}
-                  title={event.title}
-                  color={getRandomColor()}
-                />
-              ))
+              events
+                .filter(event => weekDays.some(day => day.toDateString() == event.startDate.toDateString()))
+                .map(event => (
+                  <Tile
+                    key={`${event.id}`}
+                    start={event.startDate}
+                    end={event.endDate}
+                    data-grid={getGridPosition(event.startDate, event.endDate)}
+                    title={event.title}
+                    color={event.color}
+                  />
+                ))
             }
             <div key="item-top" className="hidden"
                  data-grid={{

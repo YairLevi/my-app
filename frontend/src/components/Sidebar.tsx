@@ -27,7 +27,7 @@ export function Sidebar() {
   const [open, setOpen] = useState(true)
   const searchRef = useRef<HTMLInputElement>(null)
   const [openedSearch, setOpenSearch] = useState(false)
-  
+
   useEffect(() => {
     searchRef.current && searchRef.current.focus()
   }, [openedSearch])

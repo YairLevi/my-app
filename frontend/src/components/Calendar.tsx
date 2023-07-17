@@ -1,36 +1,24 @@
 import { PropsWithChildren, useState } from "react";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useCalendar } from "../contexts/DateContext";
 
-const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const ROW_COUNT = 6
 const COL_COUNT = 7
 
-
-
-function getRandomColor() {
-  let letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * letters.length)];
-  }
-  return color;
-}
-
 interface Props extends PropsWithChildren {
-  className?: string
   blurred?: boolean
-  date?: Date
-  selected?: Date
-  onClick?: () => void
+  date: Date
+  selected: Date
+  onClick: () => void
 }
 
-function Tile({ className, children, blurred, date, selected, onClick }: Props) {
+function Tile({ children, blurred, date, onClick }: Props) {
+  const { setDate: changeDate, date: selected } = useCalendar()
+
   function isSelected() {
-    if (!date || !selected) return false
-    return selected?.getFullYear() == date?.getFullYear()
-      && selected?.getMonth() == date?.getMonth()
-      && selected?.getDate() == date?.getDate()
+    return selected.toDateString() == date.toDateString()
   }
 
   return (
@@ -39,9 +27,11 @@ function Tile({ className, children, blurred, date, selected, onClick }: Props) 
     ${isSelected() && 'bg-white bg-opacity-20'}
     ${blurred && '!text-gray-500'}
     py-1.5 text-gray-300 text-xs w-8 flex flex-col items-center justify-center 
-    select-none hover:cursor-pointer rounded-md px-2 relative
-    ${className}`}
-      onClick={() => onClick && onClick()}
+    select-none hover:cursor-pointer rounded-md px-2 relative`}
+      onClick={() => {
+        onClick && onClick()
+        changeDate(date)
+      }}
     >
       {children}
       <div className="flex gap-0.5 absolute bottom-0">
@@ -54,26 +44,28 @@ function Tile({ className, children, blurred, date, selected, onClick }: Props) 
   )
 }
 
+
 export function Calendar() {
   const [monthIdx, setMonthIdx] = useState(new Date().getMonth())
   const [year, setYear] = useState(new Date().getFullYear())
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const { date, setDate: changeDate } = useCalendar()
+  const [selectedDate, setSelectedDate] = useState(date)
 
   function clickOnDayPreviousMonth(day: number) {
     const _year = year - (monthIdx == 0 ? 1 : 0)
     const _monthIdx = (monthIdx - 1) % 12
-    previousMonth()
+    moveToPreviousMonth()
     setSelectedDate(new Date(_year, _monthIdx, day))
   }
 
   function clickOnDayNextMonth(day: number) {
     const _year = year + (monthIdx == 11 ? 1 : 0)
     const _monthIdx = (monthIdx + 1) % 12
-    nextMonth()
+    moveToNextMonth()
     setSelectedDate(new Date(_year, _monthIdx, day))
   }
 
-  function nextMonth() {
+  function moveToNextMonth() {
     if (monthIdx == 11) {
       setYear(year => year + 1)
       setMonthIdx(0)
@@ -82,7 +74,7 @@ export function Calendar() {
     }
   }
 
-  function previousMonth() {
+  function moveToPreviousMonth() {
     if (monthIdx == 0) {
       setYear(year => year - 1)
       setMonthIdx(11)
@@ -99,7 +91,7 @@ export function Calendar() {
   function getToToday() {
     setYear(new Date().getFullYear())
     setMonthIdx(new Date().getMonth())
-    setSelectedDate(new Date())
+    changeDate(new Date())
   }
 
   function getMonthAndYear() {
@@ -111,8 +103,7 @@ export function Calendar() {
   function getNumberOfDaysInMonth(month: number) {
     const today = new Date();
     const year = today.getFullYear();
-    const lastDay = new Date(year, month + 1, 0).getDate();
-    return lastDay;
+    return new Date(year, month + 1, 0).getDate();
   }
 
   const lastMonthDay = getNumberOfDaysInMonth((monthIdx - 1) % 12)
@@ -126,22 +117,24 @@ export function Calendar() {
   return (
     <div className="flex flex-col min-w-[5rem]">
       <div className="flex px-4 justify-between [&>*]:whitespace-nowrap">
-        <p className="text-white">{getMonthAndYear()}</p>
+        <p className="text-white">
+          {getMonthAndYear()}
+        </p>
         <div className="flex gap-1 [&_*]:text-gray-300 [&_*]:text-sm [&_*]:bg-[#222222] [&_*]:rounded-md">
-          <button className="w-7 h-7" onClick={previousMonth}>
+          <button className="w-7 h-7 !text-xs" onClick={moveToPreviousMonth}>
             <FontAwesomeIcon icon={faChevronLeft}/>
           </button>
           <button className="px-2" onClick={getToToday}>
             Today
           </button>
-          <button className="w-7 h-7" onClick={nextMonth}>
+          <button className="w-7 h-7 !text-xs" onClick={moveToNextMonth}>
             <FontAwesomeIcon icon={faChevronRight}/>
           </button>
         </div>
       </div>
       <div className="grid grid-cols-7 gap-y-1 p-3 place-items-center">
         {
-          days.map((day, i) => (
+          DAYS.map((day, i) => (
             <p key={i} className="text-gray-400 text-[0.6rem] font-bold text-center mb-2">
               {day}
             </p>
@@ -149,9 +142,19 @@ export function Calendar() {
         }
         {
           previousMonthDays
-            .map((val, i) => (
-              <Tile key={i} blurred onClick={() => clickOnDayPreviousMonth(val)}>
-                {val}
+            .map((day, i) => (
+              <Tile
+                key={i}
+                blurred
+                selected={selectedDate}
+                date={new Date(
+                  monthIdx == 0 ? year - 1 : year,
+                  monthIdx == 0 ? 11 : monthIdx - 1,
+                  day
+                )}
+                onClick={() => clickOnDayPreviousMonth(day)}
+              >
+                {day}
               </Tile>
             ))
         }
@@ -170,9 +173,19 @@ export function Calendar() {
         }
         {
           nextMonthDays
-            .map((val, i) => (
-              <Tile key={i} blurred onClick={() => clickOnDayNextMonth(val)}>
-                {val}
+            .map((day, i) => (
+              <Tile
+                key={i}
+                blurred
+                selected={selectedDate}
+                date={new Date(
+                  monthIdx == 11 ? year + 1 : year,
+                  monthIdx == 11 ? 0 : monthIdx + 1,
+                  day
+                )}
+                onClick={() => clickOnDayNextMonth(day)}
+              >
+                {day}
               </Tile>
             ))
         }

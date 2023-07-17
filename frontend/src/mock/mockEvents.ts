@@ -1,23 +1,31 @@
 export interface Event {
+  id: number
   startDate: Date
   endDate: Date
   title: string
+  color: string
 }
 
 export const events: Event[] = [
   {
+    id: 1,
     title: "Meeting with friends",
-    startDate: new Date(2023, 6, 9, 14, 30),
-    endDate: new Date(2023, 6, 9, 18, 30),
+    startDate: new Date(2023, 6, 18, 8, 30),
+    endDate: new Date(2023, 6, 18, 12, 30),
+    color: "#0000ff"
   },
   {
+    id: 2,
     title: "Work on project",
-    startDate: new Date(2023, 6, 9, 9, 15),
-    endDate: new Date(2023, 6, 9, 11, 45),
+    startDate: new Date(2023, 6, 17, 3, 15),
+    endDate: new Date(2023, 6, 17, 5, 45),
+    color: "#00ff00"
   },
   {
+    id: 3,
     title: "Meditate",
-    startDate: new Date(2023, 6, 10, 7, 30),
-    endDate: new Date(2023, 6, 10, 8, 30),
+    startDate: new Date(2023, 6, 17, 1, 30),
+    endDate: new Date(2023, 6, 17, 2, 30),
+    color: "#ff0000"
   },
 ]
