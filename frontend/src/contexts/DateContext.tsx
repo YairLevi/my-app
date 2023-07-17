@@ -2,7 +2,7 @@ import React, { createContext, PropsWithChildren, useContext, useState } from "r
 
 type Exports = {
   date: Date
-  setDate: React.Dispatch<React.SetStateAction<Date>>
+  setDate: (newDate: Date) => void
 }
 
 const DateContext = createContext<Exports>({} as Exports)
@@ -12,7 +12,11 @@ export function useCalendar() {
 }
 
 export function CalendarProvider({ children }: PropsWithChildren) {
-  const [date, setDate] = useState(new Date())
+  const [date, changeDate] = useState(new Date())
+
+  function setDate(newDate: Date) {
+    changeDate(newDate)
+  }
 
   const value = {
     date,

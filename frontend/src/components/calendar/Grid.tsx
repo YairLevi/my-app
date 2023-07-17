@@ -16,18 +16,23 @@ export function Grid() {
 
   // need both ref => for persistence of value in event listeners
   // and need state => for UI change detection.
-  const selectedRef = useRef<number>(-1)
-  const [selectedId, setSelectedId] = useState(-1)
+  const NON_SELECTED = -1
+  const selectedRef = useRef<number>(NON_SELECTED)
+  const [selectedId, setSelectedId] = useState(NON_SELECTED)
+
+  function updateSelected(id: number) {
+    selectedRef.current = id
+    setSelectedId(id)
+  }
 
   useKeybind(() => {
-    if (selectedRef.current != -1) {
-      deleteEvent(selectedRef.current)
-    }
+    if (selectedRef.current != NON_SELECTED) return
+    deleteEvent(selectedRef.current)
   }, [Keys.delete], [Keys.backspace])
 
   useEffect(() => {
     function onClickHandle() {
-      selectedRef.current = -1
+      updateSelected(-1)
     }
 
     window.addEventListener('click', onClickHandle)
@@ -58,17 +63,6 @@ export function Grid() {
     }
 
     updateEvent(i, updatedEvent)
-
-
-    // const newEvents = events.filter(ev => `${ev.id}` != i)
-    // newEvents.push({
-    //   id: Number(i),
-    //   color: currEvent.color,
-    //   title: currEvent.title,
-    //   startDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), startHour, startMinute),
-    //   endDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), endHour, endMinute),
-    // })
-    // setEvents(newEvents)
   }
 
   return (
@@ -150,8 +144,7 @@ export function Grid() {
                     color={event.color}
                     onClick={(e) => {
                       e.stopPropagation()
-                      selectedRef.current = event.id
-                      setSelectedId(event.id)
+                      updateSelected(event.id)
                     }}
                   />
                 ))
