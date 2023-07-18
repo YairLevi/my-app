@@ -1,8 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Event } from "../../mock/mockEvents";
 import { useEvents } from "@/contexts/EventsContext";
+import { getRandomColor } from "../../grid";
 
 interface Props {
   open: boolean
@@ -66,7 +67,7 @@ export function AddEventModal({ open, onClose }: Props) {
       title: titleRef.current!.value,
       startDate: start,
       endDate: end,
-      color: "0",
+      color: getRandomColor(),
       id: events.length + 1
     }
 

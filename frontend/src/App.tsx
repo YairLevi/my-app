@@ -1,5 +1,5 @@
 import { Sidebar } from "@/components/Sidebar"
-import { Calendar } from "@/components/Calendar"
+import { Calendar } from "@/components/calendar/Calendar"
 import { Summary } from "@/components/calendar/Summary"
 import { Grid } from "@/components/calendar/Grid"
 import React, { useState } from "react"

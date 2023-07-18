@@ -52,7 +52,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(({ style, start, end, 
           <div className={`border rounded-lg border-l-4 h-full`} style={{ borderColor: color }}/>
           <section>
             <span className="font-medium !text-xs line-clamp-2">{title}</span>
-            <span className="!text-gray-400 !text-[0.7rem]">{getTimeFormat(start)} - {getTimeFormat(end)}, {start.toDateString()}</span>
+            <span className="!text-gray-400 !text-[0.7rem]">{getTimeFormat(start)} - {getTimeFormat(end)}</span>
           </section>
         </div>
 

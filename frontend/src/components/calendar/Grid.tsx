@@ -26,7 +26,7 @@ export function Grid() {
   }
 
   useKeybind(() => {
-    if (selectedRef.current != NON_SELECTED) return
+    if (selectedRef.current == NON_SELECTED) return
     deleteEvent(selectedRef.current)
   }, [Keys.delete], [Keys.backspace])
 
@@ -48,7 +48,7 @@ export function Grid() {
 
     if (endHour == 0 && endMinute == 0) {
       endHour = 23
-      endMinute = 45
+      endMinute = 59
     }
 
     const day = weekDays[newItem.x]

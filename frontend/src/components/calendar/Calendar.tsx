@@ -1,7 +1,7 @@
 import { PropsWithChildren, useState } from "react";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useCalendar } from "../contexts/DateContext";
+import { useCalendar } from "@/contexts/DateContext";
 
 const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const ROW_COUNT = 6
@@ -21,10 +21,13 @@ function Tile({ children, blurred, date, onClick }: Props) {
     return selected.toDateString() == date.toDateString()
   }
 
+  const isToday = date.toDateString() == new Date().toDateString()
+
   return (
     <div
       className={`
-    ${isSelected() && 'bg-white bg-opacity-20'}
+    ${isToday && 'bg-gray-500 bg-opacity-30'}
+    ${isSelected() && 'bg-gray-500 bg-opacity-80'}
     ${blurred && '!text-gray-500'}
     py-1.5 text-gray-300 text-xs w-8 flex flex-col items-center justify-center 
     select-none hover:cursor-pointer rounded-md px-2 relative`}
