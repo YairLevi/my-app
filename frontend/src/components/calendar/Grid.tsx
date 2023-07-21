@@ -6,6 +6,7 @@ import { useCalendar } from "@/contexts/DateContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { useEffect, useRef, useState } from "react";
 import { Keys, useKeybind } from "../../hooks/useKeybind";
+import { main } from "@/wails/go/models";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -52,12 +53,8 @@ export function Grid() {
     }
 
     const day = weekDays[newItem.x]
-    const currEvent = events.find(ev => ev.id == i)!
 
-    const updatedEvent = {
-      id: Number(i),
-      color: currEvent.color,
-      title: currEvent.title,
+    const updatedEvent: Partial<main.Event> = {
       startDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), startHour, startMinute),
       endDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), endHour, endMinute),
     }
@@ -126,8 +123,8 @@ export function Grid() {
             compactType={null}
             isBounded={true}
             margin={[0, 0]}
-            onResize={resizeHandler}
-            onDrag={resizeHandler}
+            onResizeStop={resizeHandler}
+            onDragStop={resizeHandler}
           >
             {
               events
@@ -141,7 +138,7 @@ export function Grid() {
                     end={event.endDate}
                     data-grid={getGridPosition(event.startDate, event.endDate)}
                     title={event.title}
-                    color={event.color}
+                    color={"#000000"}
                     onClick={(e) => {
                       e.stopPropagation()
                       updateSelected(event.id)

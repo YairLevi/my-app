@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 )
 
@@ -9,9 +10,9 @@ const (
 	NOTES_DIR = "/.wailsnotes"
 )
 
-func panicIf(err error) {
+func printErr(err error) {
 	if err != nil {
-		panic(err.Error())
+		fmt.Println(err.Error())
 	}
 }
 
@@ -33,5 +34,5 @@ func NewNoteManager() *NoteManager {
 
 func (nm *NoteManager) CreateNotesFolder() {
 	err := os.Mkdir(nm.notesDir, 0666)
-	panicIf(err)
+	printErr(err)
 }

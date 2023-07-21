@@ -39,7 +39,7 @@ export function Summary() {
             return (
               <div key={`summary-item${i}`} className="flex mb-2 gap-2">
                 <div className="w-full self-end rounded-md py-1.5 px-2 flex items-center bg-[#0f0f11] gap-2">
-                  <div className={`border rounded-lg border-l-4 h-8`} style={{ borderColor: v.color }}/>
+                  <div className={`border rounded-lg border-l-4 h-8`} style={{ borderColor: "#000000" }}/>
                   <section className="flex justify-between items-center w-full">
                     <p className="font-medium text-gray-300 text-sm">{v.title}</p>
                     <div className="text-end">

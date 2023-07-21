@@ -3,7 +3,6 @@ import { Calendar } from "@/components/calendar/Calendar"
 import { Summary } from "@/components/calendar/Summary"
 import { Grid } from "@/components/calendar/Grid"
 import React, { useState } from "react"
-import { events } from "./mock/mockEvents"
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
@@ -11,7 +10,6 @@ import { AddEventModal } from "@/components/calendar/AddEvent.modal";
 
 
 export default function App() {
-  const [_events, setEvents] = useState([...events])
   const [open, setOpen] = useState(false)
   const onClose = () => setOpen(false)
 
@@ -28,7 +26,7 @@ export default function App() {
               Add Event
             </button>
           </div>
-          <Grid />
+          <Grid/>
         </div>
       </div>
       <div className="max-w-fit min-w-fit h-full bg-[#1a1c22] flex flex-col py-3">

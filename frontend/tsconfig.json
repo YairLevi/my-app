@@ -22,7 +22,8 @@
     "baseUrl": "./src",
     "paths": {
       "@/components/*": ["components/*"],
-      "@/contexts/*": ["contexts/*"]
+      "@/contexts/*": ["contexts/*"],
+      "@/wails/*": ["../wailsjs/*"]
     }
   },
   "include": [

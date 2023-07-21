@@ -3,7 +3,7 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useState } from "react";
 import { Event } from "../../mock/mockEvents";
 import { useEvents } from "@/contexts/EventsContext";
-import { getRandomColor } from "../../grid";
+import { main } from "@/wails/go/models";
 
 interface Props {
   open: boolean
@@ -61,15 +61,14 @@ export function AddEventModal({ open, onClose }: Props) {
     if (!validateDates())
       return
 
-    const start = new Date(startDateRef.current!.value)
-    const end = new Date(endDateRef.current!.value)
-    const newEvent: Event = {
-      title: titleRef.current!.value,
-      startDate: start,
-      endDate: end,
-      color: getRandomColor(),
-      id: events.length + 1
-    }
+    const startDate = new Date(startDateRef.current!.value)
+    const endDate = new Date(endDateRef.current!.value)
+    const title = titleRef.current!.value
+
+    const newEvent: main.Event = new main.Event()
+    newEvent.title = title
+    newEvent.startDate = startDate
+    newEvent.endDate = endDate
 
 
     if (doesOverlapOtherEvent(newEvent))
