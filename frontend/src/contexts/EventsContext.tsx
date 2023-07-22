@@ -2,10 +2,12 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import { Create, Delete, Read, Update } from '@/wails/go/main/Calendar'
 import { main } from "@/wails/go/models";
 
+export type CalendarEvent = Omit<Omit<main.Event, "convertValues">, "id"> & { id?: number }
+
 type Exports = {
-  events: main.Event[]
-  addEvent: (newEvent: main.Event) => void
-  updateEvent: (id: number, updatedFields: Partial<main.Event>) => void
+  events: CalendarEvent[]
+  addEvent: (newEvent: CalendarEvent) => void
+  updateEvent: (id: number, updatedFields: Partial<CalendarEvent>) => void
   deleteEvent: (id: number) => void
 }
 
@@ -16,7 +18,7 @@ export function useEvents() {
 }
 
 export function EventsProvider({ children }: PropsWithChildren) {
-  const [events, setEvents] = useState<main.Event[]>([])
+  const [events, setEvents] = useState<CalendarEvent[]>([])
 
   useEffect(() => {
     getEvents()
@@ -32,15 +34,16 @@ export function EventsProvider({ children }: PropsWithChildren) {
     setEvents(events)
   }
 
-  async function addEvent(newEvent: main.Event) {
-    const rEvent = await Create(newEvent)
+  async function addEvent(newEvent: CalendarEvent) {
+    const event = new main.Event(newEvent)
+    const rEvent = await Create(event)
 
     rEvent.startDate = new Date(rEvent.startDate)
     rEvent.endDate = new Date(rEvent.endDate)
     setEvents(prev => [...prev, rEvent])
   }
 
-  async function updateEvent(id: number, updatedFields: Partial<main.Event>) {
+  async function updateEvent(id: number, updatedFields: Partial<CalendarEvent>) {
     const event = events.find(ev => ev.id == id)
     if (!event) return
     const updatedEvent = Object.assign({}, event, updatedFields)

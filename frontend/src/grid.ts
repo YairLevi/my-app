@@ -1,3 +1,6 @@
+import { Layout } from "react-grid-layout";
+import { main } from "@/wails/go/models";
+
 export interface GridPosition {
   x: number
   y: number
@@ -54,4 +57,23 @@ export function getRandomColor() {
     color += letters[Math.floor(Math.random() * letters.length)]
   }
   return color
+}
+
+export function calculateDatesFromLayout(item: Layout, weekDays: Date[]) {
+  const startHour = Math.floor(item.y * 15 / 60) % 24
+  const startMinute = (item.y % 4) * 15
+  let endHour = Math.floor((item.y + item.h) * 15 / 60) % 24
+  let endMinute = ((item.y + item.h) % 4) * 15
+
+  if (endHour == 0 && endMinute == 0) {
+    endHour = 23
+    endMinute = 59
+  }
+
+  const day = weekDays[item.x]
+
+  return {
+    startDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), startHour, startMinute),
+    endDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), endHour, endMinute),
+  }
 }

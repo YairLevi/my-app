@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useState } from "react";
 import { Event } from "../../mock/mockEvents";
-import { useEvents } from "@/contexts/EventsContext";
+import { CalendarEvent, useEvents } from "@/contexts/EventsContext";
 import { main } from "@/wails/go/models";
 
 interface Props {
@@ -65,10 +65,11 @@ export function AddEventModal({ open, onClose }: Props) {
     const endDate = new Date(endDateRef.current!.value)
     const title = titleRef.current!.value
 
-    const newEvent: main.Event = new main.Event()
-    newEvent.title = title
-    newEvent.startDate = startDate
-    newEvent.endDate = endDate
+    const newEvent: CalendarEvent = {
+      title: title,
+      startDate: startDate,
+      endDate: endDate
+    }
 
 
     if (doesOverlapOtherEvent(newEvent))

@@ -1,6 +1,6 @@
 import { daysFullNames, getWeekDays, prefixZero } from "../../time";
 import { Tile } from "@/components/calendar/Tile";
-import { getGridPosition, rowHeightInPixels } from "../../grid";
+import { calculateDatesFromLayout, getGridPosition, rowHeightInPixels } from "../../grid";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { useCalendar } from "@/contexts/DateContext";
 import { useEvents } from "@/contexts/EventsContext";
@@ -41,25 +41,11 @@ export function Grid() {
   }, [])
 
   const resizeHandler: ItemCallback = (layout, oldItem, newItem, placeholder, event, element) => {
-    const i = Number(newItem.i)
-    const startHour = Math.floor(newItem.y * 15 / 60) % 24
-    const startMinute = (newItem.y % 4) * 15
-    let endHour = Math.floor((newItem.y + newItem.h) * 15 / 60) % 24
-    let endMinute = ((newItem.y + newItem.h) % 4) * 15
+    const id = Number(newItem.i)
+    const dates = calculateDatesFromLayout(newItem, weekDays)
 
-    if (endHour == 0 && endMinute == 0) {
-      endHour = 23
-      endMinute = 59
-    }
-
-    const day = weekDays[newItem.x]
-
-    const updatedEvent: Partial<main.Event> = {
-      startDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), startHour, startMinute),
-      endDate: new Date(day.getFullYear(), day.getMonth(), day.getDate(), endHour, endMinute),
-    }
-
-    updateEvent(i, updatedEvent)
+    const updatedEvent: Partial<main.Event> = { ...dates }
+    updateEvent(id, updatedEvent)
   }
 
   return (
@@ -131,7 +117,7 @@ export function Grid() {
                 .filter(event => weekDays.some(day => day.toDateString() == event.startDate.toDateString()))
                 .map(event => (
                   <Tile
-                    tileId={event.id}
+                    tileId={event.id!}
                     selectedId={selectedId}
                     key={`${event.id}`}
                     start={event.startDate}
@@ -141,7 +127,7 @@ export function Grid() {
                     color={"#000000"}
                     onClick={(e) => {
                       e.stopPropagation()
-                      updateSelected(event.id)
+                      updateSelected(event.id!)
                     }}
                   />
                 ))
