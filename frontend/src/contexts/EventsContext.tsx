@@ -35,7 +35,10 @@ export function EventsProvider({ children }: PropsWithChildren) {
   }
 
   async function addEvent(newEvent: CalendarEvent) {
-    const event = new main.Event(newEvent)
+    const event = new main.Event()
+    event.title = newEvent.title
+    event.endDate = newEvent.endDate
+    event.startDate = newEvent.startDate
     const rEvent = await Create(event)
 
     rEvent.startDate = new Date(rEvent.startDate)

@@ -5,3 +5,5 @@ frontend/dist
 .vscode/
 
 database.db
+
+bugs.txt
