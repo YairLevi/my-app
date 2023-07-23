@@ -98,6 +98,9 @@ func (c *Calendar) Update(eventId int, fields map[string]interface{}) {
 	args := make([]interface{}, 0)
 
 	for key, value := range fields {
+		if key == "id" {
+			continue
+		}
 		updateSql += fmt.Sprintf("%s=?, ", key)
 		args = append(args, value)
 	}
