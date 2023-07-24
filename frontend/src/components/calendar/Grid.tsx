@@ -4,7 +4,7 @@ import { calculateDatesFromLayout, getGridPosition, rowHeightInPixels } from "..
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { useCalendar } from "@/contexts/DateContext";
 import { useEvents } from "@/contexts/EventsContext";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Keys, useKeybind } from "../../hooks/useKeybind";
 import { main } from "@/wails/go/models";
 
@@ -65,7 +65,7 @@ export function Grid() {
           ))
         }
       </div>
-      <div className="h-fit w-full relative">
+      <div className="h-fit w-full">
         <div className="flex w-full h-full">
           {
             weekDays.map((day, i) => (
@@ -76,7 +76,7 @@ export function Grid() {
             ))
           }
         </div>
-        <div className="w-full h-full relative pt-4 ">
+        <div className="w-full h-full relative pt-4">
           <div className="w-full min-h-full absolute">
             {
               [...new Array(24 * 2).keys()].map((val, i) => (
@@ -124,7 +124,7 @@ export function Grid() {
                     end={event.endDate}
                     data-grid={getGridPosition(event.startDate, event.endDate)}
                     title={event.title}
-                    color={"#000000"}
+                    color={"#0fa12f"}
                     onClick={(e) => {
                       e.stopPropagation()
                       updateSelected(event.id!)

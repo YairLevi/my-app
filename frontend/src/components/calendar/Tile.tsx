@@ -1,5 +1,7 @@
-import React, { forwardRef, HTMLAttributes } from 'react';
+import React, { forwardRef, HTMLAttributes, MouseEvent, useEffect, useState } from 'react';
 import { prefixZero } from "../../time";
+import { ContextMenu, defaultMenuState, useContextMenuRef } from "@/components/ContextMenu";
+import { useWindow } from "@/contexts/Window";
 
 interface TileProps extends HTMLAttributes<HTMLDivElement> {
   tileId: number
@@ -10,44 +12,55 @@ interface TileProps extends HTMLAttributes<HTMLDivElement> {
   selectedId: number
 }
 
-function makeColorDarker(colorCode: string): string {
-  // Extract individual color components
-  const red = parseInt(colorCode.substr(1, 2), 16);
-  const green = parseInt(colorCode.substr(3, 2), 16);
-  const blue = parseInt(colorCode.substr(5, 2), 16);
-
-  // Calculate darker color components (reducing brightness by 30%)
-  const darkerRed = Math.floor(red * 0.3);
-  const darkerGreen = Math.floor(green * 0.3);
-  const darkerBlue = Math.floor(blue * 0.3);
-
-  // Convert darker color components back to hexadecimal
-  const darkerColor = `#${darkerRed.toString(16).padStart(2, '0')}${darkerGreen.toString(16).padStart(2, '0')}${darkerBlue.toString(16).padStart(2, '0')}`;
-
-  return darkerColor;
-}
-
 
 export const Tile = forwardRef<HTMLDivElement, TileProps>(({ style, start, end, title, color, children, selectedId, tileId, ...props }, ref) => {
+  function getTimeFormat(date: Date) {
+    return `${date.getHours()}:${prefixZero(date.getMinutes())}`
+  }
 
-    function getTimeFormat(date: Date) {
-      return `${date.getHours()}:${prefixZero(date.getMinutes())}`
-    }
+  const [openMenu, setOpenMenu] = useState<ContextMenu>(defaultMenuState)
+  const { windowRef } = useWindow()
+  const { menuRef } = useContextMenuRef()
 
-    return (
+  useEffect(() => {
+    const closeMenu = () => setOpenMenu(defaultMenuState)
+
+    window.addEventListener('click', closeMenu)
+    return () => window.removeEventListener('click', closeMenu)
+  }, [])
+
+  function showMenu(e: MouseEvent) {
+    e.preventDefault()
+
+    let X = e.clientX
+    let Y = e.clientY
+
+    const menu = menuRef.current!
+    const window = windowRef.current!
+
+    X = Math.max(0, Math.min(X, window.clientWidth - menu.clientWidth))
+    Y = Math.max(0, Math.min(Y, window.clientHeight - menu.clientHeight))
+
+    setOpenMenu({
+      left: X,
+      top: Y,
+      show: true
+    })
+  }
+
+  return (
+    <>
       <div
-        style={{
-          ...style,
-        }}
-        ref={ref}{...props}
+        style={{ ...style, }}
+        ref={ref}
+        {...props}
+        className="[&_*]:select-none"
+        onContextMenu={showMenu}
       >
         <div className={`bg-[#0f0f11] h-full rounded-lg mx-1 !text-black px-1 py-1 flex gap-2
-        hover:cursor-grab active:cursor-grabbing overflow-hidden border-t-gray-800 border-t
+        active:cursor-grab overflow-hidden border-t-gray-800 border-t
         ${selectedId == tileId && 'border border-white'}
         `}
-             style={{
-               backgroundColor: makeColorDarker(color),
-             }}
         >
           <div className={`border rounded-lg border-l-4 h-full`} style={{ borderColor: color }}/>
           <section>
@@ -59,6 +72,13 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(({ style, start, end, 
         {/* Do not remove children. this is for the resize handle. */}
         {children}
       </div>
-    );
-  }
-)
+
+      <ContextMenu
+        top={openMenu.top}
+        left={openMenu.left}
+        show={openMenu.show}
+        ref={menuRef}
+      />
+    </>
+  );
+})
