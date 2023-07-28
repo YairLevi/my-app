@@ -3,6 +3,10 @@ export function getHourOfDay(number: number, offset = 0) {
   return `${hour}:00`
 }
 
+export function getTimeFormat(date: Date) {
+  return `${date.getHours()}:${prefixZero(date.getMinutes())}`
+}
+
 export function getByAMPM(number: number, offset = 0) {
   let hour = (number + offset) % 12
   let hour_24 = (number + offset) % 24

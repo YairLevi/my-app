@@ -6,9 +6,9 @@ export type CalendarEvent = Omit<Omit<main.Event, "convertValues">, "id"> & { id
 
 type Exports = {
   events: CalendarEvent[]
-  addEvent: (newEvent: CalendarEvent) => void
-  updateEvent: (id: number, updatedFields: Partial<CalendarEvent>) => void
-  deleteEvent: (id: number) => void
+  addEvent: (newEvent: CalendarEvent) => Promise<void>
+  updateEvent: (id: number, updatedFields: Partial<CalendarEvent>) => Promise<void>
+  deleteEvent: (id: number) => Promise<void>
 }
 
 const EventsContext = createContext<Exports>({} as Exports)
@@ -64,7 +64,7 @@ export function EventsProvider({ children }: PropsWithChildren) {
     events,
     addEvent,
     updateEvent,
-    deleteEvent
+    deleteEvent,
   }
 
   return (
