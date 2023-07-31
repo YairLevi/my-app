@@ -1,83 +1,50 @@
-import { useEffect, useRef, useState } from "react";
-import { faCalendarDays, faNoteSticky } from "@fortawesome/free-regular-svg-icons"
-import { faChevronLeft, faChevronRight, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { ReactElement } from "react";
+import { BarChart3, CalendarDays, StickyNote } from "lucide-react";
 
 interface ItemProps {
   text: string
-  open?: boolean
-  icon?: IconProp
+  icon?: ReactElement
 }
 
-function SidebarItem({ text, open, icon }: ItemProps) {
+function SidebarItem({ text, icon }: ItemProps) {
   return (
-    <div className={`rounded-lg flex items-center gap-3 hover:bg-white hover:bg-opacity-10 duration-100
-       select-none [&_*]:duration-200 py-1.5 my-1 px-3.5 overflow-hidden hover:cursor-pointer
-       after:w-10 after:h-10 after:bg-red-200 after:visible after:hidden
-       `}
+
+    <div
+      className={`
+        rounded flex items-center gap-3 hover:bg-white hover:bg-opacity-10
+        select-none py-3 px-3.5 hover:cursor-pointer text-white group relative
+      `}
     >
-      {icon && <FontAwesomeIcon icon={icon} className={`${!open && 'ml-[1px]'} duration-200 text-xl`}/>}
-      <p className={`${!open && '!text-transparent'} text-sm duration-200`}>{text}</p>
+      {icon}
+
+      {/* Tooltip for the sidebar item */}
+      <div
+        className={`
+          invisible group-hover:visible z-20
+          absolute ease-out duration-50 top-1/2 -translate-y-1/2 left-16 bg-black px-2.5 py-1.5 rounded w-fit text-sm
+        `}
+      >
+        {text}
+      </div>
+
+      <div
+        className={`
+          invisible group-hover:visible z-10
+          absolute w-2 h-2 bg-black -translate-x-1/2 left-16 -translate-y-1/2 top-1/2 rotate-45 
+        `}
+      />
     </div>
   )
 }
 
 export function Sidebar() {
-  const [open, setOpen] = useState(true)
-  const searchRef = useRef<HTMLInputElement>(null)
-  const [openedSearch, setOpenSearch] = useState(false)
-
-  useEffect(() => {
-    searchRef.current && searchRef.current.focus()
-  }, [openedSearch])
-
-  useEffect(() => {
-    const SIDEBAR_ANIMATION_DURATION = 200
-
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'))
-    }, SIDEBAR_ANIMATION_DURATION)
-  }, [open])
-
-  function toggleSidebar() {
-    setOpen(!open)
-  }
-
   return (
-    <div
-      className={`${open ? 'min-w-[14rem] w-56' : 'min-w-[4rem] w-16'} 
-      group duration-200 bg-[#0f0f11]  [&_*]:text-[#ceced0] h-screen px-2 py-2 flex flex-col relative group`}>
-      <button
-        className="absolute z-[-1] bg-[#0f0f11] rounded-md rounded-l-none p-1 px-2 pl-2.5 group-hover:z-20 group-hover:right-[-2rem]"
-        onClick={toggleSidebar}>
-        <FontAwesomeIcon
-          icon={open ? faChevronLeft : faChevronRight}
-          className={`mx-0.5`}
-        />
-      </button>
-      <div className="h-full [&>*]:my-2">
-        <SidebarItem text="Calendar" open={open} icon={faCalendarDays}/>
-        <SidebarItem text="Notes" open={open} icon={faNoteSticky}/>
+    <div className="max-w-fit bg-[#0f0f11] h-screen px-2 py-2">
+      <div className="h-full">
+        <SidebarItem text="Calendar" icon={<CalendarDays/>}/>
+        <SidebarItem text="Analytics" icon={<BarChart3/>}/>
+        <SidebarItem text="Notes" icon={<StickyNote/>}/>
       </div>
-      {
-        open
-          ? <input
-            ref={searchRef}
-            placeholder="search..."
-            className="rounded-md px-3 py-2 bg-black text-gray-200 w-full"
-          />
-          :
-          <div className={`rounded-lg flex items-center gap-4 font-medium hover:bg-white hover:bg-opacity-10 duration-100
-       select-none [& *]:duration-200 py-2.5 px-3.5 overflow-hidden hover:cursor-pointer`}
-               onClick={() => {
-                 setOpen(true)
-                 setOpenSearch(!openedSearch)
-               }}
-          >
-            <FontAwesomeIcon icon={faMagnifyingGlass} className={`${!open && 'text-lg'} duration-200`}/>
-          </div>
-      }
     </div>
   )
 }

@@ -109,7 +109,7 @@ export function EditEventModal({ open, onClose, event }: Props) {
     >
       <div
         onClick={e => e.stopPropagation()}
-        className={`p-5 bg-[#17191f] shadow-xl rounded-lg w-1/4 min-w-[20rem] h-fit duration-100 ease-out ${open ? 'scale-100' : 'scale-50'} [&_*]:text-gray-200`}
+        className={`p-5 bg-[#17191f] shadow-xl rounded-lg w-1/4 min-w-[20rem] h-fit duration-75 ease-out ${open ? 'scale-100' : 'scale-50'} [&_*]:text-gray-200`}
       >
         <header className="flex justify-between items-center">
           <h1 className="text-lg">New Event</h1>

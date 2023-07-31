@@ -1,4 +1,4 @@
-import { daysFullNames, getWeekDays, prefixZero } from "../../time";
+import { daysFullNames, daysInitials, getWeekDays, prefixZero } from "../../time";
 import { Tile } from "@/components/calendar/Tile";
 import { calculateDatesFromLayout, getGridPosition, rowHeightInPixels } from "../../grid";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
@@ -10,6 +10,7 @@ import { main } from "@/wails/go/models";
 import { ContextMenu } from "@/components/ContextMenu";
 import { useContextMenu } from "../../hooks/useContextMenu";
 import { EditEventModal } from "@/components/calendar/EditEvent.modal";
+import { faCog, faPencil } from "@fortawesome/free-solid-svg-icons";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const NON_SELECTED = -1
@@ -62,7 +63,7 @@ export function Grid() {
     <>
       <div className="h-full w-full overflow-auto flex [&_*]:text-white">
         <div className="h-fit pt-2">
-          <div className="px-4 py-2 mt-4 text-center w-20 !text-transparent">empty</div>
+          <div className="px-4 py-2 -mt-1 text-center w-20 !text-transparent">empty</div>
           {
             [...new Array(24).keys()].map((val, i) => (
               <div key={`t${i}`}>
@@ -81,8 +82,7 @@ export function Grid() {
             {
               weekDays.map((day, i) => (
                 <div key={`day-names${i}`} className={`px-4 py-2 text-center min-w-[7rem] w-full ${date.getDay() == i && 'bg-gray-700 rounded-lg'}`}>
-                  <p className="text-xs !text-gray-400">{day.toDateString().split(' ')[1]} {day.getDate()}</p>
-                  <p className="text-sm">{daysFullNames[day.getDay()]}</p>
+                  <p className="text-sm">{daysInitials[day.getDay()]} {day.getDate()}</p>
                 </div>
               ))
             }
@@ -186,11 +186,21 @@ export function Grid() {
         options={[
           {
             content: "Edit",
+            icon: faPencil,
             onClick: () => {
               setOpen(true)
               closeMenu()
             },
-          }
+          },
+          "divider",
+          {
+            content: "Options",
+            icon: faCog,
+            onClick: () => {
+              console.log("yes")
+            }
+          },
+
         ]}
       />
 

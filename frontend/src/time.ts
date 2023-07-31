@@ -39,3 +39,13 @@ export const daysFullNames = [
   'Friday',
   'Saturday',
 ]
+
+export const daysInitials = [
+  'Sun',
+  'Mon',
+  'Tue',
+  'Wed',
+  'Thu',
+  'Fri',
+  'Sat'
+]
