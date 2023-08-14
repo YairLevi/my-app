@@ -7,6 +7,7 @@ import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
 import { AddEventModal } from "@/components/calendar/AddEvent.modal";
+import {MonthlyCalendar} from "@/components/monthlyCalendar/MonthlyCalendar";
 
 
 export default function App() {
@@ -26,7 +27,7 @@ export default function App() {
               Add Event
             </button>
           </div>
-          <Grid/>
+          <MonthlyCalendar/>
         </div>
       </div>
       <div className="max-w-fit min-w-fit h-full bg-[#1a1c22] flex flex-col py-3">
