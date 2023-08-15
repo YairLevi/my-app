@@ -7,7 +7,7 @@ import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
 import { AddEventModal } from "@/components/calendar/AddEvent.modal";
-import {MonthlyCalendar} from "@/components/monthlyCalendar/MonthlyCalendar";
+import {MonthlyCalendar } from '@/components/monthlyCalendar/MonthlyCalendar'
 
 
 export default function App() {
@@ -19,14 +19,14 @@ export default function App() {
       <Sidebar/>
       <div className="w-full h-full overflow-auto flex">
         <div className="w-full h-full overflow-auto flex flex-col">
-          <div className="w-full flex justify-center gap-5 items-center py-2">
-            <button
-              className="bg-[#17181c] text-white px-4 py-2 text-sm font-medium rounded-lg"
-              onClick={() => setOpen(true)}
-            >
-              Add Event
-            </button>
-          </div>
+          {/*<div className="w-full flex justify-center gap-5 items-center py-2">*/}
+          {/*  <button*/}
+          {/*    className="bg-[#17181c] text-white px-4 py-2 text-sm font-medium rounded-lg"*/}
+          {/*    onClick={() => setOpen(true)}*/}
+          {/*  >*/}
+          {/*    Add Event*/}
+          {/*  </button>*/}
+          {/*</div>*/}
           <MonthlyCalendar/>
         </div>
       </div>

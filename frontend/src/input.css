@@ -57,3 +57,9 @@
     background-color: gray !important;
     opacity: 20% !important;
 }
+
+.monthly-grid .react-grid-placeholder {
+    border-radius: 0.25rem;
+    opacity: 60% !important;
+    border: 3px dashed #5aa8f5;
+}
