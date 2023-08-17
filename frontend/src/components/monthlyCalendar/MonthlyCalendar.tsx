@@ -6,6 +6,8 @@ import { useCalendar } from "@/contexts/DateContext";
 import { MonthEvent, monthlyEvents } from "../../mock/monthEvents";
 import { MonthlyTile } from "@/components/monthlyCalendar/MonthlyTile";
 import uuid from "react-uuid";
+import { ArrowDown, ArrowUp } from "lucide-react";
+
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -20,7 +22,6 @@ const rowHeightPixels = RowHeightRem * 16
 export function MonthlyCalendar() {
   const { date } = useCalendar()
   const days = generateCalendarGrid(date)
-  const [dragging, setDragging] = useState(false)
 
   const [events, setEvents] = useState<MonthEvent[]>(monthlyEvents)
 
@@ -53,10 +54,8 @@ export function MonthlyCalendar() {
     .sort((e1, e2) => e1.title.localeCompare(e2.title))
   )
 
-  const isDate = (date1: Date, date2: Date) => date1.getMonth() == date2.getMonth()
-
   return (
-    <div className="relative min-w-[49rem] h-full">
+    <div className="relative min-w-[45rem] h-full">
 
       {/* Background Grid Design */}
       <div className="w-full absolute h-full">
@@ -71,22 +70,51 @@ export function MonthlyCalendar() {
               return (
                 <div
                   key={uuid()}
-                  className={`min-h-[7rem] w-full border-r border-r-gray-700 flex flex-col justify-between`}
+                  className={`min-h-[7rem] w-full border-r border-r-gray-700 flex flex-col justify-between relative`}
                 >
+                  {
+                    extraEvents > 0 &&
+                      <div
+                          className="absolute right-0 pl-1 top-1/2 h-full bg-red-200 -translate-y-1/2 z-[1] flex items-center"
+                          style={{
+                            background: "linear-gradient(to left, #1a1c22 50%, rgba(255, 0, 0, 0))"
+                          }}
+                      >
+                          <div>
+                              <ArrowUp
+                                  className={`
+                              text-white rounded p-0.5
+                              hover:bg-white hover:bg-opacity-20
+                              `}
+                                  width={20}
+                                  height={20}
+                              />
+                              <ArrowDown
+                                  className={`
+                              text-white rounded p-0.5
+                              hover:bg-white hover:bg-opacity-20
+                              `}
+                                  width={20}
+                                  height={20}
+                              />
+                          </div>
+                      </div>
+                  }
+
                   <p
-                    className={`text-xs text-center pt-1 ${isDate(currentDate, date) ? "text-white" : "text-gray-500"}`}
+                    className={`
+                    text-xs text-center pt-1 
+                    ${currentDate.getMonth() == date.getMonth() ? "text-white" : "text-gray-500"}
+                    `}
                     style={{ height: RowHeightRem + "rem" }}
                   >
                     {currentDate.toDateString().substring(4, 10)}
                   </p>
                   {
-                    dragging ?
-                      <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded bg-red-200">Add events here...</p>
-                      :
-                      extraEvents > 0 &&
-                        <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded">
-                          {extraEvents} more events...
-                        </p>
+                    extraEvents > 0 &&
+                      <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded">
+                          +{extraEvents} event{extraEvents > 1 && "s"}...
+                      </p>
                   }
                 </div>
               )
@@ -96,7 +124,7 @@ export function MonthlyCalendar() {
       </div>
 
       <ResponsiveGridLayout
-        className="h-full w-full min-w-[49rem] layout monthly-grid"
+        className="h-full w-full min-w-[45rem] layout monthly-grid"
         breakpoints={{ lg: 1200 }}
         preventCollision={true}
         cols={{ 'lg': GRID_COLS }}
@@ -120,7 +148,7 @@ export function MonthlyCalendar() {
                 <MonthlyTile
                   {...event}
                   key={`${event.id};${uuid()}`}
-                  data-grid={{ w: 1, h: 1, x, y, isResizable: false }}
+                  data-grid={{ w: 1, h: 1, x, y, isResizable: false, minW: -1 }}
                 />
               )
             }

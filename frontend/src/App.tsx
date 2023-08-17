@@ -18,7 +18,7 @@ export default function App() {
     <div className="flex h-screen bg-[#1a1c22] overflow-hidden">
       <Sidebar/>
       <div className="w-full h-full overflow-auto flex">
-        <div className="w-full h-full overflow-auto flex flex-col">
+        <div className="w-full h-full flex flex-col">
           {/*<div className="w-full flex justify-center gap-5 items-center py-2">*/}
           {/*  <button*/}
           {/*    className="bg-[#17181c] text-white px-4 py-2 text-sm font-medium rounded-lg"*/}
