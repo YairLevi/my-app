@@ -6,7 +6,7 @@ import { useCalendar } from "@/contexts/DateContext";
 import { MonthEvent, monthlyEvents } from "../../mock/monthEvents";
 import { MonthlyTile } from "@/components/monthlyCalendar/MonthlyTile";
 import uuid from "react-uuid";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, ContactIcon } from "lucide-react";
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
@@ -25,7 +25,13 @@ export function MonthlyCalendar() {
 
   const [events, setEvents] = useState<MonthEvent[]>(monthlyEvents)
 
+  const [startingIdxArr, setStartingIdxArr] = useState(new Array(ROW_COUNT * COL_COUNT).fill(0))
+
+
+
+
   const dragStopHandle: ItemCallback = (layout, oldItem, newItem, placeholder, event, element) => {
+    updateStartingIndex(oldItem.x, oldItem.y)
     const { x, y } = newItem
     const newDate = days[Math.floor(y / ROWS_PER_CELL) * COL_COUNT + x]
 
@@ -39,6 +45,13 @@ export function MonthlyCalendar() {
   }
 
   const DateToEventList: Map<string, MonthEvent[]> = new Map<string, MonthEvent[]>()
+  console.log(DateToEventList)
+
+  useEffect(() => {
+
+  }, [events])
+
+
 
   days.forEach(day => DateToEventList
     .set(day.toDateString(), [])
@@ -54,8 +67,18 @@ export function MonthlyCalendar() {
     .sort((e1, e2) => e1.title.localeCompare(e2.title))
   )
 
+  function updateStartingIndex(x: number, y: number) {
+    const idx = Math.floor(y / ROWS_PER_CELL) * COL_COUNT + x
+    const eventCount = DateToEventList.get(days[idx].toDateString())!.length - 1
+    setStartingIdxArr(prev => {
+      if (eventCount - startingIdxArr[idx] >= 3) return [...prev]
+      prev[idx] = Math.max(0, prev[idx] - (3 - (eventCount - startingIdxArr[idx])))
+      return [...prev]
+    })
+  }
+
   return (
-    <div className="relative min-w-[45rem] h-full">
+    <div className="relative min-w-[45rem] h-full [&_*]:select-none">
 
       {/* Background Grid Design */}
       <div className="w-full absolute h-full">
@@ -65,7 +88,7 @@ export function MonthlyCalendar() {
             <For limit={COL_COUNT} mapFunc={colIndex => {
               const currentDateIndex = rowIndex * COL_COUNT + colIndex
               const currentDate = days[currentDateIndex]!
-              const extraEvents = DateToEventList.get(currentDate.toDateString())!.length - 3
+              const eventCount = DateToEventList.get(currentDate.toDateString())!.length
 
               return (
                 <div
@@ -73,7 +96,7 @@ export function MonthlyCalendar() {
                   className={`min-h-[7rem] w-full border-r border-r-gray-700 flex flex-col justify-between relative`}
                 >
                   {
-                    extraEvents > 0 &&
+                    eventCount > 3 &&
                       <div
                           className="absolute right-0 pl-1 top-1/2 h-full bg-red-200 -translate-y-1/2 z-[1] flex items-center"
                           style={{
@@ -88,6 +111,12 @@ export function MonthlyCalendar() {
                               `}
                                   width={20}
                                   height={20}
+                                  onClick={() => {
+                                    setStartingIdxArr(prev => {
+                                      prev[currentDateIndex] = Math.max(0, prev[currentDateIndex]-1)
+                                      return [...prev]
+                                    })
+                                  }}
                               />
                               <ArrowDown
                                   className={`
@@ -96,6 +125,12 @@ export function MonthlyCalendar() {
                               `}
                                   width={20}
                                   height={20}
+                                  onClick={() => {
+                                    setStartingIdxArr(prev => {
+                                      prev[currentDateIndex] = Math.min(prev[currentDateIndex]+1, DateToEventList.get(currentDate.toDateString())!.length-3)
+                                      return [...prev]
+                                    })
+                                  }}
                               />
                           </div>
                       </div>
@@ -103,7 +138,7 @@ export function MonthlyCalendar() {
 
                   <p
                     className={`
-                    text-xs text-center pt-1 
+                    text-xs text-center pt-1
                     ${currentDate.getMonth() == date.getMonth() ? "text-white" : "text-gray-500"}
                     `}
                     style={{ height: RowHeightRem + "rem" }}
@@ -111,9 +146,9 @@ export function MonthlyCalendar() {
                     {currentDate.toDateString().substring(4, 10)}
                   </p>
                   {
-                    extraEvents > 0 &&
+                    eventCount > 3 &&
                       <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded">
-                          +{extraEvents} event{extraEvents > 1 && "s"}...
+                          {eventCount} events...
                       </p>
                   }
                 </div>
@@ -140,9 +175,9 @@ export function MonthlyCalendar() {
           days.map((day, index) => {
             const dayEvents = DateToEventList.get(day.toDateString())!
             const Nodes: ReactNode[] = []
-            for (let i = 0; i < Math.min(dayEvents.length, 3); i++) {
+            for (let i = Math.min(startingIdxArr[index], ); i < Math.min(dayEvents.length, startingIdxArr[index]+3); i++) {
               const event = dayEvents[i]
-              const y = Math.floor(index / 7) * 5 + 1 + i
+              const y = Math.floor(index / 7) * 5 + 1 + i - startingIdxArr[index]
               const x = event.date.getDay()
               Nodes.push(
                 <MonthlyTile
