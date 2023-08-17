@@ -6,7 +6,7 @@ import { useCalendar } from "@/contexts/DateContext";
 import { MonthEvent, monthlyEvents } from "../../mock/monthEvents";
 import { MonthlyTile } from "@/components/monthlyCalendar/MonthlyTile";
 import uuid from "react-uuid";
-import { ArrowDown, ArrowUp, ContactIcon } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
@@ -24,11 +24,9 @@ export function MonthlyCalendar() {
   const days = generateCalendarGrid(date)
 
   const [events, setEvents] = useState<MonthEvent[]>(monthlyEvents)
+  const dateToEvents: Map<string, MonthEvent[]> = new Map<string, MonthEvent[]>()
 
   const [startingIdxArr, setStartingIdxArr] = useState(new Array(ROW_COUNT * COL_COUNT).fill(0))
-
-
-
 
   const dragStopHandle: ItemCallback = (layout, oldItem, newItem, placeholder, event, element) => {
     updateStartingIndex(oldItem.x, oldItem.y)
@@ -44,32 +42,23 @@ export function MonthlyCalendar() {
     setEvents(prev => [...prev.filter(ev => ev.id != eventId), newMonthEvent])
   }
 
-  const DateToEventList: Map<string, MonthEvent[]> = new Map<string, MonthEvent[]>()
-  console.log(DateToEventList)
-
-  useEffect(() => {
-
-  }, [events])
-
-
-
-  days.forEach(day => DateToEventList
+  days.forEach(day => dateToEvents
     .set(day.toDateString(), [])
   )
   events.forEach(event => {
     const key = event.date.toDateString()
-    const eventList = DateToEventList.get(key)
+    const eventList = dateToEvents.get(key)
     if (!eventList) return
     eventList.push(event)
   })
-  days.forEach(day => DateToEventList
+  days.forEach(day => dateToEvents
     .get(day.toDateString())!
     .sort((e1, e2) => e1.title.localeCompare(e2.title))
   )
 
   function updateStartingIndex(x: number, y: number) {
     const idx = Math.floor(y / ROWS_PER_CELL) * COL_COUNT + x
-    const eventCount = DateToEventList.get(days[idx].toDateString())!.length - 1
+    const eventCount = dateToEvents.get(days[idx].toDateString())!.length - 1
     setStartingIdxArr(prev => {
       if (eventCount - startingIdxArr[idx] >= 3) return [...prev]
       prev[idx] = Math.max(0, prev[idx] - (3 - (eventCount - startingIdxArr[idx])))
@@ -80,15 +69,15 @@ export function MonthlyCalendar() {
   return (
     <div className="relative min-w-[45rem] h-full [&_*]:select-none">
 
-      {/* Background Grid Design */}
+      {/* Background Grid UI */}
       <div className="w-full absolute h-full">
         <For limit={ROW_COUNT} mapFunc={rowIndex => (
           <div className="flex border-b border-b-gray-700"
-               style={{ height: 5 * RowHeightRem + "rem" }}>
+               style={{ height: ROWS_PER_CELL * RowHeightRem + "rem" }}>
             <For limit={COL_COUNT} mapFunc={colIndex => {
               const currentDateIndex = rowIndex * COL_COUNT + colIndex
               const currentDate = days[currentDateIndex]!
-              const eventCount = DateToEventList.get(currentDate.toDateString())!.length
+              const eventCount = dateToEvents.get(currentDate.toDateString())!.length
 
               return (
                 <div
@@ -127,7 +116,7 @@ export function MonthlyCalendar() {
                                   height={20}
                                   onClick={() => {
                                     setStartingIdxArr(prev => {
-                                      prev[currentDateIndex] = Math.min(prev[currentDateIndex]+1, DateToEventList.get(currentDate.toDateString())!.length-3)
+                                      prev[currentDateIndex] = Math.min(prev[currentDateIndex]+1, eventCount-3)
                                       return [...prev]
                                     })
                                   }}
@@ -173,17 +162,17 @@ export function MonthlyCalendar() {
       >
         {
           days.map((day, index) => {
-            const dayEvents = DateToEventList.get(day.toDateString())!
+            const dayEvents = dateToEvents.get(day.toDateString())!
             const Nodes: ReactNode[] = []
-            for (let i = Math.min(startingIdxArr[index], ); i < Math.min(dayEvents.length, startingIdxArr[index]+3); i++) {
+            for (let i = startingIdxArr[index]; i < Math.min(dayEvents.length, startingIdxArr[index]+3); i++) {
               const event = dayEvents[i]
-              const y = Math.floor(index / 7) * 5 + 1 + i - startingIdxArr[index]
+              const y = Math.floor(index / COL_COUNT) * ROWS_PER_CELL + 1 + i - startingIdxArr[index]
               const x = event.date.getDay()
               Nodes.push(
                 <MonthlyTile
                   {...event}
                   key={`${event.id};${uuid()}`}
-                  data-grid={{ w: 1, h: 1, x, y, isResizable: false, minW: -1 }}
+                  data-grid={{ w: 1, h: 1, x, y, isResizable: false }}
                 />
               )
             }
@@ -192,37 +181,18 @@ export function MonthlyCalendar() {
           })
         }
 
+        {/* HIDDEN CELLS, TO STRETCH THE GRID */}
         <div
           key="item-top"
           className="hidden"
-          data-grid={{
-            w: 0,
-            h: 0,
-            x: 0,
-            y: 0,
-            isResizable: false,
-            isDraggable: false,
-            static: true,
-            minH: -1,
-            minW: -1
-          }}
+          data-grid={{ w: 0, h: 0, x: 0, y: 0, static: true, minH: -1, minW: -1 }}
         >
           This is the top item, hidden, to stretch the grid.
         </div>
         <div
           key="item-bottom"
           className="hidden"
-          data-grid={{
-            w: 0,
-            h: 1,
-            x: 0,
-            y: GRID_ROWS - 1,
-            isResizable: false,
-            isDraggable: false,
-            static: true,
-            minH: -1,
-            minW: -1
-          }}
+          data-grid={{ w: 0, h: 1, x: 0, y: GRID_ROWS - 1, static: true, minH: -1, minW: -1 }}
         >
           This is the bottom item, hidden, to stretch the grid.
         </div>
