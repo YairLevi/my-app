@@ -1,13 +1,11 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { For } from "@/components/For";
-import { generateCalendarGrid } from "@/components/monthlyCalendar/utils";
 import { useCalendar } from "@/contexts/DateContext";
 import { MonthEvent, monthlyEvents } from "../../mock/monthEvents";
 import { MonthlyTile } from "@/components/monthlyCalendar/MonthlyTile";
 import uuid from "react-uuid";
 import { ArrowDown, ArrowUp } from "lucide-react";
-
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -18,6 +16,35 @@ const GRID_COLS = COL_COUNT
 const GRID_ROWS = ROW_COUNT * ROWS_PER_CELL
 const RowHeightRem = 2
 const rowHeightPixels = RowHeightRem * 16
+
+
+export function generateCalendarGrid(currentDate: Date): Date[] {
+  const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+  const prevMonthLastDays = [];
+  const startDay = firstDayOfMonth.getDay(); // Starting from Sunday
+  for (let i = startDay === 0 ? 6 : startDay - 1; i >= 0; i--) {
+    const prevDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), -i);
+    prevMonthLastDays.push(prevDay);
+  }
+
+  const daysToAdd = 42 - daysInMonth - prevMonthLastDays.length;
+  const nextMonthCompletingDays = [];
+  for (let i = 1; i <= daysToAdd; i++) {
+    const nextDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, i);
+    nextMonthCompletingDays.push(nextDay);
+  }
+
+  return [
+    ...prevMonthLastDays,
+    ...Array.from({ length: daysInMonth },
+      (_, i) => new Date(currentDate.getFullYear(), currentDate.getMonth(), i + 1)),
+    ...nextMonthCompletingDays
+  ];
+}
+
 
 export function MonthlyCalendar() {
   const { date } = useCalendar()
