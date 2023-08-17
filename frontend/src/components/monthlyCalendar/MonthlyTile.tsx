@@ -9,8 +9,8 @@ export const MonthlyTile = forwardRef<HTMLDivElement, TileProps2>(({children, da
   return (
     <div
       ref={ref}
-      className="[&_*]:select-none"
       {...props}
+      className="[&_*]:select-none"
     >
       <div className={`bg-[#0f0f11] h-full rounded mx-1 !text-black px-1 py-1 flex gap-2
         active:cursor-grab overflow-hidden border-t-gray-800 border-t

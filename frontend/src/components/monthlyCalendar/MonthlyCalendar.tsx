@@ -1,10 +1,11 @@
-import React, {ReactNode, useState} from "react";
-import {Responsive, WidthProvider} from "react-grid-layout";
-import {For} from "@/components/For";
-import {generateCalendarGrid} from "@/components/monthlyCalendar/utils";
-import {useCalendar} from "@/contexts/DateContext";
-import {MonthEvent, monthlyEvents} from "../../mock/monthEvents";
-import {MonthlyTile} from "@/components/monthlyCalendar/MonthlyTile";
+import React, { ReactNode, useEffect, useState } from "react";
+import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
+import { For } from "@/components/For";
+import { generateCalendarGrid } from "@/components/monthlyCalendar/utils";
+import { useCalendar } from "@/contexts/DateContext";
+import { MonthEvent, monthlyEvents } from "../../mock/monthEvents";
+import { MonthlyTile } from "@/components/monthlyCalendar/MonthlyTile";
+import uuid from "react-uuid";
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -17,27 +18,40 @@ const RowHeightRem = 2
 const rowHeightPixels = RowHeightRem * 16
 
 export function MonthlyCalendar() {
-  const {date} = useCalendar()
+  const { date } = useCalendar()
   const days = generateCalendarGrid(date)
+  const [dragging, setDragging] = useState(false)
 
   const [events, setEvents] = useState<MonthEvent[]>(monthlyEvents)
 
+  const dragStopHandle: ItemCallback = (layout, oldItem, newItem, placeholder, event, element) => {
+    const { x, y } = newItem
+    const newDate = days[Math.floor(y / ROWS_PER_CELL) * COL_COUNT + x]
+
+    // To rerender programmatically, I added to the key some random
+    // element... so, to get the ID, I need to split and take the first.
+    const eventId = Number(newItem.i.split(';')[0])
+
+    const monthEvent = events.find(ev => ev.id == eventId)!
+    const newMonthEvent: MonthEvent = { ...monthEvent, date: newDate }
+    setEvents(prev => [...prev.filter(ev => ev.id != eventId), newMonthEvent])
+  }
+
   const DateToEventList: Map<string, MonthEvent[]> = new Map<string, MonthEvent[]>()
 
-  for (const day of days) {
-    DateToEventList.set(day.toDateString(), [])
-  }
-
-  for (const event of events) {
+  days.forEach(day => DateToEventList
+    .set(day.toDateString(), [])
+  )
+  events.forEach(event => {
     const key = event.date.toDateString()
     const eventList = DateToEventList.get(key)
-    if (!eventList) continue
+    if (!eventList) return
     eventList.push(event)
-  }
-
-  for (const day of days) {
-    DateToEventList.get(day.toDateString())!.sort((ev1, ev2) => ev1.date < ev2.date ? -1 : 1)
-  }
+  })
+  days.forEach(day => DateToEventList
+    .get(day.toDateString())!
+    .sort((e1, e2) => e1.title.localeCompare(e2.title))
+  )
 
   const isDate = (date1: Date, date2: Date) => date1.getMonth() == date2.getMonth()
 
@@ -48,23 +62,32 @@ export function MonthlyCalendar() {
       <div className="w-full absolute h-full">
         <For limit={ROW_COUNT} mapFunc={rowIndex => (
           <div className="flex border-b border-b-gray-700"
-               style={{height: 5 * RowHeightRem + "rem"}}>
+               style={{ height: 5 * RowHeightRem + "rem" }}>
             <For limit={COL_COUNT} mapFunc={colIndex => {
-              const extraEvents = DateToEventList.get(days[rowIndex * 7 + colIndex].toDateString())!.length - 3
+              const currentDateIndex = rowIndex * COL_COUNT + colIndex
+              const currentDate = days[currentDateIndex]!
+              const extraEvents = DateToEventList.get(currentDate.toDateString())!.length - 3
 
               return (
                 <div
-                  key={`monthly-grid-${rowIndex}-${colIndex}`}
+                  key={uuid()}
                   className={`min-h-[7rem] w-full border-r border-r-gray-700 flex flex-col justify-between`}
                 >
                   <p
-                    className={`text-xs text-center pt-1 ${isDate(days[rowIndex * 7 + colIndex], date) ? "text-white" : "text-gray-500"}`}
-                    style={{height: RowHeightRem + "rem"}}
+                    className={`text-xs text-center pt-1 ${isDate(currentDate, date) ? "text-white" : "text-gray-500"}`}
+                    style={{ height: RowHeightRem + "rem" }}
                   >
-                    {days[rowIndex * 7 + colIndex].toDateString().substring(4, 10)}
+                    {currentDate.toDateString().substring(4, 10)}
                   </p>
-                  {extraEvents > 0 &&
-                      <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded">{extraEvents} more events...</p>}
+                  {
+                    dragging ?
+                      <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded bg-red-200">Add events here...</p>
+                      :
+                      extraEvents > 0 &&
+                        <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded">
+                          {extraEvents} more events...
+                        </p>
+                  }
                 </div>
               )
             }}/>
@@ -74,42 +97,32 @@ export function MonthlyCalendar() {
 
       <ResponsiveGridLayout
         className="h-full w-full min-w-[49rem] layout monthly-grid"
-        breakpoints={{lg: 1200}}
+        breakpoints={{ lg: 1200 }}
         preventCollision={true}
-        cols={{'lg': 7}}
+        cols={{ 'lg': GRID_COLS }}
         rowHeight={rowHeightPixels}
         maxRows={GRID_ROWS}
         compactType={null}
         allowOverlap={false}
         isBounded={true}
         margin={[0, 0]}
-        // onDragStop={(layout, oldItem, newItem, placeholder, event, element) => {
-        //   const monthEvent = events.find(ev => ev.id + "" == newItem.i)!
-        //   const newDate = days[Math.floor(newItem.y / 5) * 7 + newItem.x]
-        //   const date = monthEvent.date
-        //   date.setFullYear(newDate.getFullYear(), newDate.getMonth(), newDate.getDate())
-        //
-        //   setEvents(prev => [
-        //     ...prev.filter(ev => ev.id + "" != newItem.i),
-        //     {
-        //       ...monthEvent,
-        //       date
-        //     }
-        //   ])
-        //
-        // }}
+        onDragStop={dragStopHandle}
       >
         {
           days.map((day, index) => {
             const dayEvents = DateToEventList.get(day.toDateString())!
             const Nodes: ReactNode[] = []
-
             for (let i = 0; i < Math.min(dayEvents.length, 3); i++) {
               const event = dayEvents[i]
               const y = Math.floor(index / 7) * 5 + 1 + i
               const x = event.date.getDay()
-              const key = event.date.toDateString() + y
-              Nodes.push(<MonthlyTile {...event} key={event.id} data-grid={{w: 1, h: 1, x, y, isResizable: false}}/>)
+              Nodes.push(
+                <MonthlyTile
+                  {...event}
+                  key={`${event.id};${uuid()}`}
+                  data-grid={{ w: 1, h: 1, x, y, isResizable: false }}
+                />
+              )
             }
 
             return Nodes
