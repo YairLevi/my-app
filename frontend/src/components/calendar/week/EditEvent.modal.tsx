@@ -3,6 +3,7 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import { Event } from "../../../mock/mockEvents";
 import { WeekEvent, useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
+import { roundToNearest15Minutes } from "../../../time";
 
 interface Props {
   open: boolean
@@ -67,11 +68,6 @@ export function EditEventModal({ open, onClose, event }: Props) {
       return false
     }
 
-    if (start.getMinutes() % 15 != 0 || end.getMinutes() % 15 != 0) {
-      setError("Minutes must be of 15 minute interval.")
-      return false
-    }
-
     if (start.toDateString() != end.toDateString()) {
       setError("Must be the same day.")
       return false
@@ -84,8 +80,8 @@ export function EditEventModal({ open, onClose, event }: Props) {
     if (!validateDates())
       return
 
-    const startDate = new Date(startDateRef.current!.value)
-    const endDate = new Date(endDateRef.current!.value)
+    const startDate = roundToNearest15Minutes(new Date(startDateRef.current!.value), false)
+    const endDate = roundToNearest15Minutes(new Date(endDateRef.current!.value), true)
     const title = titleRef.current!.value
 
     const newEvent: WeekEvent = {
@@ -93,7 +89,6 @@ export function EditEventModal({ open, onClose, event }: Props) {
       startDate: startDate,
       endDate: endDate
     }
-
 
     if (doesOverlapOtherEvent(newEvent))
       return setError("Overlap detected. Try again")

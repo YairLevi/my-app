@@ -1,9 +1,9 @@
-import { daysFullNames, daysInitials, getWeekDays, prefixZero } from "../../../time";
+import { daysInitials, getWeekDays, prefixZero } from "../../../time";
 import { Tile } from "@/components/calendar/week/Tile";
 import { calculateDatesFromLayout, getGridPosition, rowHeightInPixels } from "../../../grid";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { useCalendar } from "@/contexts/DateContext";
-import { WeekEvent, useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
+import { useWeekEvents, WeekEvent } from "@/contexts/Events/WeekEventsProvider";
 import React, { useEffect, useRef, useState } from "react";
 import { Keys, useKeybind } from "../../../hooks/useKeybind";
 import { main } from "@/wails/go/models";
@@ -11,6 +11,7 @@ import { ContextMenu } from "@/components/ContextMenu";
 import { useContextMenu } from "../../../hooks/useContextMenu";
 import { EditEventModal } from "@/components/calendar/week/EditEvent.modal";
 import { faCog, faPencil } from "@fortawesome/free-solid-svg-icons";
+import { AddEventModal } from "@/components/calendar/week/AddEvent.modal";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const NON_SELECTED = -1
@@ -21,8 +22,8 @@ export function WeeklyCalendar() {
   const { weekEvents, weekEventService } = useWeekEvents()
   const weekDays = getWeekDays(date)
 
-  const [edited, setEdited] = useState<WeekEvent | undefined>()
-  const [open, setOpen] = useState(false)
+  const [openEdit, setOpenEdit] = useState(false)
+  const [openAdd, setOpenAdd] = useState(false)
 
   const menuRef = useRef<HTMLDivElement>(null)
   const [options, openMenu, closeMenu] = useContextMenu(menuRef)
@@ -31,6 +32,8 @@ export function WeeklyCalendar() {
   // and need state => for UI change detection.
   const selectedRef = useRef<number>(NON_SELECTED)
   const [selectedId, setSelectedId] = useState(NON_SELECTED)
+
+  const [edited, setEdited] = useState<WeekEvent | undefined>()
 
   function updateSelected(id: number) {
     selectedRef.current = id
@@ -61,6 +64,14 @@ export function WeeklyCalendar() {
 
   return (
     <>
+      <div className="w-full flex justify-center gap-5 items-center py-2">
+        <button
+          className="bg-[#17181c] text-white px-4 py-2 text-sm font-medium rounded-lg"
+          onClick={() => setOpenAdd(true)}
+        >
+          Add Event
+        </button>
+      </div>
       <div className="h-full w-full overflow-auto flex [&_*]:text-white">
         <div className="h-fit pt-2">
           <div className="px-4 py-2 -mt-1 text-center w-20 !text-transparent">empty</div>
@@ -188,7 +199,7 @@ export function WeeklyCalendar() {
             content: "Edit",
             icon: faPencil,
             onClick: () => {
-              setOpen(true)
+              setOpenEdit(true)
               closeMenu()
             },
           },
@@ -207,11 +218,15 @@ export function WeeklyCalendar() {
       {
         edited &&
           <EditEventModal
-              open={open}
-              onClose={() => setOpen(false)}
+              open={openEdit}
+              onClose={() => setOpenEdit(false)}
               event={edited}
           />
       }
+      <AddEventModal
+        open={openAdd}
+        onClose={() => setOpenAdd(false)}
+      />
     </>
   )
 }

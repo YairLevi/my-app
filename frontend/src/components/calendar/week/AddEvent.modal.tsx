@@ -2,8 +2,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useState } from "react";
 import { Event } from "../../../mock/mockEvents";
-import { WeekEvent, useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
-import { main } from "@/wails/go/models";
+import { useWeekEvents, WeekEvent } from "@/contexts/Events/WeekEventsProvider";
+import { roundToNearest15Minutes } from "../../../time";
 
 interface Props {
   open: boolean
@@ -44,11 +44,6 @@ export function AddEventModal({ open, onClose }: Props) {
       return false
     }
 
-    if (start.getMinutes() % 15 != 0 || end.getMinutes() % 15 != 0) {
-      setError("Minutes must be of 15 minute interval.")
-      return false
-    }
-
     if (start.toDateString() != end.toDateString()) {
       setError("Must be the same day.")
       return false
@@ -61,8 +56,8 @@ export function AddEventModal({ open, onClose }: Props) {
     if (!validateDates())
       return
 
-    const startDate = new Date(startDateRef.current!.value)
-    const endDate = new Date(endDateRef.current!.value)
+    const startDate = roundToNearest15Minutes(new Date(startDateRef.current!.value), false)
+    const endDate = roundToNearest15Minutes(new Date(endDateRef.current!.value), true)
     const title = titleRef.current!.value
 
     const newEvent: WeekEvent = {
@@ -70,7 +65,6 @@ export function AddEventModal({ open, onClose }: Props) {
       startDate: startDate,
       endDate: endDate
     }
-
 
     if (doesOverlapOtherEvent(newEvent))
       return setError("Overlap detected. Try again")
@@ -82,7 +76,7 @@ export function AddEventModal({ open, onClose }: Props) {
   return (
     <div
       onClick={onClose}
-      className={`absolute w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center ${open ? 'scale-1' : 'scale-0'}`}
+      className={`fixed z-[1000] top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center ${open ? 'scale-1' : 'scale-0'}`}
     >
       <div
         onClick={e => e.stopPropagation()}
