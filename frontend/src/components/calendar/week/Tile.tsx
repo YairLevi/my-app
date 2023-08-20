@@ -1,5 +1,5 @@
 import React, { forwardRef, HTMLAttributes } from 'react';
-import { getTimeFormat } from "../../time";
+import { getTimeFormat } from "../../../time";
 import { WeekEvent } from "@/contexts/Events/WeekEventsProvider";
 
 interface TileProps extends HTMLAttributes<HTMLDivElement> {
@@ -10,6 +10,9 @@ interface TileProps extends HTMLAttributes<HTMLDivElement> {
 
 export const Tile = forwardRef<HTMLDivElement, TileProps>(({ event, color, children, selectedId, ...props }, ref) => {
   const { title, startDate, endDate, id } = event
+
+  const isFifteenMin = 1000 * 60 * 15 == endDate - startDate
+  const isThirtyMin =  1000 * 60 * 30 == endDate - startDate
 
   return (
     <div
@@ -24,8 +27,23 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(({ event, color, child
       >
         <div className={`border rounded-lg border-l-4 h-full`} style={{ borderColor: color }}/>
         <section>
-          <span className="font-medium !text-xs line-clamp-2">{title}</span>
-          <span className="!text-gray-400 !text-[0.7rem]">{getTimeFormat(startDate)} - {getTimeFormat(endDate)}</span>
+          <span
+            className={`
+            line-clamp-2
+            ${isFifteenMin && "-mt-1 !line-clamp-1"}
+            ${isThirtyMin && "-mt-0.5 !line-clamp-1"}
+            font-medium !text-xs
+            `}
+          >
+            {title}
+          </span>
+          <p
+            className={`
+            !text-gray-400 !text-[0.7rem] -mt-0.5
+            `}
+          >
+            {getTimeFormat(startDate)} - {getTimeFormat(endDate)}
+          </p>
         </section>
       </div>
 

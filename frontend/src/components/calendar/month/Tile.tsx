@@ -5,7 +5,7 @@ interface TileProps2 extends PropsWithChildren {
   date: Date
 }
 
-export const MonthlyTile = forwardRef<HTMLDivElement, TileProps2>(({children, date, title, ...props}, ref) => {
+export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, date, title, ...props}, ref) => {
   return (
     <div
       ref={ref}

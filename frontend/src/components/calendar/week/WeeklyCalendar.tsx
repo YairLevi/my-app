@@ -1,5 +1,5 @@
 import { daysFullNames, daysInitials, getWeekDays, prefixZero } from "../../../time";
-import { Tile } from "@/components/calendar/Tile";
+import { Tile } from "@/components/calendar/week/Tile";
 import { calculateDatesFromLayout, getGridPosition, rowHeightInPixels } from "../../../grid";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { useCalendar } from "@/contexts/DateContext";
@@ -16,7 +16,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 const NON_SELECTED = -1
 
 
-export function Grid() {
+export function WeeklyCalendar() {
   const { date } = useCalendar()
   const { weekEvents, weekEventService } = useWeekEvents()
   const weekDays = getWeekDays(date)

@@ -4,7 +4,7 @@ import { For } from "@/components/For";
 import { useCalendar } from "@/contexts/DateContext";
 import { monthlyEvents } from "../../../mock/monthEvents";
 import { MonthEvent } from "@/contexts/Events";
-import { MonthlyTile } from "@/components/calendar/month/MonthlyTile";
+import { Tile } from "@/components/calendar/month/Tile";
 import uuid from "react-uuid";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/Button";
@@ -205,7 +205,7 @@ export function MonthlyCalendar() {
                 const y = Math.floor(index / COL_COUNT) * ROWS_PER_CELL + 1 + i - startingIdxArr[index]
                 const x = event.date.getDay()
                 Nodes.push(
-                  <MonthlyTile
+                  <Tile
                     {...event}
                     key={`${event.id};${uuid()}`}
                     data-grid={{ w: 1, h: 1, x, y, isResizable: false }}

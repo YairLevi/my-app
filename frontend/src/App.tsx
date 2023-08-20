@@ -8,7 +8,7 @@ import './input.css'
 import { AddEventModal } from "@/components/calendar/week/AddEvent.modal";
 import { MonthlyCalendar } from '@/components/calendar/month/MonthlyCalendar'
 import { Route, Routes, useLocation, useNavigate } from "react-router";
-import { Grid } from "@/components/calendar/week/Grid";
+import { WeeklyCalendar } from "@/components/calendar/week/WeeklyCalendar";
 import { Button } from "@/components/Button";
 
 
@@ -71,7 +71,7 @@ export default function App() {
           </div>
           <Routes>
             <Route path="/" element={<button className="text-white">Home!</button>}/>
-            <Route path="/week" element={<Grid/>}/>
+            <Route path="/week" element={<WeeklyCalendar/>}/>
             <Route path="/month" element={<MonthlyCalendar/>}/>
           </Routes>
         </div>
