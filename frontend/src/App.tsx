@@ -9,6 +9,7 @@ import { MonthlyCalendar } from '@/components/calendar/month/MonthlyCalendar'
 import { Route, Routes, useLocation, useNavigate } from "react-router";
 import { WeeklyCalendar } from "@/components/calendar/week/WeeklyCalendar";
 import { Button } from "@/components/Button";
+import { Modal, useModal } from "@/components/Modal";
 
 
 export default function App() {
@@ -39,6 +40,8 @@ export default function App() {
     }
   }, []);
 
+  const { open, onOpen, onClose } = useModal()
+
   /**
    * refresh page on some path
    * save current path to session storage
@@ -59,7 +62,7 @@ export default function App() {
             <Button onClick={() => navigate('/')} color="#0f0f11">Go to home</Button>
           </div>
           <Routes>
-            <Route path="/" element={<button className="text-white">Home!</button>}/>
+            <Route path="/" element={<button className="text-white" onClick={onOpen}>Home!</button>}/>
             <Route path="/week" element={<WeeklyCalendar/>}/>
             <Route path="/month" element={<MonthlyCalendar/>}/>
           </Routes>
@@ -69,6 +72,25 @@ export default function App() {
         <Calendar/>
         <Summary/>
       </div>
+
+      <Modal
+        open={open}
+        onClose={onClose}
+        title="Some modal title">
+
+        <Modal.Group label="Field 1">
+          <input
+            type="text"
+            className="bg-[#0f0f11] px-3 py-1.5 text-gray-200 rounded-md"
+          />
+        </Modal.Group>
+
+        <Modal.Footer>
+          <Button color="#0f0f11" onClick={() => false}>Cancel</Button>
+        </Modal.Footer>
+
+
+      </Modal>
     </div>
-)
+  )
 }

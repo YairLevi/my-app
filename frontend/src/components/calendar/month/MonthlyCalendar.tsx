@@ -9,6 +9,8 @@ import uuid from "react-uuid";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/Button";
 import { useMonthEvents } from "@/contexts/Events";
+import { AddMonthlyEventModal } from "@/components/calendar/month/AddEvent.modal";
+import { useModal } from "@/components/Modal";
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -51,16 +53,22 @@ function generateCalendarGrid(currentDate: Date): Date[] {
 
 export function MonthlyCalendar() {
   const { date } = useCalendar()
+  const {
+    open: openAdd,
+    onClose: onCloseAdd,
+    onOpen: onOpenAdd
+  } = useModal()
   const days = generateCalendarGrid(date)
-  // const [events, setEvents] = useState<MonthEvent[]>(monthlyEvents)
-  const { monthEvents: m_events } = useMonthEvents()
-  const [events, setEvents] = useState([...monthlyEvents, ...m_events])
+
+
+  const { monthEvents, monthEventService } = useMonthEvents()
+
+
   const dateToEvents: Map<string, MonthEvent[]> = new Map<string, MonthEvent[]>()
 
   const [startingIdxArr, setStartingIdxArr] = useState(new Array(ROW_COUNT * COL_COUNT).fill(0))
 
-  const dragStopHandle: ItemCallback = (layout, oldItem, newItem, placeholder, event, element) => {
-    updateStartingIndex(oldItem.x, oldItem.y)
+  const dragStopHandle: ItemCallback = async (layout, oldItem, newItem, placeholder, event, element) => {
     const { x, y } = newItem
     const newDate = days[Math.floor(y / ROWS_PER_CELL) * COL_COUNT + x]
 
@@ -68,15 +76,18 @@ export function MonthlyCalendar() {
     // element... so, to get the ID, I need to split and take the first.
     const eventId = Number(newItem.i.split(';')[0])
 
-    const monthEvent = events.find(ev => ev.id == eventId)!
+    const monthEvent = monthEvents.find(ev => ev.id == eventId)!
     const newMonthEvent: MonthEvent = { ...monthEvent, date: newDate }
-    setEvents(prev => [...prev.filter(ev => ev.id != eventId), newMonthEvent])
+    await monthEventService.updateEvent(eventId, {
+      date: newDate
+    })
+    updateStartingIndex(oldItem.x, oldItem.y)
   }
 
   days.forEach(day => dateToEvents
     .set(day.toDateString(), [])
   )
-  events.forEach(event => {
+  monthEvents.forEach(event => {
     const key = event.date.toDateString()
     const eventList = dateToEvents.get(key)
     if (!eventList) return
@@ -100,7 +111,7 @@ export function MonthlyCalendar() {
   return (
     <>
       <div>
-        <Button onClick={() => {}} color="#1a6aeb">Add Random event</Button>
+        <Button onClick={onOpenAdd} color="#1a6aeb">Add Random event</Button>
       </div>
       <div className="relative min-w-[45rem] h-full overflow-auto [&_*]:select-none">
 
@@ -234,6 +245,12 @@ export function MonthlyCalendar() {
           </div>
         </ResponsiveGridLayout>
       </div>
+
+      <AddMonthlyEventModal
+        open={openAdd}
+        onClose={onCloseAdd}
+        title="Add Event"
+      />
     </>
   )
 }
