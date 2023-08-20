@@ -13,12 +13,17 @@ var assets embed.FS
 
 const TimeZone = "Asia/Jerusalem"
 
+func RandomData(m MonthCalendarService) {
+
+}
+
 func main() {
 	// Create an instance of the app structure
 	app := NewApp()
 
 	// Create services
 	var calendar CalendarService = NewCalendar()
+	var monthCalendar MonthCalendarService = NewMonthCalendar()
 	notes := NewNoteManager()
 
 	// Create application with options
@@ -34,11 +39,13 @@ func main() {
 		OnStartup: app.startup,
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
 			calendar.Close()
+			monthCalendar.Close()
 			return false
 		},
 		Bind: []interface{}{
 			app,
 			calendar,
+			monthCalendar,
 			notes,
 		},
 	})

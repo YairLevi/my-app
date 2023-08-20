@@ -1,8 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useState } from "react";
-import { Event } from "../../mock/mockEvents";
-import { CalendarEvent, useEvents } from "@/contexts/EventsContext";
+import { Event } from "../../../mock/mockEvents";
+import { WeekEvent, useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
 import { main } from "@/wails/go/models";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function AddEventModal({ open, onClose }: Props) {
-  const { events, addEvent } = useEvents()
+  const { weekEvents, weekEventService } = useWeekEvents()
 
   const startDateRef = useRef<HTMLInputElement>(null)
   const endDateRef = useRef<HTMLInputElement>(null)
@@ -27,7 +27,7 @@ export function AddEventModal({ open, onClose }: Props) {
   }
 
   function doesOverlapOtherEvent(event: Event) {
-    return events.some(ev => ev.startDate < event.endDate && event.startDate < ev.endDate)
+    return weekEvents.some(ev => ev.startDate < event.endDate && event.startDate < ev.endDate)
   }
 
   function validateDates() {
@@ -65,7 +65,7 @@ export function AddEventModal({ open, onClose }: Props) {
     const endDate = new Date(endDateRef.current!.value)
     const title = titleRef.current!.value
 
-    const newEvent: CalendarEvent = {
+    const newEvent: WeekEvent = {
       title: title,
       startDate: startDate,
       endDate: endDate
@@ -75,7 +75,7 @@ export function AddEventModal({ open, onClose }: Props) {
     if (doesOverlapOtherEvent(newEvent))
       return setError("Overlap detected. Try again")
 
-    addEvent(newEvent)
+    weekEventService.addEvent(newEvent)
     clearAndExit()
   }
 

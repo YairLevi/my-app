@@ -58,8 +58,8 @@
     opacity: 20% !important;
 }
 
-.monthly-grid .react-grid-placeholder {
-    border-radius: 0.25rem;
-    opacity: 60% !important;
-    border: 3px dashed #5aa8f5;
-}
+/*.monthly-grid .react-grid-placeholder {*/
+/*    border-radius: 0.25rem;*/
+/*    opacity: 20% !important;*/
+/*    border: 3px dashed #5aa8f5;*/
+/*}*/

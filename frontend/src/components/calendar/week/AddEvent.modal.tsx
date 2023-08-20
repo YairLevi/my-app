@@ -1,45 +1,22 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useRef, useState } from "react";
-import { Event } from "../../mock/mockEvents";
-import { CalendarEvent, useEvents } from "@/contexts/EventsContext";
+import { useRef, useState } from "react";
+import { Event } from "../../../mock/mockEvents";
+import { WeekEvent, useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
+import { main } from "@/wails/go/models";
 
 interface Props {
   open: boolean
   onClose: () => void
-  event: CalendarEvent
 }
 
-function formatDateToDatetimeLocal(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-export function EditEventModal({ open, onClose, event }: Props) {
-  const {
-    startDate: currStartDate,
-    endDate: currEndDate,
-    title: currTitle,
-    id
-  } = event
-
-  const { events, addEvent, updateEvent } = useEvents()
+export function AddEventModal({ open, onClose }: Props) {
+  const { weekEvents, weekEventService } = useWeekEvents()
 
   const startDateRef = useRef<HTMLInputElement>(null)
   const endDateRef = useRef<HTMLInputElement>(null)
   const titleRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    startDateRef.current!.value = formatDateToDatetimeLocal(currStartDate)
-    endDateRef.current!.value = formatDateToDatetimeLocal(currEndDate)
-    titleRef.current!.value = currTitle
-  }, [id, currStartDate, currEndDate, currTitle])
 
   function clearAndExit() {
     startDateRef.current!.value = ''
@@ -50,7 +27,7 @@ export function EditEventModal({ open, onClose, event }: Props) {
   }
 
   function doesOverlapOtherEvent(event: Event) {
-    return events.some(ev => ev.id != id && ev.startDate < event.endDate && event.startDate < ev.endDate)
+    return weekEvents.some(ev => ev.startDate < event.endDate && event.startDate < ev.endDate)
   }
 
   function validateDates() {
@@ -80,7 +57,7 @@ export function EditEventModal({ open, onClose, event }: Props) {
     return true
   }
 
-  async function onSubmit() {
+  function onSubmit() {
     if (!validateDates())
       return
 
@@ -88,7 +65,7 @@ export function EditEventModal({ open, onClose, event }: Props) {
     const endDate = new Date(endDateRef.current!.value)
     const title = titleRef.current!.value
 
-    const newEvent: CalendarEvent = {
+    const newEvent: WeekEvent = {
       title: title,
       startDate: startDate,
       endDate: endDate
@@ -98,18 +75,18 @@ export function EditEventModal({ open, onClose, event }: Props) {
     if (doesOverlapOtherEvent(newEvent))
       return setError("Overlap detected. Try again")
 
-    await updateEvent(id!, newEvent)
+    weekEventService.addEvent(newEvent)
     clearAndExit()
   }
 
-  return event && (
+  return (
     <div
       onClick={onClose}
-      className={`fixed z-[1000] top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center ${open ? 'scale-1' : 'scale-0'}`}
+      className={`absolute w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center ${open ? 'scale-1' : 'scale-0'}`}
     >
       <div
         onClick={e => e.stopPropagation()}
-        className={`p-5 bg-[#17191f] shadow-xl rounded-lg w-1/4 min-w-[20rem] h-fit duration-75 ease-out ${open ? 'scale-100' : 'scale-50'} [&_*]:text-gray-200`}
+        className={`p-5 bg-[#17191f] shadow-xl rounded-lg w-1/4 min-w-[20rem] h-fit duration-100 ease-out ${open ? 'scale-100' : 'scale-50'} [&_*]:text-gray-200`}
       >
         <header className="flex justify-between items-center">
           <h1 className="text-lg">New Event</h1>
@@ -120,7 +97,7 @@ export function EditEventModal({ open, onClose, event }: Props) {
           />
         </header>
         <div className="flex flex-col gap-1 my-5">
-          <label className="text-xs !text-gray-400 font-semibold">
+          <label className="text-[0.8rem] !text-gray-400 font-semibold">
             Title
           </label>
           <input
@@ -131,7 +108,7 @@ export function EditEventModal({ open, onClose, event }: Props) {
           />
         </div>
         <div className="flex flex-col gap-1 my-5">
-          <label className="text-xs !text-gray-400 font-semibold">
+          <label className="text-[0.8rem] !text-gray-400 font-semibold">
             Starts at
           </label>
           <input
@@ -142,7 +119,7 @@ export function EditEventModal({ open, onClose, event }: Props) {
           />
         </div>
         <div className="flex flex-col gap-1 my-5">
-          <label className="text-xs !text-gray-400 font-medium">
+          <label className="text-[0.8rem] !text-gray-400 font-semibold">
             Ends at
           </label>
           <input
@@ -162,9 +139,9 @@ export function EditEventModal({ open, onClose, event }: Props) {
           </button>
           <button
             onClick={onSubmit}
-            className="text-sm px-3 py-2 hover:bg-gray-700 bg-gray-800 rounded-lg"
+            className="text-sm px-3 py-2 hover:bg-gray-800 bg-gray-700 rounded-lg"
           >
-            Edit
+            Add
           </button>
         </footer>
       </div>

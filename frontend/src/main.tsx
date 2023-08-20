@@ -2,7 +2,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { DirectionProvider } from "./contexts/Direction";
 import { CalendarProvider } from "./contexts/DateContext";
-import { EventsProvider } from "./contexts/EventsContext";
+import { EventProvider } from "@/contexts/Events";
 import { WindowProvider } from "@/contexts/Window";
 import { BrowserRouter } from "react-router-dom";
 import App from './App'
@@ -17,9 +17,9 @@ root.render(
     <WindowProvider>
       <DirectionProvider>
         <CalendarProvider>
-          <EventsProvider>
+          <EventProvider>
             <App/>
-          </EventsProvider>
+          </EventProvider>
         </CalendarProvider>
       </DirectionProvider>
     </WindowProvider>

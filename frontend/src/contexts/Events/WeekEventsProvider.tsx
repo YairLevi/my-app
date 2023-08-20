@@ -1,24 +1,22 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import { Create, Delete, Read, Update } from '@/wails/go/main/Calendar'
 import { main } from "@/wails/go/models";
+import { EventProviderExports } from "@/contexts/Events/EventProvider";
 
-export type CalendarEvent = Omit<Omit<main.Event, "convertValues">, "id"> & { id?: number }
+export type WeekEvent = Omit<Omit<main.Event, "convertValues">, "id"> & { id?: number }
 
-type Exports = {
-  events: CalendarEvent[]
-  addEvent: (newEvent: CalendarEvent) => Promise<void>
-  updateEvent: (id: number, updatedFields: Partial<CalendarEvent>) => Promise<void>
-  deleteEvent: (id: number) => Promise<void>
+const WeekEventsContext = createContext<EventProviderExports<WeekEvent>>({} as EventProviderExports<WeekEvent>)
+
+export function useWeekEvents() {
+  const { events, ...functions } = useContext(WeekEventsContext)
+  return {
+    weekEvents: events,
+    weekEventService: functions
+  }
 }
 
-const EventsContext = createContext<Exports>({} as Exports)
-
-export function useEvents() {
-  return useContext(EventsContext)
-}
-
-export function EventsProvider({ children }: PropsWithChildren) {
-  const [events, setEvents] = useState<CalendarEvent[]>([])
+export function WeekEventsProvider({ children }: PropsWithChildren) {
+  const [events, setEvents] = useState<WeekEvent[]>([])
 
   useEffect(() => {
     getEvents()
@@ -34,7 +32,7 @@ export function EventsProvider({ children }: PropsWithChildren) {
     setEvents(events)
   }
 
-  async function addEvent(newEvent: CalendarEvent) {
+  async function addEvent(newEvent: WeekEvent) {
     const event = new main.Event()
     event.title = newEvent.title
     event.endDate = newEvent.endDate
@@ -46,7 +44,7 @@ export function EventsProvider({ children }: PropsWithChildren) {
     setEvents(prev => [...prev, rEvent])
   }
 
-  async function updateEvent(id: number, updatedFields: Partial<CalendarEvent>) {
+  async function updateEvent(id: number, updatedFields: Partial<WeekEvent>) {
     const event = events.find(ev => ev.id == id)
     if (!event) return
     const updatedEvent = Object.assign({}, event, updatedFields)
@@ -68,8 +66,8 @@ export function EventsProvider({ children }: PropsWithChildren) {
   }
 
   return (
-    <EventsContext.Provider value={value}>
+    <WeekEventsContext.Provider value={value}>
       {children}
-    </EventsContext.Provider>
+    </WeekEventsContext.Provider>
   )
 }

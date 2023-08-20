@@ -1,15 +1,15 @@
-import { daysFullNames, daysInitials, getWeekDays, prefixZero } from "../../time";
+import { daysFullNames, daysInitials, getWeekDays, prefixZero } from "../../../time";
 import { Tile } from "@/components/calendar/Tile";
-import { calculateDatesFromLayout, getGridPosition, rowHeightInPixels } from "../../grid";
+import { calculateDatesFromLayout, getGridPosition, rowHeightInPixels } from "../../../grid";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { useCalendar } from "@/contexts/DateContext";
-import { CalendarEvent, useEvents } from "@/contexts/EventsContext";
+import { WeekEvent, useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
 import React, { useEffect, useRef, useState } from "react";
-import { Keys, useKeybind } from "../../hooks/useKeybind";
+import { Keys, useKeybind } from "../../../hooks/useKeybind";
 import { main } from "@/wails/go/models";
 import { ContextMenu } from "@/components/ContextMenu";
-import { useContextMenu } from "../../hooks/useContextMenu";
-import { EditEventModal } from "@/components/calendar/EditEvent.modal";
+import { useContextMenu } from "../../../hooks/useContextMenu";
+import { EditEventModal } from "@/components/calendar/week/EditEvent.modal";
 import { faCog, faPencil } from "@fortawesome/free-solid-svg-icons";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -18,10 +18,10 @@ const NON_SELECTED = -1
 
 export function Grid() {
   const { date } = useCalendar()
-  const { events, updateEvent, deleteEvent } = useEvents()
+  const { weekEvents, weekEventService } = useWeekEvents()
   const weekDays = getWeekDays(date)
 
-  const [edited, setEdited] = useState<CalendarEvent | undefined>()
+  const [edited, setEdited] = useState<WeekEvent | undefined>()
   const [open, setOpen] = useState(false)
 
   const menuRef = useRef<HTMLDivElement>(null)
@@ -39,7 +39,7 @@ export function Grid() {
 
   useKeybind(() => {
     if (selectedRef.current == NON_SELECTED) return
-    deleteEvent(selectedRef.current)
+    weekEventService.deleteEvent(selectedRef.current)
   }, [Keys.delete], [Keys.backspace])
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function Grid() {
     const dates = calculateDatesFromLayout(newItem, weekDays)
 
     const updatedEvent: Partial<main.Event> = { ...dates }
-    updateEvent(id, updatedEvent)
+    weekEventService.updateEvent(id, updatedEvent)
   }
 
   return (
@@ -124,7 +124,7 @@ export function Grid() {
               onDragStop={resizeHandler}
             >
               {
-                events
+                weekEvents
                   .filter(event => weekDays.some(day => day.toDateString() == event.startDate.toDateString()))
                   .map(event => {
                     const key = `${event.id};${new Date(event.startDate).getTime()};${new Date(event.endDate).getTime()}`
@@ -147,7 +147,7 @@ export function Grid() {
                     )
                   })
               }
-              <div key="item-top" className="hidden"
+              <div key="item-top-week" className="hidden"
                    data-grid={{
                      w: 0,
                      h: 0,
@@ -161,7 +161,7 @@ export function Grid() {
                    }}>
                 This is the top item, hidden, to stretch the grid.
               </div>
-              <div key="item-bottom" className="hidden"
+              <div key="item-bottom-week" className="hidden"
                    data-grid={{
                      w: 0,
                      h: 0,
