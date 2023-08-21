@@ -1,15 +1,16 @@
-import { ReactElement } from "react";
+import { Children, PropsWithChildren, ReactElement } from "react";
 import { BarChart3, CalendarDays, StickyNote } from "lucide-react";
 
 interface ItemProps {
   text: string
   icon?: ReactElement
+  onClick: () => void
 }
 
-function SidebarItem({ text, icon }: ItemProps) {
+export function SidebarItem({ text, icon, onClick }: ItemProps) {
   return (
-
     <div
+      onClick={onClick}
       className={`
         rounded flex items-center gap-3 hover:bg-white hover:bg-opacity-10
         select-none py-3 px-3.5 hover:cursor-pointer text-white group relative
@@ -37,13 +38,11 @@ function SidebarItem({ text, icon }: ItemProps) {
   )
 }
 
-export function Sidebar() {
+export function Sidebar({ children }: PropsWithChildren) {
   return (
     <div className="max-w-fit bg-[#0f0f11] h-screen px-2 py-2">
       <div className="h-full">
-        <SidebarItem text="Calendar" icon={<CalendarDays/>}/>
-        <SidebarItem text="Analytics" icon={<BarChart3/>}/>
-        <SidebarItem text="Notes" icon={<StickyNote/>}/>
+        {children}
       </div>
     </div>
   )
