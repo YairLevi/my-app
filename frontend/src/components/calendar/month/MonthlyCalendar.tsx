@@ -1,9 +1,9 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { For } from "@/components/For";
 import { useCalendar } from "@/contexts/DateContext";
 import { monthlyEvents } from "../../../mock/monthEvents";
-import { MonthEvent } from "@/contexts/Events";
+import { MonthEvent, WeekEvent } from "@/contexts/Events";
 import { Tile } from "@/components/calendar/month/Tile";
 import uuid from "react-uuid";
 import { ArrowDown, ArrowUp } from "lucide-react";
@@ -11,6 +11,7 @@ import { Button } from "@/components/Button";
 import { useMonthEvents } from "@/contexts/Events";
 import { AddMonthlyEventModal } from "@/components/calendar/month/AddEvent.modal";
 import { useModal } from "@/components/Modal";
+import { Keys, useKeybind } from "@/hooks/useKeybind";
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -59,6 +60,33 @@ export function MonthlyCalendar() {
     onOpen: onOpenAdd
   } = useModal()
   const days = generateCalendarGrid(date)
+  const NON_SELECTED = -1
+
+  // need both ref => for persistence of value in event listeners
+  // and need state => for UI change detection.
+  const selectedRef = useRef<number>(NON_SELECTED)
+  const [selectedId, setSelectedId] = useState(NON_SELECTED)
+
+  const [edited, setEdited] = useState<WeekEvent | undefined>()
+
+  function updateSelected(id: number) {
+    selectedRef.current = id
+    setSelectedId(id)
+  }
+
+  useKeybind(() => {
+    if (selectedRef.current == NON_SELECTED) return
+    monthEventService.deleteEvent(selectedRef.current)
+  }, [Keys.delete], [Keys.backspace])
+
+  useEffect(() => {
+    function onClickHandle() {
+      updateSelected(-1)
+    }
+
+    window.addEventListener('click', onClickHandle)
+    return () => window.removeEventListener('click', onClickHandle)
+  }, [])
 
 
   const { monthEvents, monthEventService } = useMonthEvents()
@@ -217,9 +245,14 @@ export function MonthlyCalendar() {
                 const x = event.date.getDay()
                 Nodes.push(
                   <Tile
-                    {...event}
+                    event={event}
+                    selectedId={selectedId}
                     key={`${event.id};${uuid()}`}
                     data-grid={{ w: 1, h: 1, x, y, isResizable: false }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      updateSelected(event.id!)
+                    }}
                   />
                 )
               }

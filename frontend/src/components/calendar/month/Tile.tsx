@@ -1,11 +1,14 @@
-import React, {forwardRef, PropsWithChildren} from "react";
+import React, { forwardRef, HTMLAttributes } from "react";
+import { MonthEvent } from "@/contexts/Events";
 
-interface TileProps2 extends PropsWithChildren {
-  title: string
-  date: Date
+interface TileProps2 extends HTMLAttributes<HTMLDivElement> {
+  selectedId: number
+  event: MonthEvent
 }
 
-export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, date, title, ...props}, ref) => {
+export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, event, selectedId, ...props}, ref) => {
+  const { title, date, id } = event
+
   return (
     <div
       ref={ref}
@@ -14,6 +17,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, date, tit
     >
       <div className={`bg-[#0f0f11] h-full rounded mx-1 !text-black px-1 py-1 flex gap-2
         active:cursor-grabbing hover:cursor-grab overflow-hidden border-t-gray-800 border-t items-center
+        ${selectedId == id && 'border border-white'}
         `}
       >
         <div className={`border rounded-lg border-l-4 h-full`} style={{borderColor: "#0e9426"}}/>
