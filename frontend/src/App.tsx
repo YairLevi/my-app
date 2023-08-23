@@ -1,20 +1,41 @@
 import { Sidebar, SidebarItem } from "@/components/Sidebar"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router";
 import CalendarPage from "@/components/calendar/Page";
 import { BarChart3, CalendarDays, StickyNote } from "lucide-react";
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
+import { GetVersion, IsUpdateAvailable, Update } from "@/wails/go/main/App";
+import { Modal, useModal } from "@/components/Modal";
+import { Button } from "@/components/Button";
 
 export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
+  const [version, setVersion] = useState('')
+  const { onOpen, open, onClose } = useModal()
+  const [isUpdate, setIsUpdate] = useState(false)
 
   useEffect(() => {
-    console.log(location.pathname)
-  }, [location]);
+    (async function () {
+      const isUpdate = await IsUpdateAvailable()
+      if (isUpdate) onOpen()
+    })()
+  }, []);
 
+  useEffect(() => {
+    (async function () {
+      const ver = await GetVersion()
+      setVersion(ver)
+    })()
+    onOpen()
+  }, []);
+
+  function update() {
+    setIsUpdate(true)
+    Update()
+  }
 
   /**
    * For now, this is a solution that will be refactored.
@@ -68,11 +89,32 @@ export default function App() {
       </Sidebar>
 
       <Routes>
-        <Route path="/" element={<div className="text-white">Dashboard page</div>}/>
-        <Route path="/calendar/*" element={<CalendarPage/>} />
-        <Route path="/analytics/*" element={<div className="text-white">Analytics Page</div>} />
-        <Route path="/notes/*" element={<div className="text-white">Notes Page</div>} />
+        <Route path="/" element={<div className="text-white">Dashboard page {version}</div>}/>
+        <Route path="/calendar/*" element={<CalendarPage/>}/>
+        <Route path="/analytics/*" element={<div className="text-white">Analytics Page</div>}/>
+        <Route path="/notes/*" element={<div className="text-white">Notes Page</div>}/>
       </Routes>
+
+      <Modal
+        title="Update Available"
+        onClose={() => !isUpdate && onClose()}
+        open={open}
+      >
+        {
+          isUpdate
+            ? <div className="py-3">
+              <div className="text-sm text-gray-300">Preparing to update...</div>
+              <div className="text-gray-300 text-sm">The application will restart automatically.</div>
+            </div>
+            : <>
+            <div className="text-gray-300 text-sm py-3">A new update is available.</div>
+            <Modal.Footer>
+              <Button onClick={update} color="#141414">Update</Button>
+              <Button onClick={onClose} color="#141414">Skip</Button>
+            </Modal.Footer>
+            </>
+        }
+      </Modal>
     </div>
   )
 }
