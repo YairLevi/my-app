@@ -16,7 +16,6 @@ export function getGridPosition(startDate: Date, endDate: Date) {
   const x = startDate.getDay()
 
   const startOfDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
-  startOfDay.setHours(0, 0, 0, 0)
   const timeDifferenceMs = startDate.getTime() - startOfDay.getTime()
   const minutesPassed = Math.floor(timeDifferenceMs / 1000 / 60);
   const y = Math.floor(minutesPassed / 15)
@@ -25,7 +24,9 @@ export function getGridPosition(startDate: Date, endDate: Date) {
 
   const minToStart = startDate.getHours() * 60 + startDate.getMinutes()
   const minToEnd = endDate.getHours() * 60 + endDate.getMinutes()
-  const h = Math.floor((minToEnd - minToStart) / 15)
+  let h = Math.floor((minToEnd - minToStart) / 15)
+  if (endDate.getHours() == 23 && endDate.getMinutes() == 59)
+    h++
 
   return {x, y, w, h}
 }

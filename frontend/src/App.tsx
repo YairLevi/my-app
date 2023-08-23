@@ -1,42 +1,78 @@
-import { Sidebar } from "@/components/Sidebar"
-import { Calendar } from "@/components/calendar/Calendar"
-import { Summary } from "@/components/calendar/Summary"
-import { Grid } from "@/components/calendar/Grid"
-import React, { useState } from "react"
+import { Sidebar, SidebarItem } from "@/components/Sidebar"
+import { useEffect } from "react"
+import { Route, Routes, useLocation, useNavigate } from "react-router";
+import CalendarPage from "@/components/calendar/Page";
+import { BarChart3, CalendarDays, StickyNote } from "lucide-react";
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
-import { AddEventModal } from "@/components/calendar/AddEvent.modal";
-
 
 export default function App() {
-  const [open, setOpen] = useState(false)
-  const onClose = () => setOpen(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    console.log(location.pathname)
+  }, [location]);
+
+
+  /**
+   * For now, this is a solution that will be refactored.
+   * The problem is that Wails doesn't bind the window['go']['main'] functions
+   * to a page when its reloaded, but only to '/'.
+   * So, I go back, refresh, wait some time, and go back to current path.
+   * It's not optimal, but it will be with some loading spinner or something..
+   * for now, this works.
+   */
+  const PPKEY = "previousPath"
+
+  useEffect(() => {
+    const previousPath = sessionStorage.getItem(PPKEY)
+    if (previousPath == null) {
+      sessionStorage.setItem(PPKEY, location.pathname)
+      window.location.replace('/')
+    } else {
+      setTimeout(() => {
+        navigate(previousPath)
+        sessionStorage.removeItem(PPKEY)
+      }, 10)
+    }
+  }, []);
+  /**
+   * refresh page on some path
+   * save current path to session storage
+   * go to '/' page
+   * refresh there, make the wails runtime bind the functions
+   * go to saved path
+   * set path to NULL
+   */
 
   return (
     <div className="flex h-screen bg-[#1a1c22] overflow-hidden">
-      <Sidebar/>
-      <div className="w-full h-full overflow-auto flex">
-        <div className="w-full h-full overflow-auto flex flex-col">
-          <div className="w-full flex justify-center gap-5 items-center py-2">
-            <button
-              className="bg-[#17181c] text-white px-4 py-2 text-sm font-medium rounded-lg"
-              onClick={() => setOpen(true)}
-            >
-              Add Event
-            </button>
-          </div>
-          <Grid/>
-        </div>
-      </div>
-      <div className="max-w-fit min-w-fit h-full bg-[#1a1c22] flex flex-col py-3">
-        <Calendar/>
-        <Summary/>
-      </div>
-      <AddEventModal
-        open={open}
-        onClose={onClose}
-      />
+      <Sidebar>
+        <SidebarItem
+          text="Calendar"
+          icon={<CalendarDays/>}
+          onClick={() => navigate('/calendar/week')}
+        />
+        <SidebarItem
+          text="Analytics"
+          icon={<BarChart3/>}
+          onClick={() => navigate('/analytics')}
+        />
+        <SidebarItem
+          text="Notes"
+          icon={<StickyNote/>}
+          onClick={() => navigate('/notes')}
+        />
+      </Sidebar>
+
+      <Routes>
+        <Route path="/" element={<div className="text-white">Dashboard page</div>}/>
+        <Route path="/calendar/*" element={<CalendarPage/>} />
+        <Route path="/analytics/*" element={<div className="text-white">Analytics Page</div>} />
+        <Route path="/notes/*" element={<div className="text-white">Notes Page</div>} />
+      </Routes>
     </div>
   )
 }

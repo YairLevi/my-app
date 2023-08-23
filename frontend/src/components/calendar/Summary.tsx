@@ -1,4 +1,4 @@
-import { useEvents } from "@/contexts/EventsContext";
+import { useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
 import { prefixZero } from "../../time";
 
 function getHourOfDay(number: number, offset = 7) {
@@ -16,8 +16,8 @@ function getRandomColor() {
 }
 
 export function Summary() {
-  const { events } = useEvents()
-  const todayEvents = events
+  const { weekEvents } = useWeekEvents()
+  const todayEvents = weekEvents
     .filter(event => event.startDate.toDateString() == new Date().toDateString())
     .sort((eventA, eventB) => eventA.startDate < eventB.startDate ? -1 : 1)
 

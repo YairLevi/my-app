@@ -23,6 +23,8 @@
     "paths": {
       "@/components/*": ["components/*"],
       "@/contexts/*": ["contexts/*"],
+      "@/pages/*": ["pages/*"],
+      "@/hooks/*": ["hooks/*"],
       "@/wails/*": ["../wailsjs/*"]
     }
   },

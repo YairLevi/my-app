@@ -30,6 +30,34 @@ export function getWeekDays(date: Date) {
   return week
 }
 
+export function roundToNearest15Minutes(date: Date, roundUp: boolean): Date {
+  const minutes = date.getMinutes();
+  const remainder = minutes % 15;
+
+  if (remainder == 0) {
+    return date
+  }
+
+  let roundedMinutes = minutes;
+  if (roundUp) {
+    roundedMinutes += 15 - remainder;
+    if (roundedMinutes >= 60) {
+      if (date.getHours() + 1 == 24) {
+        date.setHours(23, 59)
+        return date
+      }
+
+      date.setHours(date.getHours() + 1);
+      roundedMinutes = 0;
+    }
+  } else {
+    roundedMinutes -= remainder;
+  }
+
+  date.setMinutes(roundedMinutes);
+  return date;
+}
+
 export const daysFullNames = [
   'Sunday',
   'Monday',
