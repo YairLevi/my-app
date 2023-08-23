@@ -1,20 +1,28 @@
 import { Sidebar, SidebarItem } from "@/components/Sidebar"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router";
 import CalendarPage from "@/components/calendar/Page";
 import { BarChart3, CalendarDays, StickyNote } from "lucide-react";
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
+import { GetVersion } from "@/wails/go/main/App";
 
 export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
+  const [version, setVersion] = useState('')
 
   useEffect(() => {
     console.log(location.pathname)
   }, [location]);
 
+  useEffect(() => {
+    (async function(){
+      const ver = await GetVersion()
+      setVersion(ver)
+    })()
+  }, []);
 
   /**
    * For now, this is a solution that will be refactored.
@@ -68,7 +76,7 @@ export default function App() {
       </Sidebar>
 
       <Routes>
-        <Route path="/" element={<div className="text-white">Dashboard page</div>}/>
+        <Route path="/" element={<div className="text-white">Dashboard page {version}</div>}/>
         <Route path="/calendar/*" element={<CalendarPage/>} />
         <Route path="/analytics/*" element={<div className="text-white">Analytics Page</div>} />
         <Route path="/notes/*" element={<div className="text-white">Notes Page</div>} />

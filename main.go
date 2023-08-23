@@ -76,6 +76,10 @@ func RunUpdater(pid int) {
 func main() {
 	isUpdate := IsThereUpdate()
 
+	std := os.Stdout
+	file, _ := os.Create("init.log")
+	os.Stdout = file
+
 	if isUpdate {
 		fmt.Println("Update available. Running updater")
 		pid := os.Getpid()
@@ -84,7 +88,7 @@ func main() {
 	}
 
 	fmt.Println("Latest version here:", AppVersion)
-
+	os.Stdout = std
 	// Create an instance of the app structure
 	app := NewApp()
 
