@@ -20,7 +20,7 @@ var assets embed.FS
 const (
 	Owner       = "YairLevi"
 	UpdaterRepo = "my-app"
-	AppVersion  = "v0.4.0"
+	AppVersion  = "v0.0.4"
 )
 
 func isNewer(current, latest string) bool {
