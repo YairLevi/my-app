@@ -9,3 +9,11 @@ export function GetVersion() {
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
+
+export function IsUpdateAvailable() {
+  return window['go']['main']['App']['IsUpdateAvailable']();
+}
+
+export function Update() {
+  return window['go']['main']['App']['Update']();
+}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/go-github/v39/github"
 	"io"
 	"log"
@@ -9,11 +10,32 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 )
 
-const AppName = "./my-app.exe"
+const (
+	AppPath        = "./my-app.exe"
+	UpdaterRelease = "updater-v1.0.0"
+)
+
+func DownloadUpdater() {
+	client := github.NewClient(nil)
+	releases, _, _ := client.Repositories.ListReleases(context.Background(), Owner, Repo, nil)
+	var updaterRelease *github.RepositoryRelease
+	for _, release := range releases {
+		if *release.TagName == UpdaterRelease {
+			updaterRelease = release
+			break
+		}
+	}
+	updaterAsset := updaterRelease.Assets[0]
+	err := downloadFile(*updaterAsset.Name, *updaterAsset.BrowserDownloadURL)
+	if err != nil {
+		return
+	}
+}
 
 func downloadFile(fileName, url string) error {
 	// Create the file
@@ -91,10 +113,45 @@ func WaitForProcess(pid int) {
 }
 
 func RunApp() {
-	cmd := exec.Command(AppName)
+	cmd := exec.Command(AppPath)
 	err := cmd.Start()
 	if err != nil {
-		log.Println("Error starting", AppName)
+		log.Println("Error starting", AppPath)
+	}
+}
+
+func isNewer(current, latest string) bool {
+	// Remove the "v" prefix and split the version strings
+	currentParts := strings.Split(strings.TrimPrefix(current, "v"), ".")
+	latestParts := strings.Split(strings.TrimPrefix(latest, "v"), ".")
+
+	// Convert version parts to integers
+	currentInts := make([]int, len(currentParts))
+	latestInts := make([]int, len(latestParts))
+
+	for i := 0; i < len(currentParts); i++ {
+		currentInts[i], _ = strconv.Atoi(currentParts[i])
+		latestInts[i], _ = strconv.Atoi(latestParts[i])
+	}
+
+	// Compare version parts
+	for i := 0; i < len(currentInts); i++ {
+		if latestInts[i] > currentInts[i] {
+			return true // Latest version is newer
+		}
+	}
+
+	return false // Versions are identical
+}
+
+func RunUpdater(pid int) {
+	str := "update.exe " + strconv.Itoa(pid)
+	fmt.Println("running command:", str)
+	cmd := exec.Command("./update.exe", strconv.Itoa(pid))
+	err := cmd.Start()
+	if err != nil {
+		fmt.Println("Error starting update.exe")
+		fmt.Println(err.Error())
 	}
 }
 
