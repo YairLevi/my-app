@@ -19,8 +19,10 @@ export default function App() {
 
   useEffect(() => {
     (async function () {
-      const isUpdate = await IsUpdateAvailable()
-      if (isUpdate) onOpen()
+      if (import.meta.env.PROD) {
+        const isUpdate = await IsUpdateAvailable()
+        if (isUpdate) onOpen()
+      }
     })()
   }, []);
 
@@ -29,7 +31,6 @@ export default function App() {
       const ver = await GetVersion()
       setVersion(ver)
     })()
-    onOpen()
   }, []);
 
   function update() {
