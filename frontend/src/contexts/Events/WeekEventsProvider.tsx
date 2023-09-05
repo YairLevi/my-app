@@ -1,5 +1,5 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
-import { Create, Delete, Read, Update } from '@/wails/go/repositories/WeeklyCalendar'
+import { Create, Delete, Read, Update } from '@/wails/go/repositories/WeekCalendar'
 import { repositories } from "@/wails/go/models";
 import { EventProviderExports } from "@/contexts/Events/EventProvider";
 
@@ -62,8 +62,6 @@ export function WeekEventsProvider({ children }: PropsWithChildren) {
     Object.assign(repoEvent, newEvent)
     const newRepoEvent = await Create(repoEvent)
     const newWeekEvent = convertToWeekEvent(newRepoEvent)
-    console.log("current events:", events)
-    console.log("new events:", [...events, newWeekEvent])
     setEvents(prev => [...prev, newWeekEvent])
   }
 
@@ -78,7 +76,6 @@ export function WeekEventsProvider({ children }: PropsWithChildren) {
 
   async function deleteEvent(deleteEvent: WeekEvent) {
     const repoEvent = new repositories.WeekEvent()
-    console.log(deleteEvent)
     Object.assign(repoEvent, deleteEvent)
     await Delete(repoEvent)
     setEvents(prev => prev.filter(ev => ev.id != deleteEvent.id))
@@ -89,6 +86,7 @@ export function WeekEventsProvider({ children }: PropsWithChildren) {
     addEvent,
     updateEvent,
     deleteEvent,
+    forceRefresh: getEvents
   }
 
   return (

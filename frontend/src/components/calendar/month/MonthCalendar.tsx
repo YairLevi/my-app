@@ -2,7 +2,6 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { For } from "@/components/For";
 import { useCalendar } from "@/contexts/DateContext";
-import { monthlyEvents } from "../../../mock/monthEvents";
 import { MonthEvent, WeekEvent } from "@/contexts/Events";
 import { Tile } from "@/components/calendar/month/Tile";
 import uuid from "react-uuid";
@@ -52,7 +51,7 @@ function generateCalendarGrid(currentDate: Date): Date[] {
 }
 
 
-export function MonthlyCalendar() {
+export function MonthCalendar() {
   const { date } = useCalendar()
   const {
     open: openAdd,
@@ -76,8 +75,9 @@ export function MonthlyCalendar() {
 
   useKeybind(() => {
     if (selectedRef.current == NON_SELECTED) return
-    // monthEventService.deleteEvent(selectedRef.current)
-  }, [Keys.delete], [Keys.backspace])
+    const monthEventToDelete = monthEvents.find(ev => ev.id == selectedRef.current)!
+    monthEventService.deleteEvent(monthEventToDelete)
+  }, [], [Keys.delete], [Keys.backspace])
 
   useEffect(() => {
     function onClickHandle() {
@@ -106,9 +106,7 @@ export function MonthlyCalendar() {
 
     const monthEvent = monthEvents.find(ev => ev.id == eventId)!
     const newMonthEvent: MonthEvent = { ...monthEvent, date: newDate }
-    // await monthEventService.updateEvent(eventId, {
-    //   date: newDate
-    // })
+    await monthEventService.updateEvent(newMonthEvent)
     updateStartingIndex(oldItem.x, oldItem.y)
   }
 
@@ -140,6 +138,7 @@ export function MonthlyCalendar() {
     <>
       <div>
         <Button onClick={onOpenAdd} color="#1a6aeb">Add Random event</Button>
+        <Button onClick={monthEventService.forceRefresh} color="#1a6aeb">force refresh</Button>
       </div>
       <div className="relative min-w-[45rem] h-full overflow-auto [&_*]:select-none">
 

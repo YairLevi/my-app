@@ -9,6 +9,7 @@ export type EventProviderExports<T> = {
   addEvent: (newEvent: Partial<T>) => Promise<void>
   updateEvent: (updatedEvent: T) => Promise<void>
   deleteEvent: (deletedEvent: T) => Promise<void>
+  forceRefresh: () => Promise<void>
 }
 
 export function EventProvider({ children }: PropsWithChildren) {

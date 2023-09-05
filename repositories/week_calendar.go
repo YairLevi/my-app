@@ -7,13 +7,6 @@ import (
 	"time"
 )
 
-type Model struct {
-	ID        uint           `json:"id" gorm:"primarykey"`
-	CreatedAt time.Time      `json:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt"`
-	DeletedAt gorm.DeletedAt `json:"deletedAt" gorm:"index"`
-}
-
 type WeekEvent struct {
 	Model
 	Title     string    `json:"title"`
@@ -21,7 +14,7 @@ type WeekEvent struct {
 	EndDate   time.Time `json:"endDate"`
 }
 
-type WeeklyCalendar struct {
+type WeekCalendar struct {
 	db *gorm.DB
 }
 
@@ -32,16 +25,16 @@ type WeekEventRepository interface {
 	Delete(event *WeekEvent)
 }
 
-func NewWeeklyCalendar(db *gorm.DB) *WeeklyCalendar {
+func NewWeekCalendar(db *gorm.DB) *WeekCalendar {
 	err := db.AutoMigrate(&WeekEvent{})
 	if err != nil {
 		log.Println("Failed to migrate struct WeekEvent")
 		log.Fatal(err.Error())
 	}
-	return &WeeklyCalendar{db}
+	return &WeekCalendar{db}
 }
 
-func (c *WeeklyCalendar) Create(event *WeekEvent) *WeekEvent {
+func (c *WeekCalendar) Create(event *WeekEvent) *WeekEvent {
 	result := c.db.Create(event)
 	if result.Error != nil {
 		log.Println("Failed to create event", event)
@@ -52,7 +45,7 @@ func (c *WeeklyCalendar) Create(event *WeekEvent) *WeekEvent {
 	return event
 }
 
-func (c *WeeklyCalendar) Read() []WeekEvent {
+func (c *WeekCalendar) Read() []WeekEvent {
 	var weekEvents []WeekEvent
 	result := c.db.Find(&weekEvents)
 	if result.Error != nil {
@@ -63,7 +56,7 @@ func (c *WeeklyCalendar) Read() []WeekEvent {
 	return weekEvents
 }
 
-func (c *WeeklyCalendar) Update(event *WeekEvent) *WeekEvent {
+func (c *WeekCalendar) Update(event *WeekEvent) *WeekEvent {
 	result := c.db.Save(event)
 	if result.Error != nil {
 		log.Println("Failed to update event", event)
@@ -72,7 +65,7 @@ func (c *WeeklyCalendar) Update(event *WeekEvent) *WeekEvent {
 	return event
 }
 
-func (c *WeeklyCalendar) Delete(event *WeekEvent) {
+func (c *WeekCalendar) Delete(event *WeekEvent) {
 	result := c.db.Delete(event)
 	if result.Error != nil {
 		log.Println("Failed to delete event", event)

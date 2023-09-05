@@ -1,7 +1,13 @@
-export namespace main {
+export namespace repositories {
 	
 	export class MonthEvent {
 	    id: number;
+	    // Go type: time
+	    createdAt: any;
+	    // Go type: time
+	    updatedAt: any;
+	    // Go type: gorm
+	    deletedAt: any;
 	    title: string;
 	    // Go type: time
 	    date: any;
@@ -13,6 +19,9 @@ export namespace main {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.id = source["id"];
+	        this.createdAt = this.convertValues(source["createdAt"], null);
+	        this.updatedAt = this.convertValues(source["updatedAt"], null);
+	        this.deletedAt = this.convertValues(source["deletedAt"], null);
 	        this.title = source["title"];
 	        this.date = this.convertValues(source["date"], null);
 	    }
@@ -35,11 +44,6 @@ export namespace main {
 		    return a;
 		}
 	}
-
-}
-
-export namespace repositories {
-	
 	export class WeekEvent {
 	    id: number;
 	    // Go type: time

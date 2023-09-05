@@ -16,7 +16,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 const NON_SELECTED = -1
 
 
-export function WeeklyCalendar() {
+export function WeekCalendar() {
   const { date } = useCalendar()
   const { weekEvents, weekEventService } = useWeekEvents()
   const weekDays = getWeekDays(date)

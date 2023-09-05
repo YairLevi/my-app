@@ -23,9 +23,10 @@ func main() {
 	sqliteDb := repos.InitializeSqlite(DbDestinationString)
 
 	// Create services
-	var weeklyCalendar repos.WeekEventRepository = repos.NewWeeklyCalendar(sqliteDb)
-	var calendar CalendarService = NewCalendar()
-	var monthCalendar MonthCalendarService = NewMonthCalendar()
+	var (
+		weekCalendar  repos.WeekEventRepository  = repos.NewWeekCalendar(sqliteDb)
+		monthCalendar repos.MonthEventRepository = repos.NewMonthCalendar(sqliteDb)
+	)
 	notes := NewNoteManager()
 
 	app := NewApp()
@@ -41,13 +42,13 @@ func main() {
 		},
 		OnStartup: app.startup,
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
-			calendar.Close()
-			monthCalendar.Close()
+			gormDb, _ := sqliteDb.DB()
+			gormDb.Close()
 			return false
 		},
 		Bind: []interface{}{
 			app,
-			weeklyCalendar,
+			weekCalendar,
 			monthCalendar,
 			notes,
 		},
