@@ -20,7 +20,7 @@ export default function CalendarPage() {
           </div>
           <Routes>
             <Route path="/week" element={<WeeklyCalendar/>}/>
-            <Route path="/month" element={<MonthlyCalendar/>}/>
+            {/*<Route path="/month" element={<MonthlyCalendar/>}/>*/}
           </Routes>
         </div>
       </div>

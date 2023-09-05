@@ -6,9 +6,9 @@ const EventContext = createContext({})
 
 export type EventProviderExports<T> = {
   events: T[]
-  addEvent: (newEvent: T) => Promise<void>
-  updateEvent: (id: number, updatedFields: Partial<T>) => Promise<void>
-  deleteEvent: (id: number) => Promise<void>
+  addEvent: (newEvent: Partial<T>) => Promise<void>
+  updateEvent: (updatedEvent: T) => Promise<void>
+  deleteEvent: (deletedEvent: T) => Promise<void>
 }
 
 export function EventProvider({ children }: PropsWithChildren) {

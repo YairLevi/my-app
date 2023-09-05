@@ -36,7 +36,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
   return (
     <div
       onClick={onClose}
-      className={`fixed z-[1000] top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center ${open ? 'scale-1' : 'scale-0'}`}
+      className={`fixed z-[1000] top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center overflow-auto justify-center ${open ? 'scale-1' : 'scale-0'}`}
     >
       <div
         onClick={e => e.stopPropagation()}

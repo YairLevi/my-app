@@ -26,8 +26,8 @@ export function AddEventModal({ open, onClose }: Props) {
     onClose()
   }
 
-  function doesOverlapOtherEvent(event: Event) {
-    return weekEvents.some(ev => ev.startDate < event.endDate && event.startDate < ev.endDate)
+  function doesOverlapOtherEvent(event: Partial<WeekEvent>) {
+    return weekEvents.some(ev => ev.startDate < event.endDate! && event.startDate! < ev.endDate)
   }
 
   function validateDates() {
@@ -60,7 +60,7 @@ export function AddEventModal({ open, onClose }: Props) {
     const endDate = roundToNearest15Minutes(new Date(endDateRef.current!.value), true)
     const title = titleRef.current!.value
 
-    const newEvent: WeekEvent = {
+    const newEvent: Partial<WeekEvent> = {
       title: title,
       startDate: startDate,
       endDate: endDate

@@ -6,25 +6,29 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	repos "my-app/repositories"
 )
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
 const (
-	Owner      = "YairLevi"
-	Repo       = "my-app"
-	AppVersion = "v0.0.3"
+	Owner               = "YairLevi"
+	Repo                = "my-app"
+	AppVersion          = "v0.0.3"
+	DbDestinationString = "database.db"
 )
 
 func main() {
-	app := NewApp()
+	sqliteDb := repos.InitializeSqlite(DbDestinationString)
 
 	// Create services
+	var weeklyCalendar repos.WeekEventRepository = repos.NewWeeklyCalendar(sqliteDb)
 	var calendar CalendarService = NewCalendar()
 	var monthCalendar MonthCalendarService = NewMonthCalendar()
 	notes := NewNoteManager()
 
+	app := NewApp()
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:     "my-app",
@@ -43,7 +47,7 @@ func main() {
 		},
 		Bind: []interface{}{
 			app,
-			calendar,
+			weeklyCalendar,
 			monthCalendar,
 			notes,
 		},

@@ -76,7 +76,7 @@ export function MonthlyCalendar() {
 
   useKeybind(() => {
     if (selectedRef.current == NON_SELECTED) return
-    monthEventService.deleteEvent(selectedRef.current)
+    // monthEventService.deleteEvent(selectedRef.current)
   }, [Keys.delete], [Keys.backspace])
 
   useEffect(() => {
@@ -106,9 +106,9 @@ export function MonthlyCalendar() {
 
     const monthEvent = monthEvents.find(ev => ev.id == eventId)!
     const newMonthEvent: MonthEvent = { ...monthEvent, date: newDate }
-    await monthEventService.updateEvent(eventId, {
-      date: newDate
-    })
+    // await monthEventService.updateEvent(eventId, {
+    //   date: newDate
+    // })
     updateStartingIndex(oldItem.x, oldItem.y)
   }
 
