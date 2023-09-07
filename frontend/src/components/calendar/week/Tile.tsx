@@ -11,8 +11,8 @@ interface TileProps extends HTMLAttributes<HTMLDivElement> {
 export const Tile = forwardRef<HTMLDivElement, TileProps>(({ event, color, children, selectedId, ...props }, ref) => {
   const { title, startDate, endDate, id } = event
 
-  const isFifteenMin = 1000 * 60 * 15 == endDate - startDate
-  const isThirtyMin =  1000 * 60 * 30 == endDate - startDate
+  const isFifteenMin = 1000 * 60 * 15 == endDate.getTime() - startDate.getTime()
+  const isThirtyMin =  1000 * 60 * 30 == endDate.getTime() - startDate.getTime()
 
   return (
     <div

@@ -5,10 +5,9 @@ import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { useCalendar } from "@/contexts/DateContext";
 import { useWeekEvents, WeekEvent } from "@/contexts/Events/WeekEventsProvider";
 import React, { useEffect, useRef, useState } from "react";
-import { Keys, useKeybind } from "../../../hooks/useKeybind";
-import { main } from "@/wails/go/models";
+import { Keys, useKeybind } from "@/hooks/useKeybind";
 import { ContextMenu } from "@/components/ContextMenu";
-import { useContextMenu } from "../../../hooks/useContextMenu";
+import { useContextMenu } from "@/hooks/useContextMenu";
 import { EditEventModal } from "@/components/calendar/week/EditEvent.modal";
 import { faCog, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { AddEventModal } from "@/components/calendar/week/AddEvent.modal";
@@ -17,10 +16,11 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 const NON_SELECTED = -1
 
 
-export function WeeklyCalendar() {
+export function WeekCalendar() {
   const { date } = useCalendar()
   const { weekEvents, weekEventService } = useWeekEvents()
   const weekDays = getWeekDays(date)
+  const deleteRefWeekDays = useRef(weekEvents)
 
   const [openEdit, setOpenEdit] = useState(false)
   const [openAdd, setOpenAdd] = useState(false)
@@ -35,6 +35,10 @@ export function WeeklyCalendar() {
 
   const [edited, setEdited] = useState<WeekEvent | undefined>()
 
+  useEffect(() => {
+    deleteRefWeekDays.current = weekEvents
+  }, [weekEvents]);
+
   function updateSelected(id: number) {
     selectedRef.current = id
     setSelectedId(id)
@@ -42,8 +46,9 @@ export function WeeklyCalendar() {
 
   useKeybind(() => {
     if (selectedRef.current == NON_SELECTED) return
-    weekEventService.deleteEvent(selectedRef.current)
-  }, [Keys.delete], [Keys.backspace])
+    const weekEvent = deleteRefWeekDays.current.find(ev => ev.id == selectedRef.current)!
+    weekEventService.deleteEvent(weekEvent)
+  }, [], [Keys.delete], [Keys.backspace])
 
   useEffect(() => {
     function onClickHandle() {
@@ -58,8 +63,9 @@ export function WeeklyCalendar() {
     const id = Number(newItem.i.split(';')[0])
     const dates = calculateDatesFromLayout(newItem, weekDays)
 
-    const updatedEvent: Partial<main.Event> = { ...dates }
-    weekEventService.updateEvent(id, updatedEvent)
+    const weekEvent = weekEvents.find(ev => ev.id == id)!
+    const updatedEvent: WeekEvent = { ...weekEvent, ...dates }
+    weekEventService.updateEvent(updatedEvent)
   }
 
   return (

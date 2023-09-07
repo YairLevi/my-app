@@ -15,7 +15,7 @@ function keyDown(k: string, e: KeyboardEvent) {
   return d[k] ?? e.code === k
 }
 
-export function useKeybind(handler: (e?: KeyboardEvent) => void, ...keySets: string[][]) {
+export function useKeybind(handler: (e?: KeyboardEvent) => void, deps: any[], ...keySets: string[][]) {
   useEffect(() => {
     const applyIfPressed = (e: KeyboardEvent) => {
       for (const keys of keySets) {
@@ -28,5 +28,5 @@ export function useKeybind(handler: (e?: KeyboardEvent) => void, ...keySets: str
 
     window.addEventListener('keydown', applyIfPressed)
     return () => window.removeEventListener('keydown', applyIfPressed)
-  }, [])
+  }, deps)
 }

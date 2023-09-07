@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useState } from "react";
-import { Event } from "../../../mock/mockEvents";
 import { useWeekEvents, WeekEvent } from "@/contexts/Events/WeekEventsProvider";
 import { roundToNearest15Minutes } from "../../../time";
 
@@ -26,8 +25,8 @@ export function AddEventModal({ open, onClose }: Props) {
     onClose()
   }
 
-  function doesOverlapOtherEvent(event: Event) {
-    return weekEvents.some(ev => ev.startDate < event.endDate && event.startDate < ev.endDate)
+  function doesOverlapOtherEvent(event: Partial<WeekEvent>) {
+    return weekEvents.some(ev => ev.startDate < event.endDate! && event.startDate! < ev.endDate)
   }
 
   function validateDates() {
@@ -60,7 +59,7 @@ export function AddEventModal({ open, onClose }: Props) {
     const endDate = roundToNearest15Minutes(new Date(endDateRef.current!.value), true)
     const title = titleRef.current!.value
 
-    const newEvent: WeekEvent = {
+    const newEvent: Partial<WeekEvent> = {
       title: title,
       startDate: startDate,
       endDate: endDate

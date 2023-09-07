@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router";
 import { Button } from "@/components/Button";
-import { WeeklyCalendar } from "@/components/calendar/week/WeeklyCalendar";
-import { MonthlyCalendar } from "@/components/calendar/month/MonthlyCalendar";
+import { WeekCalendar } from "@/components/calendar/week/WeekCalendar";
+import { MonthCalendar } from "@/components/calendar/month/MonthCalendar";
 import { Calendar } from "@/components/calendar/Calendar";
 import { Summary } from "@/components/calendar/Summary";
 import { useCustomNav } from "@/components/nav";
@@ -19,8 +19,8 @@ export default function CalendarPage() {
             <Button onClick={() => navigate('/')} color="#0f0f11">Go to home</Button>
           </div>
           <Routes>
-            <Route path="/week" element={<WeeklyCalendar/>}/>
-            <Route path="/month" element={<MonthlyCalendar/>}/>
+            <Route path="/week" element={<WeekCalendar/>}/>
+            <Route path="/month" element={<MonthCalendar/>}/>
           </Routes>
         </div>
       </div>

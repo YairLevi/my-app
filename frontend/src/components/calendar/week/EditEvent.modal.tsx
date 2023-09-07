@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
-import { Event } from "../../../mock/mockEvents";
 import { WeekEvent, useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
 import { roundToNearest15Minutes } from "../../../time";
 
@@ -50,7 +49,7 @@ export function EditEventModal({ open, onClose, event }: Props) {
     onClose()
   }
 
-  function doesOverlapOtherEvent(event: Event) {
+  function doesOverlapOtherEvent(event: WeekEvent) {
     return weekEvents.some(ev => ev.id != id && ev.startDate < event.endDate && event.startDate < ev.endDate)
   }
 
@@ -84,16 +83,13 @@ export function EditEventModal({ open, onClose, event }: Props) {
     const endDate = roundToNearest15Minutes(new Date(endDateRef.current!.value), true)
     const title = titleRef.current!.value
 
-    const newEvent: WeekEvent = {
-      title: title,
-      startDate: startDate,
-      endDate: endDate
-    }
+    const updatedEvent = event
+    Object.assign(updatedEvent, { title, startDate, endDate })
 
-    if (doesOverlapOtherEvent(newEvent))
+    if (doesOverlapOtherEvent(updatedEvent))
       return setError("Overlap detected. Try again")
 
-    await weekEventService.updateEvent(id!, newEvent)
+    await weekEventService.updateEvent(updatedEvent)
     clearAndExit()
   }
 

@@ -1,10 +1,12 @@
-module changeme
+module my-app
 
 go 1.18
 
 require (
 	github.com/google/go-github/v39 v39.2.0
 	github.com/wailsapp/wails/v2 v2.5.1
+	gorm.io/driver/sqlite v1.5.3
+	gorm.io/gorm v1.25.4
 	modernc.org/sqlite v1.24.0
 )
 
@@ -15,6 +17,8 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/labstack/echo/v4 v4.9.0 // indirect
 	github.com/labstack/gommon v0.3.1 // indirect

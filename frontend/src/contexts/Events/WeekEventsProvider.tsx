@@ -1,11 +1,40 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
-import { Create, Delete, Read, Update } from '@/wails/go/main/Calendar'
-import { main } from "@/wails/go/models";
+import { Create, Delete, Read, Update } from '@/wails/go/repositories/WeekCalendar'
+import { repositories } from "@/wails/go/models";
 import { EventProviderExports } from "@/contexts/Events/EventProvider";
 
-export type WeekEvent = Omit<Omit<main.Event, "convertValues">, "id"> & { id?: number }
+type WeekEventNoConvert = Omit<repositories.WeekEvent, "convertValues">
+
+type TDateKey =
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt"
+  | "endDate"
+  | "startDate"
+
+const DateKeyList: TDateKey[] = [
+  "createdAt",
+  "updatedAt",
+  "deletedAt",
+  "endDate",
+  "startDate"
+]
+
+export type WeekEvent = { [K in keyof WeekEventNoConvert]: K extends TDateKey ? Date : WeekEventNoConvert[K] };
 
 const WeekEventsContext = createContext<EventProviderExports<WeekEvent>>({} as EventProviderExports<WeekEvent>)
+
+function convertToWeekEvent(event: repositories.WeekEvent): WeekEvent {
+  const obj: Record<string, any> = {}
+  for (const key of Object.keys(event)) {
+    if (DateKeyList.includes(key as TDateKey)) {
+      obj[key] = new Date(event[key as keyof typeof event])
+    } else {
+      obj[key] = event[key as keyof typeof event]
+    }
+  }
+  return obj as WeekEvent
+}
 
 export function useWeekEvents() {
   const { events, ...functions } = useContext(WeekEventsContext)
@@ -23,39 +52,33 @@ export function WeekEventsProvider({ children }: PropsWithChildren) {
   }, [])
 
   async function getEvents() {
-    let events = await Read()
-    events = events.map(event => {
-      event.startDate = new Date(event.startDate)
-      event.endDate = new Date(event.endDate)
-      return event
-    })
-    setEvents(events)
+    const events = await Read()
+    const weekEvents: WeekEvent[] = events.map(ev => convertToWeekEvent(ev))
+    setEvents(weekEvents)
   }
 
-  async function addEvent(newEvent: WeekEvent) {
-    const event = new main.Event()
-    event.title = newEvent.title
-    event.endDate = newEvent.endDate
-    event.startDate = newEvent.startDate
-    const rEvent = await Create(event)
-
-    rEvent.startDate = new Date(rEvent.startDate)
-    rEvent.endDate = new Date(rEvent.endDate)
-    setEvents(prev => [...prev, rEvent])
+  async function addEvent(newEvent: Partial<WeekEvent>) {
+    const repoEvent = new repositories.WeekEvent()
+    Object.assign(repoEvent, newEvent)
+    const newRepoEvent = await Create(repoEvent)
+    const newWeekEvent = convertToWeekEvent(newRepoEvent)
+    setEvents(prev => [...prev, newWeekEvent])
   }
 
-  async function updateEvent(id: number, updatedFields: Partial<WeekEvent>) {
-    const event = events.find(ev => ev.id == id)
-    if (!event) return
-    const updatedEvent = Object.assign({}, event, updatedFields)
-
-    await Update(id, updatedFields)
-    setEvents(prev => [...prev.filter(ev => ev.id != id), updatedEvent])
+  async function updateEvent(updatedEvent: WeekEvent) {
+    const repoEvent = new repositories.WeekEvent()
+    Object.assign(repoEvent, updatedEvent)
+    repoEvent.deletedAt = undefined
+    const updatedRepoEvent = await Update(repoEvent)
+    const updatedWeekEvent = convertToWeekEvent(updatedRepoEvent)
+    setEvents(prev => [...prev.filter(ev => ev.id != updatedEvent.id), updatedWeekEvent])
   }
 
-  async function deleteEvent(id: number) {
-    await Delete(id)
-    setEvents(prev => prev.filter(event => event.id != id))
+  async function deleteEvent(deleteEvent: WeekEvent) {
+    const repoEvent = new repositories.WeekEvent()
+    Object.assign(repoEvent, deleteEvent)
+    await Delete(repoEvent)
+    setEvents(prev => prev.filter(ev => ev.id != deleteEvent.id))
   }
 
   const value = {
@@ -63,6 +86,7 @@ export function WeekEventsProvider({ children }: PropsWithChildren) {
     addEvent,
     updateEvent,
     deleteEvent,
+    forceRefresh: getEvents
   }
 
   return (

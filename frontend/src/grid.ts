@@ -1,5 +1,4 @@
 import { Layout } from "react-grid-layout";
-import { main } from "@/wails/go/models";
 
 export interface GridPosition {
   x: number

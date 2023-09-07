@@ -3,8 +3,6 @@
 
 export function GetVersion():Promise<string>;
 
-export function Greet(arg1:string):Promise<string>;
-
 export function IsUpdateAvailable():Promise<boolean>;
 
 export function Update():Promise<void>;
