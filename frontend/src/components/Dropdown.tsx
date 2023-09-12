@@ -33,7 +33,7 @@ interface ItemProps extends PropsWithChildren {
 
 function DropdownItem(props: ItemProps) {
   return (
-    <li className={`select-none text-white list-none px-3 py-2 my-1 rounded-lg hover:cursor-pointer hover:bg-gray-600
+    <li className={`select-none text-black list-none px-2 py-1 my-1 rounded-lg hover:cursor-pointer hover:bg-black hover:bg-opacity-20
       ${props.isSelected && 'bg-gray-500 bg-opacity-30'}
     `}
         onClick={props.onClick}
@@ -55,8 +55,8 @@ function DropdownMenu(props: MenuProps) {
         props.open &&
           <div
               className={`
-              max-w-[350px] min-w-[5rem] max-h-52 overflow-auto mt-2 p-1 
-              rounded-md shadow-sm z-10 ${!props.inline && 'absolute'} bg-[#0f0f11]
+              max-w-[350px] min-w-[5rem] overflow-auto mt-2 p-1 
+              rounded-md z-10 shadow-2xl ${!props.inline && 'absolute'} bg-white
               [&_*]:text-sm
               `}
           >
@@ -77,7 +77,7 @@ interface PickerProps {
 function DropdownPicker(props: PickerProps) {
   return (
     <div
-      className={`px-3 py-1 text-sm hover:cursor-pointer flex justify-between items-center gap-2 bg-[#0f0f11] [&_*]:text-gray-200`}
+      className={`px-3 py-1 text-sm hover:cursor-pointer flex justify-between items-center gap-2 [&_*]:text-gray-600`}
       onClick={props.onClick}
     >
       <div className="overflow-hidden text-ellipsis whitespace-nowrap">

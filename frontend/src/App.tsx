@@ -9,6 +9,7 @@ import './input.css'
 import { GetVersion, IsUpdateAvailable, Update } from "@/wails/go/main/App";
 import { Modal, useModal } from "@/components/Modal";
 import { Button } from "@/components/Button";
+import { Editor } from '@/pages/notes/Lexical/Editor'
 
 export default function App() {
   const navigate = useNavigate()
@@ -93,7 +94,7 @@ export default function App() {
         <Route path="/" element={<div className="text-white">Dashboard page {version}</div>}/>
         <Route path="/calendar/*" element={<CalendarPage/>}/>
         <Route path="/analytics/*" element={<div className="text-white">Analytics Page</div>}/>
-        <Route path="/notes/*" element={<div className="text-white">Notes Page</div>}/>
+        <Route path="/notes/*" element={<Editor/>}/>
       </Routes>
 
       <Modal
