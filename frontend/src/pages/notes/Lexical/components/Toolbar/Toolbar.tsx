@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import "@/pages/notes/Lexical/styles/EditorTheme.css";
 import { ToolbarProps } from "../../types";
-import { RotateCcw, RotateCw } from 'lucide-react'
+import { Bold, Code, Italic, Link, RotateCcw, RotateCw, Underline } from 'lucide-react'
 import {
   $getSelection,
   $isElementNode,
@@ -11,7 +11,7 @@ import {
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  ElementFormatType,
+  ElementFormatType, FORMAT_TEXT_COMMAND,
   NodeKey,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
@@ -22,7 +22,7 @@ import { FontDropDown } from "@/pages/notes/Lexical/components/Toolbar/Font/Font
 import { $findMatchingParent, $getNearestNodeOfType, mergeRegister } from "@lexical/utils";
 import { $getSelectionStyleValueForProperty, $isParentElementRTL } from "@lexical/selection";
 import getSelectedNode from "@/pages/notes/Lexical/utils/getSelectedNode";
-import { $isLinkNode } from "@lexical/link";
+import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { $isTableNode } from "@lexical/table";
 import { $isListNode, ListNode } from "@lexical/list";
 import { $isHeadingNode } from "@lexical/rich-text";
@@ -202,18 +202,49 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
     );
   }, [editor, $updateToolbar, activeEditor]);
 
+  const insertLink = useCallback(() => {
+    if (!isLink) {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl('https://'));
+    } else {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+    }
+  }, [editor, isLink]);
+
+
+  const SUPPORTED_URL_PROTOCOLS = new Set([
+    'http:',
+    'https:',
+    'mailto:',
+    'sms:',
+    'tel:',
+  ]);
+
+  function sanitizeUrl(url: string): string {
+    try {
+      const parsedUrl = new URL(url);
+      // eslint-disable-next-line no-script-url
+      if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
+        return 'about:blank';
+      }
+    } catch {
+      return url;
+    }
+    return url;
+  }
+
+  const IS_APPLE = false
+
+
   return (
-    <div className="flex bg-gray-100 h-10 border-b">
+    <div className="flex bg-gray-100 h-10 border-b [&_*]:!text-gray-600 items-center">
       <div id="undo-redo- contianer" className="items-center w-fit flex p-1 justify-evenly">
         <RotateCcw
           className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
-          strokeWidth={1.5}
           size={32}
           onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
         />
         <RotateCw
           className="p-2 rounded-md hover:bg-gray-300 hover:cursor-pointer text-gray-600"
-          strokeWidth={1.5}
           size={32}
           onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         />
@@ -225,6 +256,45 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         editor={editor}
         value={fontSize}
         style={"font-size"}
+      />
+      <FontDropDown
+        editor={editor}
+        value={fontFamily}
+        style={"font-family"}
+      />
+      <Bold
+        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        strokeWidth={4}
+        size={32}
+        onClick={() => {
+          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');
+        }}
+      />
+      <Italic
+        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        size={32}
+        onClick={() => {
+          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
+        }}
+      />
+      <Underline
+        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        size={32}
+        onClick={() => {
+          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
+        }}
+      />
+      <Code
+        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        size={32}
+        onClick={() => {
+          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
+        }}
+      />
+      <Link
+        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        size={32}
+        onClick={insertLink}
       />
     </div>
   );
