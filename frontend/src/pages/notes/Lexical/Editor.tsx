@@ -38,10 +38,10 @@ export const Editor = () => {
         },
       }}
     >
-      <div className="w-full p-0 overflow-hidden">
+      <div className="w-full p-0 overflow-hidden flex flex-col">
         <Toolbar editable/>
         <RichTextPlugin
-          contentEditable={<ContentEditable className="bg-white w-full p-3 overflow-auto max-h-[20rem]"/>}
+          contentEditable={<ContentEditable className="bg-white w-full p-3 overflow-auto h-full"/>}
           placeholder={<p className="absolute top-0 left-0">Hello</p>}
           ErrorBoundary={LexicalErrorBoundary}
         />
@@ -54,7 +54,6 @@ export const Editor = () => {
         <TabIndentationPlugin/>
         <CheckListPlugin/>
       </div>
-      {/* {false && <TreeViewPlugin />} */}
     </LexicalComposer>
   )
 }
