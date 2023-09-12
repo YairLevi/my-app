@@ -9,7 +9,7 @@ import {HeadingNode, QuoteNode} from "@lexical/rich-text";
 import {InitialConfigType} from "@lexical/react/LexicalComposer";
 import {LexicalEditor} from "lexical";
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
-import { registerTabIndentation } from "@lexical/react/LexicalTabIndentationPlugin";
+import { Text } from "lucide-react";
 
 export const theme: EditorThemeClasses = {
     blockCursor: 'blockCursor',
@@ -63,7 +63,6 @@ export const theme: EditorThemeClasses = {
     image: 'editor-image',
     indent: 'indent',
     link: 'link',
-
     list: {
         listitem: 'listItem',
         listitemChecked: 'listItemChecked',
@@ -167,3 +166,69 @@ export const initialHasFormat: Record<TextFormatType, boolean> = {
     code: false,
     highlight: false,
 }
+
+export const alignMenuItems: AlignMenuItem[] = [
+    {
+        name: "Left Align",
+        icon: <Text />,
+        payload: "left",
+    },
+    {
+        name: "Center Align",
+        icon: <Text />,
+        payload: "center",
+    },
+    {
+        name: "Right Align",
+        icon: <Text />,
+        payload: "right",
+    },
+    {
+        name: "Justify Align",
+        icon: <Text />,
+        payload: "justify",
+    }
+];
+
+export const formatMenuItems: FormatTextMenuItem[] = [
+    {
+        name: "Bold",
+        icon: <Text />,
+        payload: "bold",
+    },
+    {
+        name: "Italic",
+        icon: <Text />,
+        payload: "italic",
+    },
+    {
+        name: "Strikethrough",
+        icon: <Text />,
+        payload: "strikethrough",
+    },
+    {
+        name: "Underline",
+        icon: <Text />,
+        payload: "underline",
+    },
+    {
+        name: "Code",
+        icon: <Text />,
+        payload: "code",
+    },
+    {
+        name: "Highlight",
+        icon: <Text />,
+        payload: "highlight",
+    },
+    {
+        name: "Subscript",
+        icon: <Text />,
+        payload: "subscript",
+    },
+    {
+        name: "Superscript",
+        icon: <Text />,
+        payload: "superscript",
+    }
+];

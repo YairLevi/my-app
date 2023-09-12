@@ -3,10 +3,10 @@ import {$createParagraphNode, $getSelection, $isRangeSelection, DEPRECATED_$isGr
 import {$setBlocksType} from "@lexical/selection";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import { $createHeadingNode, $createQuoteNode, HeadingTagType, } from '@lexical/rich-text';
-import {blockTypeToBlockName} from "./constants";
+import {blockTypeToBlockName} from "../../constants";
 import { INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND, } from '@lexical/list';
 import {$createCodeNode} from "@lexical/code";
-import {UseBlockFormatProps} from "./types";
+import {UseBlockFormatProps} from "../../types";
 import {
   Text,
   Heading1,
