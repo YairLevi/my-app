@@ -91,7 +91,6 @@ export function FormatDropdown() {
             onClick={() => {
               onSelect(idx)()
               option.onClick()
-              toggleOpen()
             }}
           >
             <Option

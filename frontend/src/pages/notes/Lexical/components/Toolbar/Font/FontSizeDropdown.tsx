@@ -250,6 +250,10 @@ export function FontDropDown({
     options,
   } = useDropdown(FONT_STYLE)
 
+  useEffect(() => {
+    console.log(open)
+  }, [open]);
+
   return (
     <Dropdown>
       <Dropdown.Picker
@@ -265,7 +269,6 @@ export function FontDropDown({
               onClick={() => {
                 onSelect(idx)()
                 handleClick(option)
-                toggleOpen()
               }}
             >
               <FontOption key={"font" + idx} name={option}/>
