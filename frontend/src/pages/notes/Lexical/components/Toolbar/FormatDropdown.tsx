@@ -75,6 +75,7 @@ export function FormatDropdown() {
       <Dropdown.Picker
         onClick={toggleOpen}
         open={open}
+        className="hover:bg-gray-300"
         value={
           !selectedOption ?
             "Pick a type format" :

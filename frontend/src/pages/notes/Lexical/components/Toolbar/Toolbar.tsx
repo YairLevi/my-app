@@ -2,16 +2,17 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import "@/pages/notes/Lexical/styles/EditorTheme.css";
 import { ToolbarProps } from "../../types";
-import { Bold, Code, Italic, Link, RotateCcw, RotateCw, Underline } from 'lucide-react'
+import { Bold, Code, Highlighter, Italic, Link, RotateCcw, RotateCw, Type, Underline } from 'lucide-react'
 import {
   $getSelection,
-  $isElementNode,
   $isRangeSelection,
   $isRootOrShadowRoot,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  ElementFormatType, FORMAT_TEXT_COMMAND,
+  COMMAND_PRIORITY_NORMAL, DEPRECATED_$isGridSelection,
+  FORMAT_TEXT_COMMAND,
+  KEY_MODIFIER_COMMAND,
   NodeKey,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
@@ -20,36 +21,26 @@ import {
 import { blockTypeToBlockName, FormatDropdown } from "@/pages/notes/Lexical/components/Toolbar/FormatDropdown";
 import { FontDropDown } from "@/pages/notes/Lexical/components/Toolbar/Font/FontSizeDropdown";
 import { $findMatchingParent, $getNearestNodeOfType, mergeRegister } from "@lexical/utils";
-import { $getSelectionStyleValueForProperty, $isParentElementRTL } from "@lexical/selection";
+import { $getSelectionStyleValueForProperty, $isParentElementRTL, $patchStyleText } from "@lexical/selection";
 import getSelectedNode from "@/pages/notes/Lexical/utils/getSelectedNode";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
-import { $isTableNode } from "@lexical/table";
 import { $isListNode, ListNode } from "@lexical/list";
 import { $isHeadingNode } from "@lexical/rich-text";
 import { $isCodeNode, CODE_LANGUAGE_MAP } from "@lexical/code";
-
-;
+import DropdownColorPicker from '../FontColor/DropdownColorPicker'
 
 const Toolbar: FC<ToolbarProps> = ({ editable }) => {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
   const [blockType, setBlockType] =
-    useState<keyof typeof blockTypeToBlockName>('paragraph');
-
-  const rootTypeToRootName = {
-    root: 'Root',
-    table: 'Table',
-  };
-  const [rootType, setRootType] =
-    useState<keyof typeof rootTypeToRootName>('root');
+    useState<keyof typeof blockTypeToBlockName>("paragraph");
   const [selectedElementKey, setSelectedElementKey] = useState<NodeKey | null>(
-    null,
+    null
   );
-  const [fontSize, setFontSize] = useState<string>('15px');
-  const [fontColor, setFontColor] = useState<string>('#000');
-  const [bgColor, setBgColor] = useState<string>('#fff');
-  const [fontFamily, setFontFamily] = useState<string>('Arial');
-  const [elementFormat, setElementFormat] = useState<ElementFormatType>('left');
+  const [fontSize, setFontSize] = useState<string>("15px");
+  const [fontColor, setFontColor] = useState<string>("#000");
+  const [bgColor, setBgColor] = useState<string>("#fff");
+  const [fontFamily, setFontFamily] = useState<string>("Arial");
   const [isLink, setIsLink] = useState(false);
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
@@ -60,17 +51,18 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
   const [isCode, setIsCode] = useState(false);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  //   const [modal, showModal] = useModal();
   const [isRTL, setIsRTL] = useState(false);
-  const [codeLanguage, setCodeLanguage] = useState<string>('');
+  const [codeLanguage, setCodeLanguage] = useState<string>("");
   const [isEditable, setIsEditable] = useState(() => editor.isEditable());
+  const IS_APPLE = false;
 
-
-  const $updateToolbar = useCallback(() => {
+  const updateToolbar = useCallback(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       const anchorNode = selection.anchor.getNode();
       let element =
-        anchorNode.getKey() === 'root'
+        anchorNode.getKey() === "root"
           ? anchorNode
           : $findMatchingParent(anchorNode, (e) => {
             const parent = e.getParent();
@@ -85,13 +77,13 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
       const elementDOM = activeEditor.getElementByKey(elementKey);
 
       // Update text format
-      setIsBold(selection.hasFormat('bold'));
-      setIsItalic(selection.hasFormat('italic'));
-      setIsUnderline(selection.hasFormat('underline'));
-      setIsStrikethrough(selection.hasFormat('strikethrough'));
-      setIsSubscript(selection.hasFormat('subscript'));
-      setIsSuperscript(selection.hasFormat('superscript'));
-      setIsCode(selection.hasFormat('code'));
+      setIsBold(selection.hasFormat("bold"));
+      setIsItalic(selection.hasFormat("italic"));
+      setIsUnderline(selection.hasFormat("underline"));
+      setIsStrikethrough(selection.hasFormat("strikethrough"));
+      setIsSubscript(selection.hasFormat("subscript"));
+      setIsSuperscript(selection.hasFormat("superscript"));
+      setIsCode(selection.hasFormat("code"));
       setIsRTL($isParentElementRTL(selection));
 
       // Update links
@@ -103,19 +95,12 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         setIsLink(false);
       }
 
-      const tableNode = $findMatchingParent(node, $isTableNode);
-      if ($isTableNode(tableNode)) {
-        setRootType('table');
-      } else {
-        setRootType('root');
-      }
-
       if (elementDOM !== null) {
         setSelectedElementKey(elementKey);
         if ($isListNode(element)) {
           const parentList = $getNearestNodeOfType<ListNode>(
             anchorNode,
-            ListNode,
+            ListNode
           );
           const type = parentList
             ? parentList.getListType()
@@ -132,7 +117,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
             const language =
               element.getLanguage() as keyof typeof CODE_LANGUAGE_MAP;
             setCodeLanguage(
-              language ? CODE_LANGUAGE_MAP[language] || language : '',
+              language ? CODE_LANGUAGE_MAP[language] || language : ""
             );
             return;
           }
@@ -140,25 +125,20 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
       }
       // Handle buttons
       setFontSize(
-        $getSelectionStyleValueForProperty(selection, 'font-size', '15px'),
+        $getSelectionStyleValueForProperty(selection, "font-size", "15px")
       );
       setFontColor(
-        $getSelectionStyleValueForProperty(selection, 'color', '#000'),
+        $getSelectionStyleValueForProperty(selection, "color", "#000")
       );
       setBgColor(
         $getSelectionStyleValueForProperty(
           selection,
-          'background-color',
-          '#fff',
-        ),
+          "background-color",
+          "#fff"
+        )
       );
       setFontFamily(
-        $getSelectionStyleValueForProperty(selection, 'font-family', 'Arial'),
-      );
-      setElementFormat(
-        ($isElementNode(node)
-          ? node.getFormatType()
-          : parent?.getFormatType()) || 'left',
+        $getSelectionStyleValueForProperty(selection, "font-family", "Arial")
       );
     }
   }, [activeEditor]);
@@ -166,13 +146,13 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
     return editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
       (_payload, newEditor) => {
-        $updateToolbar();
+        updateToolbar();
         setActiveEditor(newEditor);
         return false;
       },
-      COMMAND_PRIORITY_CRITICAL,
+      COMMAND_PRIORITY_CRITICAL
     );
-  }, [editor, $updateToolbar]);
+  }, [editor, updateToolbar]);
   useEffect(() => {
     return mergeRegister(
       editor.registerEditableListener((editable) => {
@@ -180,7 +160,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
       }),
       activeEditor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
-          $updateToolbar();
+          updateToolbar();
         });
       }),
       activeEditor.registerCommand<boolean>(
@@ -189,7 +169,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
           setCanUndo(payload);
           return false;
         },
-        COMMAND_PRIORITY_CRITICAL,
+        COMMAND_PRIORITY_CRITICAL
       ),
       activeEditor.registerCommand<boolean>(
         CAN_REDO_COMMAND,
@@ -197,19 +177,66 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
           setCanRedo(payload);
           return false;
         },
-        COMMAND_PRIORITY_CRITICAL,
-      ),
+        COMMAND_PRIORITY_CRITICAL
+      )
     );
-  }, [editor, $updateToolbar, activeEditor]);
+  }, [activeEditor, editor, updateToolbar]);
+  useEffect(() => {
+    return activeEditor.registerCommand(
+      KEY_MODIFIER_COMMAND,
+      (payload) => {
+        const event: KeyboardEvent = payload;
+        const { code, ctrlKey, metaKey } = event;
+
+        if (code === 'KeyK' && (ctrlKey || metaKey)) {
+          event.preventDefault();
+          return activeEditor.dispatchCommand(
+            TOGGLE_LINK_COMMAND,
+            sanitizeUrl('https://'),
+          );
+        }
+        return false;
+      },
+      COMMAND_PRIORITY_NORMAL,
+    );
+  }, [activeEditor, isLink])
 
   const insertLink = useCallback(() => {
     if (!isLink) {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl('https://'));
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, "www.google.com");
     } else {
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     }
   }, [editor, isLink]);
 
+  const applyStyleText = useCallback(
+    (styles: Record<string, string>) => {
+      activeEditor.update(() => {
+        const selection = $getSelection();
+        if (
+          $isRangeSelection(selection) ||
+          DEPRECATED_$isGridSelection(selection)
+        ) {
+          $patchStyleText(selection, styles);
+        }
+      });
+    },
+    [activeEditor],
+  );
+
+  const onFontColorSelect = useCallback(
+    (value: string) => {
+      applyStyleText({color: value});
+    },
+    [applyStyleText],
+  );
+
+  const onBgColorSelect = useCallback(
+    (value: string) => {
+      applyStyleText({'background-color': value});
+    },
+    [applyStyleText],
+  );
 
   const SUPPORTED_URL_PROTOCOLS = new Set([
     'http:',
@@ -221,8 +248,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
 
   function sanitizeUrl(url: string): string {
     try {
-      const parsedUrl = new URL(url);
-      // eslint-disable-next-line no-script-url
+      const parsedUrl = new URL(url)
       if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
         return 'about:blank';
       }
@@ -232,26 +258,24 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
     return url;
   }
 
-  const IS_APPLE = false
-
 
   return (
-    <div className="flex bg-gray-100 h-10 border-b [&_*]:!text-gray-600 items-center">
-      <div id="undo-redo- contianer" className="items-center w-fit flex p-1 justify-evenly">
+    <div className="flex bg-gray-100 h-fit border-b [&_*]:!text-gray-600 items-center gap-1 p-1">
+      <div id="undo-redo- contianer" className="items-center w-fit flex justify-evenly">
         <RotateCcw
           className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
           size={32}
           onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
         />
         <RotateCw
-          className="p-2 rounded-md hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+          className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
           size={32}
           onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         />
       </div>
-      <div className="border-r"/>
+      <div className="h-full bg-gray-300 w-[1px]" />
       <FormatDropdown/>
-      <div className="border-r"/>
+      <div className="h-full bg-gray-300 w-[1px]" />
       <FontDropDown
         editor={editor}
         value={fontSize}
@@ -262,8 +286,9 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         value={fontFamily}
         style={"font-family"}
       />
+      <div className="h-full bg-gray-300 w-[1px]" />
       <Bold
-        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isBold && "bg-gray-300"}`}
         strokeWidth={4}
         size={32}
         onClick={() => {
@@ -271,30 +296,51 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         }}
       />
       <Italic
-        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isItalic && "bg-gray-300"}`}
         size={32}
         onClick={() => {
           activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
         }}
       />
       <Underline
-        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isUnderline && "bg-gray-300"}`}
         size={32}
         onClick={() => {
           activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
         }}
       />
       <Code
-        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isCode && "bg-gray-300"}`}
         size={32}
         onClick={() => {
           activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
         }}
       />
       <Link
-        className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
         size={32}
         onClick={insertLink}
+      />
+      <div className="h-full bg-gray-300 w-[1px]" />
+      <DropdownColorPicker
+        disabled={!isEditable}
+        buttonClassName="toolbar-item color-picker"
+        buttonAriaLabel="Formatting text color"
+        buttonIconClassName="icon font-color"
+        color={fontColor}
+        onChange={onFontColorSelect}
+        value={<Type size={32} className="p-2"/>}
+        title="text color"
+      />
+      <DropdownColorPicker
+        disabled={!isEditable}
+        buttonClassName="toolbar-item color-picker"
+        buttonAriaLabel="Formatting background color"
+        buttonIconClassName="icon bg-color"
+        color={bgColor}
+        onChange={onBgColorSelect}
+        value={<Highlighter size={32} className="p-2"/>}
+        title="bg color"
       />
     </div>
   );

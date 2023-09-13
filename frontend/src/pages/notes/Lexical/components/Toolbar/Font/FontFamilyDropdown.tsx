@@ -80,15 +80,12 @@ export function FontDropDown({
     options,
   } = useDropdown(FONT_STYLE)
 
-  useEffect(() => {
-    console.log(open)
-  }, [open]);
-
   return (
     <Dropdown>
       <Dropdown.Picker
         onClick={toggleOpen}
         open={open}
+        className="hover:bg-gray-300"
         value={<FontOption name={value}/>}
       />
       <Dropdown.Menu open={open}>

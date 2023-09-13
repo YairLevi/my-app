@@ -8,6 +8,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin';
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import Toolbar from "@/pages/notes/Lexical/components/Toolbar";
 import LocalStoragePlugin from "@/pages/notes/Lexical/plugins/LocalStoragePlugin";
@@ -52,6 +53,7 @@ export const Editor = () => {
         <ListPlugin/>
         <HorizontalRulePlugin/>
         <TabIndentationPlugin/>
+        <LinkPlugin/>
         <CheckListPlugin/>
       </div>
     </LexicalComposer>

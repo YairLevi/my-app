@@ -1,6 +1,8 @@
-import React, { PropsWithChildren, ReactNode, useState } from 'react'
+import React, { PropsWithChildren, ReactNode, ReactPropTypes, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { clsx } from "clsx";
+import PropTypes from "prop-types";
 
 export function useDropdown<T>(data: T[]) {
   const [open, setOpen] = useState(false)
@@ -67,17 +69,18 @@ function DropdownMenu(props: MenuProps) {
   )
 }
 
-interface PickerProps {
+type PickerProps = {
   open: boolean
   onClick: () => void
   placeholder?: string
+  className?: string
   value: string | ReactNode
 }
 
 function DropdownPicker(props: PickerProps) {
   return (
     <div
-      className={`px-3 py-1 text-sm hover:cursor-pointer flex justify-between items-center gap-2 [&_*]:text-gray-600`}
+      className={`px-3 py-1 text-sm hover:cursor-pointer flex justify-between items-center gap-2 [&_*]:text-gray-600 ${props.className}`}
       onClick={props.onClick}
     >
       <div className="overflow-hidden text-ellipsis whitespace-nowrap">

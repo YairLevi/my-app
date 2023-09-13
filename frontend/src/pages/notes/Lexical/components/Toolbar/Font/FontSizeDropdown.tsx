@@ -259,6 +259,7 @@ export function FontDropDown({
       <Dropdown.Picker
         onClick={toggleOpen}
         open={open}
+        className="hover:bg-gray-300"
         value={<FontOption name={value}/>}
       />
       <Dropdown.Menu open={open}>
