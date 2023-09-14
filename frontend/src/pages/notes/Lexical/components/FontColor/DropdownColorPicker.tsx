@@ -50,7 +50,14 @@ export default function DropdownColorPicker({
         </div>}
       />
       <Dropdown.Menu open={open}>
-        <ColorPicker color={color} onChange={onChange}/>
+        <ColorPicker color={color} onChange={(c) => {
+          if (onChange) {
+            onChange(c)
+          }
+          if (open && color != c) {
+            toggleOpen()
+          }
+        }}/>
       </Dropdown.Menu>
     </Dropdown>
   );

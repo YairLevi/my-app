@@ -2,32 +2,53 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import "@/pages/notes/Lexical/styles/EditorTheme.css";
 import { ToolbarProps } from "../../types";
-import { Bold, Code, Highlighter, Italic, Link, RotateCcw, RotateCw, Type, Underline } from 'lucide-react'
 import {
-  $getSelection,
+  AlignCenter, AlignJustify,
+  AlignLeft, AlignRight,
+  Bold,
+  Code, Eraser,
+  Highlighter, Indent,
+  Italic,
+  Link, Outdent,
+  RotateCcw,
+  RotateCw, Strikethrough, StrikethroughIcon,
+  Subscript,
+  Superscript,
+  Type,
+  Underline
+} from 'lucide-react'
+import {
+  $createParagraphNode,
+  $getSelection, $isElementNode,
   $isRangeSelection,
-  $isRootOrShadowRoot,
+  $isRootOrShadowRoot, $isTextNode,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_NORMAL, DEPRECATED_$isGridSelection,
-  FORMAT_TEXT_COMMAND,
+  COMMAND_PRIORITY_NORMAL, DEPRECATED_$isGridSelection, ElementFormatType, FORMAT_ELEMENT_COMMAND,
+  FORMAT_TEXT_COMMAND, INDENT_CONTENT_COMMAND,
   KEY_MODIFIER_COMMAND,
-  NodeKey,
+  NodeKey, OUTDENT_CONTENT_COMMAND,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND
 } from "lexical";
 import { blockTypeToBlockName, FormatDropdown } from "@/pages/notes/Lexical/components/Toolbar/FormatDropdown";
 import { FontDropDown } from "@/pages/notes/Lexical/components/Toolbar/Font/FontSizeDropdown";
-import { $findMatchingParent, $getNearestNodeOfType, mergeRegister } from "@lexical/utils";
+import {
+  $findMatchingParent,
+  $getNearestBlockElementAncestorOrThrow,
+  $getNearestNodeOfType,
+  mergeRegister
+} from "@lexical/utils";
 import { $getSelectionStyleValueForProperty, $isParentElementRTL, $patchStyleText } from "@lexical/selection";
 import getSelectedNode from "@/pages/notes/Lexical/utils/getSelectedNode";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { $isListNode, ListNode } from "@lexical/list";
-import { $isHeadingNode } from "@lexical/rich-text";
+import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
 import { $isCodeNode, CODE_LANGUAGE_MAP } from "@lexical/code";
 import DropdownColorPicker from '../FontColor/DropdownColorPicker'
+import { $isDecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 
 const Toolbar: FC<ToolbarProps> = ({ editable }) => {
   const [editor] = useLexicalComposerContext();
@@ -41,6 +62,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
   const [fontColor, setFontColor] = useState<string>("#000");
   const [bgColor, setBgColor] = useState<string>("#fff");
   const [fontFamily, setFontFamily] = useState<string>("Arial");
+  const [elementFormat, setElementFormat] = useState<ElementFormatType>('left');
   const [isLink, setIsLink] = useState(false);
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
@@ -139,6 +161,11 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
       );
       setFontFamily(
         $getSelectionStyleValueForProperty(selection, "font-family", "Arial")
+      );
+      setElementFormat(
+        ($isElementNode(node)
+          ? node.getFormatType()
+          : parent?.getFormatType()) || 'left',
       );
     }
   }, [activeEditor]);
@@ -258,6 +285,66 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
     return url;
   }
 
+  const clearFormatting = useCallback(() => {
+    activeEditor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        const anchor = selection.anchor;
+        const focus = selection.focus;
+        const nodes = selection.getNodes();
+
+        if (anchor.key === focus.key && anchor.offset === focus.offset) {
+          return;
+        }
+
+        nodes.forEach((node, idx) => {
+          // We split the first and last node by the selection
+          // So that we don't format unselected text inside those nodes
+          if ($isTextNode(node)) {
+            if (idx === 0 && anchor.offset !== 0) {
+              node = node.splitText(anchor.offset)[1] || node;
+            }
+            if (idx === nodes.length - 1) {
+              node = node.splitText(focus.offset)[0] || node;
+            }
+
+            if (node.__style !== '') {
+              node.setStyle('');
+            }
+            if (node.__format !== 0) {
+              node.setFormat(0);
+              $getNearestBlockElementAncestorOrThrow(node).setFormat('');
+            }
+          } else if ($isHeadingNode(node) || $isQuoteNode(node)) {
+            node.replace($createParagraphNode(), true);
+          } else if ($isDecoratorBlockNode(node)) {
+            node.setFormat('');
+          }
+        });
+      }
+    });
+  }, [activeEditor]);
+
+  const FORMAT_TYPES = {
+    left: "left",
+    center: "center",
+    right: "right",
+    justify: "justify",
+  }
+
+  function strikeThroughOnClick() {
+    activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')
+  }
+  function clearFormattingOnClick() {
+    clearFormatting()
+  }
+  function superscriptOnClick() {
+    activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript')
+  }
+  function subscriptOnClick() {
+    activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'subscript')
+  }
+
 
   return (
     <div className="flex bg-gray-100 h-fit border-b [&_*]:!text-gray-600 items-center gap-1 p-1">
@@ -329,7 +416,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         buttonIconClassName="icon font-color"
         color={fontColor}
         onChange={onFontColorSelect}
-        value={<Type size={32} className="p-2"/>}
+        value={<Type size={32} className="p-2 -ml-2"/>}
         title="text color"
       />
       <DropdownColorPicker
@@ -339,8 +426,61 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         buttonIconClassName="icon bg-color"
         color={bgColor}
         onChange={onBgColorSelect}
-        value={<Highlighter size={32} className="p-2"/>}
+        value={<Highlighter size={32} className="p-2 -ml-2"/>}
         title="bg color"
+      />
+      <div className="h-full bg-gray-300 w-[1px]" />
+      <Superscript
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isSuperscript && "bg-gray-300"}`}
+        size={32}
+        onClick={superscriptOnClick}
+      />
+      <Subscript
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isSubscript && "bg-gray-300"}`}
+        size={32}
+        onClick={subscriptOnClick}
+      />
+      <Strikethrough
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isStrikethrough && "bg-gray-300"}`}
+        size={32}
+        onClick={strikeThroughOnClick}
+      />
+      <Eraser
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600`}
+        size={32}
+        onClick={clearFormattingOnClick}
+      />
+      <div className="h-full bg-gray-300 w-[1px]" />
+      <AlignLeft
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.left && "bg-gray-300"}`}
+        size={32}
+        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}
+      />
+      <AlignCenter
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.center && "bg-gray-300"}`}
+        size={32}
+        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}
+      />
+      <AlignRight
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.right && "bg-gray-300"}`}
+        size={32}
+        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}
+      />
+      <AlignJustify
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.justify && "bg-gray-300"}`}
+        size={32}
+        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}
+      />
+      <div className="h-full bg-gray-300 w-[1px]" />
+      <Indent
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
+        size={32}
+        onClick={() => editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)}
+      />
+      <Outdent
+        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
+        size={32}
+        onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}
       />
     </div>
   );
