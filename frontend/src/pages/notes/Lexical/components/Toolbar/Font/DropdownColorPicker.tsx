@@ -3,7 +3,6 @@ import { ReactNode } from 'react';
 
 import ColorPicker from './ColorPicker';
 import Dropdown, { useDropdown } from "@/components/Dropdown";
-import { Type } from "lucide-react";
 
 type Props = {
   disabled?: boolean;
@@ -18,19 +17,9 @@ type Props = {
   value: ReactNode
 };
 
-export default function DropdownColorPicker({
-                                              disabled = false,
-                                              stopCloseOnClickSelf = true,
-                                              color,
-                                              onChange,
-                                              value,
-                                              ...rest
-                                            }: Props) {
-
-  const {
-    open,
-    toggleOpen,
-  } = useDropdown([])
+export default function DropdownColorPicker(props: Props) {
+  const { disabled = false, stopCloseOnClickSelf = true, color, onChange, value, ...rest } = props
+  const { open, toggleOpen, } = useDropdown([])
 
   return (
     <Dropdown>
@@ -45,19 +34,12 @@ export default function DropdownColorPicker({
             style={{
               backgroundColor: color,
               border: "1px groove lightgray",
-          }}
+            }}
           />
         </div>}
       />
       <Dropdown.Menu open={open}>
-        <ColorPicker color={color} onChange={(c) => {
-          if (onChange) {
-            onChange(c)
-          }
-          if (open && color != c) {
-            toggleOpen()
-          }
-        }}/>
+        <ColorPicker color={color} onChange={onChange}/>
       </Dropdown.Menu>
     </Dropdown>
   );

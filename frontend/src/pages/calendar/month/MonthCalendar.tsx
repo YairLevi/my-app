@@ -3,12 +3,12 @@ import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { For } from "@/components/For";
 import { useCalendar } from "@/contexts/DateContext";
 import { MonthEvent, WeekEvent } from "@/contexts/Events";
-import { Tile } from "@/components/calendar/month/Tile";
+import { Tile } from "@/pages/calendar/month/Tile";
 import uuid from "react-uuid";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/Button";
 import { useMonthEvents } from "@/contexts/Events";
-import { AddMonthlyEventModal } from "@/components/calendar/month/AddEvent.modal";
+import { AddMonthlyEventModal } from "@/pages/calendar/month/AddEvent.modal";
 import { useModal } from "@/components/Modal";
 import { Keys, useKeybind } from "@/hooks/useKeybind";
 

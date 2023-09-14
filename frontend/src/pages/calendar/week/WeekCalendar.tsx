@@ -1,5 +1,5 @@
 import { daysInitials, getWeekDays, prefixZero } from "../../../time";
-import { Tile } from "@/components/calendar/week/Tile";
+import { Tile } from "@/pages/calendar/week/Tile";
 import { calculateDatesFromLayout, getGridPosition, rowHeightInPixels } from "../../../grid";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { useCalendar } from "@/contexts/DateContext";
@@ -8,9 +8,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { Keys, useKeybind } from "@/hooks/useKeybind";
 import { ContextMenu } from "@/components/ContextMenu";
 import { useContextMenu } from "@/hooks/useContextMenu";
-import { EditEventModal } from "@/components/calendar/week/EditEvent.modal";
+import { EditEventModal } from "@/pages/calendar/week/EditEvent.modal";
 import { faCog, faPencil } from "@fortawesome/free-solid-svg-icons";
-import { AddEventModal } from "@/components/calendar/week/AddEvent.modal";
+import { AddEventModal } from "@/pages/calendar/week/AddEvent.modal";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const NON_SELECTED = -1

@@ -2,7 +2,7 @@ import Dropdown, { useDropdown } from "@/components/Dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useBlockFormat } from './useBlockFormat'
-import useEditorToolbar from "@/pages/notes/Lexical/hooks/useEditorToolbar";
+import useEditorToolbar from "@/pages/notes/Lexical/components/Toolbar/useEditorToolbar";
 import { $getRoot, $getSelection, RangeSelection } from "lexical";
 
 type OptionProps = {

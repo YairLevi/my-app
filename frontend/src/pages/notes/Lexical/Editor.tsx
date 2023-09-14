@@ -13,20 +13,21 @@ import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import Toolbar from "@/pages/notes/Lexical/components/Toolbar";
 import LocalStoragePlugin from "@/pages/notes/Lexical/plugins/LocalStoragePlugin";
 import CodeHighlightPlugin from '@/pages/notes/Lexical/plugins/CodeHighlightPlugin';
-import { initialConfig } from "./constants";
+import { initialConfig } from "./editorConfig";
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 
+
+// Maybe use this in the future for something like shortcuts? "\eq" to "=" for example.
 const handleChange = (editorState: EditorState) => {
   editorState.read(() => {
     const root = $getRoot();
     const selection = $getSelection();
-  });
+  })
 }
 
 export const Editor = () => {
   // we retrieved the content from local storage in the Editor component
   const content = localStorage.getItem(initialConfig.namespace);
-
 
   return (
     <LexicalComposer
@@ -34,16 +35,13 @@ export const Editor = () => {
         ...initialConfig,
         editorState: content,
         nodes: [...initialConfig.nodes!],
-        onError: (error: Error) => {
-          throw error;
-        },
       }}
     >
-      <div className="w-full p-0 overflow-hidden flex flex-col">
+      <div className="w-full p-0 overflow-hidden flex flex-col relative">
         <Toolbar editable/>
         <RichTextPlugin
-          contentEditable={<ContentEditable className="bg-white w-full p-8 overflow-auto h-full"/>}
-          placeholder={<p className="absolute top-0 left-0">Hello</p>}
+          contentEditable={<ContentEditable className="bg-white w-full px-36 py-8 overflow-auto h-full"/>}
+          placeholder={<p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400">Write something...</p>}
           ErrorBoundary={LexicalErrorBoundary}
         />
         <CodeHighlightPlugin/>

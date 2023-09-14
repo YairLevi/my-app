@@ -1,12 +1,14 @@
 import { useCallback, useEffect, FC } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import debounce from '../utils/debounce';
-import {LocalStoragePluginProps} from "../types";
-
 /**
  * We have extended our editor so that it stores our content safely in an external store, utilizing the concept of Lexical’s editor state.
  * @param namespace
  */
+type LocalStoragePluginProps = {
+  namespace: string
+}
+
 const LocalStoragePlugin: FC<LocalStoragePluginProps> = ({ namespace }) => {
     const [editor] = useLexicalComposerContext();
 

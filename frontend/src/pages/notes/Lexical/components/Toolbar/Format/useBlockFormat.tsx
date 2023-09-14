@@ -3,10 +3,8 @@ import {$createParagraphNode, $getSelection, $isRangeSelection, DEPRECATED_$isGr
 import {$setBlocksType} from "@lexical/selection";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import { $createHeadingNode, $createQuoteNode, HeadingTagType, } from '@lexical/rich-text';
-import {blockTypeToBlockName} from "../../constants";
 import { INSERT_CHECK_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND, } from '@lexical/list';
 import {$createCodeNode} from "@lexical/code";
-import {UseBlockFormatProps} from "../../types";
 import {
   Text,
   Heading1,
@@ -18,6 +16,11 @@ import {
   Quote,
   Code
 } from 'lucide-react'
+import { blockTypeToBlockName } from "@/pages/notes/Lexical/components/Toolbar/Format/FormatDropdown";
+
+type UseBlockFormatProps = {
+  blockType: keyof typeof blockTypeToBlockName;
+}
 
 export function useBlockFormat(props: UseBlockFormatProps) {
   const {blockType} = props;
@@ -123,59 +126,60 @@ export function useBlockFormat(props: UseBlockFormatProps) {
     onClick: () => void;
   }
 
+  const blockIconSize = 20
   const blocks: Block[] = [
     {
       name: 'Normal',
       blockType: 'paragraph',
-      icon: <Text size={20}/>,
+      icon: <Text size={blockIconSize}/>,
       onClick: formatParagraph,
     },
     {
       name: 'Heading 1',
       blockType: 'h1',
-      icon: <Heading1 size={20}/>,
+      icon: <Heading1 size={blockIconSize}/>,
       onClick: () => formatHeading("h1")
     },
     {
       name: 'Heading 2',
       blockType: 'h2',
-      icon: <Heading2 size={20}/>,
+      icon: <Heading2 size={blockIconSize}/>,
       onClick: () => formatHeading("h2")
     },
     {
       name: 'Heading 3',
       blockType: 'h3',
-      icon: <Heading3 size={20}/>,
+      icon: <Heading3 size={blockIconSize}/>,
       onClick: () => formatHeading("h3")
     },
     {
       name: "Quote",
       blockType: 'quote',
-      icon: <Quote size={16}/>,
+      icon: <Quote size={blockIconSize}/>,
       onClick: formatQuote,
     },
     {
       name: 'Bulleted List',
       blockType: 'bullet',
-      icon: <List size={20}/>,
+      icon: <List size={blockIconSize}/>,
       onClick: formatBulletList,
     },
     {
       name: 'Numbered List',
       blockType: 'number',
-      icon: <ListOrdered size={20}/>,
+      icon: <ListOrdered size={blockIconSize}/>,
       onClick: formatNumberedList,
     },
     {
       name: 'Check List',
       blockType: 'check',
-      icon: <CheckSquare size={20}/>,
+      icon: <CheckSquare size={blockIconSize}/>,
       onClick: formatCheckList,
     },
     {
       name: "Code Block",
       blockType: 'code',
-      icon: <Code size={20}/>,
+      icon: <Code size={blockIconSize}/>,
       onClick: formatCode
     },
   ];

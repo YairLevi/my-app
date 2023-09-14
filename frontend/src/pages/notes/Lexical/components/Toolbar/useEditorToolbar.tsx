@@ -8,7 +8,7 @@ import {
 } from "@lexical/utils";
 import {useLexicalComposerContext} from "@lexical/react/LexicalComposerContext";
 import {$getRoot, $getSelection, $isParagraphNode, $isRangeSelection} from "lexical";
-import {blockTypeToBlockName, initialHasFormat} from "@/pages/notes/Lexical/constants";
+import {initialHasFormat} from "@/pages/notes/Lexical/editorConfig";
 import {$isListNode, ListNode} from "@lexical/list";
 import {$isDecoratorBlockNode} from '@lexical/react/LexicalDecoratorBlockNode';
 import {$isLinkNode, TOGGLE_LINK_COMMAND} from '@lexical/link';
@@ -16,7 +16,8 @@ import {INSERT_HORIZONTAL_RULE_COMMAND} from '@lexical/react/LexicalHorizontalRu
 import {$selectAll} from '@lexical/selection';
 import {$isHeadingNode} from '@lexical/rich-text';
 import {$isCodeNode, CODE_LANGUAGE_MAP} from '@lexical/code';
-import getSelectedNode from "../utils/getSelectedNode";
+import getSelectedNode from "../../utils/getSelectedNode";
+import { blockTypeToBlockName } from "@/pages/notes/Lexical/components/Toolbar/Format/FormatDropdown";
 
 
 const useEditorToolbar = () => {

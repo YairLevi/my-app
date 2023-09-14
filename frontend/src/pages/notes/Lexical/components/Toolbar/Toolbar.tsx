@@ -1,17 +1,22 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import "@/pages/notes/Lexical/styles/EditorTheme.css";
-import { ToolbarProps } from "../../types";
+import "@/pages/notes/Lexical/editorTheme.css";
 import {
-  AlignCenter, AlignJustify,
-  AlignLeft, AlignRight,
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
   Bold,
-  Code, Eraser,
-  Highlighter, Indent,
+  Code,
+  Eraser,
+  Highlighter,
+  Indent,
   Italic,
-  Link, Outdent,
+  Link,
+  Outdent,
   RotateCcw,
-  RotateCw, Strikethrough, StrikethroughIcon,
+  RotateCw,
+  Strikethrough,
   Subscript,
   Superscript,
   Type,
@@ -19,21 +24,28 @@ import {
 } from 'lucide-react'
 import {
   $createParagraphNode,
-  $getSelection, $isElementNode,
+  $getSelection,
+  $isElementNode,
   $isRangeSelection,
-  $isRootOrShadowRoot, $isTextNode,
+  $isRootOrShadowRoot,
+  $isTextNode,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_NORMAL, DEPRECATED_$isGridSelection, ElementFormatType, FORMAT_ELEMENT_COMMAND,
-  FORMAT_TEXT_COMMAND, INDENT_CONTENT_COMMAND,
+  COMMAND_PRIORITY_NORMAL,
+  DEPRECATED_$isGridSelection,
+  ElementFormatType,
+  FORMAT_ELEMENT_COMMAND,
+  FORMAT_TEXT_COMMAND,
+  INDENT_CONTENT_COMMAND,
   KEY_MODIFIER_COMMAND,
-  NodeKey, OUTDENT_CONTENT_COMMAND,
+  NodeKey,
+  OUTDENT_CONTENT_COMMAND,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND
 } from "lexical";
-import { blockTypeToBlockName, FormatDropdown } from "@/pages/notes/Lexical/components/Toolbar/FormatDropdown";
+import { blockTypeToBlockName, FormatDropdown } from "@/pages/notes/Lexical/components/Toolbar/Format/FormatDropdown";
 import { FontDropDown } from "@/pages/notes/Lexical/components/Toolbar/Font/FontSizeDropdown";
 import {
   $findMatchingParent,
@@ -47,10 +59,11 @@ import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { $isListNode, ListNode } from "@lexical/list";
 import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
 import { $isCodeNode, CODE_LANGUAGE_MAP } from "@lexical/code";
-import DropdownColorPicker from '../FontColor/DropdownColorPicker'
+import DropdownColorPicker from './Font/DropdownColorPicker'
 import { $isDecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 
-const Toolbar: FC<ToolbarProps> = ({ editable }) => {
+
+function Toolbar() {
   const [editor] = useLexicalComposerContext();
   const [activeEditor, setActiveEditor] = useState(editor);
   const [blockType, setBlockType] =
@@ -253,14 +266,14 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
 
   const onFontColorSelect = useCallback(
     (value: string) => {
-      applyStyleText({color: value});
+      applyStyleText({ color: value });
     },
     [applyStyleText],
   );
 
   const onBgColorSelect = useCallback(
     (value: string) => {
-      applyStyleText({'background-color': value});
+      applyStyleText({ 'background-color': value });
     },
     [applyStyleText],
   );
@@ -335,12 +348,15 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
   function strikeThroughOnClick() {
     activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')
   }
+
   function clearFormattingOnClick() {
     clearFormatting()
   }
+
   function superscriptOnClick() {
     activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript')
   }
+
   function subscriptOnClick() {
     activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'subscript')
   }
@@ -360,9 +376,9 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
           onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         />
       </div>
-      <div className="h-full bg-gray-300 w-[1px]" />
+      <div className="h-full bg-gray-300 w-[1px]"/>
       <FormatDropdown/>
-      <div className="h-full bg-gray-300 w-[1px]" />
+      <div className="h-full bg-gray-300 w-[1px]"/>
       <FontDropDown
         editor={editor}
         value={fontSize}
@@ -373,7 +389,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         value={fontFamily}
         style={"font-family"}
       />
-      <div className="h-full bg-gray-300 w-[1px]" />
+      <div className="h-full bg-gray-300 w-[1px]"/>
       <Bold
         className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isBold && "bg-gray-300"}`}
         strokeWidth={4}
@@ -408,7 +424,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         size={32}
         onClick={insertLink}
       />
-      <div className="h-full bg-gray-300 w-[1px]" />
+      <div className="h-full bg-gray-300 w-[1px]"/>
       <DropdownColorPicker
         disabled={!isEditable}
         buttonClassName="toolbar-item color-picker"
@@ -429,7 +445,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         value={<Highlighter size={32} className="p-2 -ml-2"/>}
         title="bg color"
       />
-      <div className="h-full bg-gray-300 w-[1px]" />
+      <div className="h-full bg-gray-300 w-[1px]"/>
       <Superscript
         className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isSuperscript && "bg-gray-300"}`}
         size={32}
@@ -450,7 +466,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         size={32}
         onClick={clearFormattingOnClick}
       />
-      <div className="h-full bg-gray-300 w-[1px]" />
+      <div className="h-full bg-gray-300 w-[1px]"/>
       <AlignLeft
         className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.left && "bg-gray-300"}`}
         size={32}
@@ -471,7 +487,7 @@ const Toolbar: FC<ToolbarProps> = ({ editable }) => {
         size={32}
         onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}
       />
-      <div className="h-full bg-gray-300 w-[1px]" />
+      <div className="h-full bg-gray-300 w-[1px]"/>
       <Indent
         className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
         size={32}

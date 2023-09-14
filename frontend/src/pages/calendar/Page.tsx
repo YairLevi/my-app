@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router";
 import { Button } from "@/components/Button";
-import { WeekCalendar } from "@/components/calendar/week/WeekCalendar";
-import { MonthCalendar } from "@/components/calendar/month/MonthCalendar";
-import { Calendar } from "@/components/calendar/Calendar";
-import { Summary } from "@/components/calendar/Summary";
+import { WeekCalendar } from "@/pages/calendar/week/WeekCalendar";
+import { MonthCalendar } from "@/pages/calendar/month/MonthCalendar";
+import { Calendar } from "@/pages/calendar/Calendar";
+import { Summary } from "@/pages/calendar/Summary";
 import { useCustomNav } from "@/components/nav";
 
 export default function CalendarPage() {

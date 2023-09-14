@@ -1,7 +1,7 @@
 import { Sidebar, SidebarItem } from "@/components/Sidebar"
 import { useEffect, useState } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router";
-import CalendarPage from "@/components/calendar/Page";
+import CalendarPage from "@/pages/calendar/Page";
 import { BarChart3, CalendarDays, StickyNote } from "lucide-react";
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
