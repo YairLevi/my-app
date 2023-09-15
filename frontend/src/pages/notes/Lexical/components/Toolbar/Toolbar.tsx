@@ -61,6 +61,7 @@ import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
 import { $isCodeNode, CODE_LANGUAGE_MAP } from "@lexical/code";
 import DropdownColorPicker from './Font/DropdownColorPicker'
 import { $isDecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
+import { InsertDropdown } from "@/pages/notes/Lexical/components/Toolbar/Insert/InsertDropdown";
 
 
 function Toolbar() {
@@ -498,6 +499,8 @@ function Toolbar() {
         size={32}
         onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}
       />
+      <div className="h-full bg-gray-300 w-[1px]"/>
+      <InsertDropdown activeEditor={activeEditor}/>
     </div>
   );
 };

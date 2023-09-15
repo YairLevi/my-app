@@ -48,6 +48,7 @@ function DropdownItem(props: ItemProps) {
 interface MenuProps extends PropsWithChildren {
   open: boolean
   inline?: boolean
+  className?: string
 }
 
 function DropdownMenu(props: MenuProps) {
@@ -59,7 +60,7 @@ function DropdownMenu(props: MenuProps) {
               className={`
               max-w-[350px] min-w-[5rem] overflow-auto mt-2 p-1 
               rounded-md z-10 shadow-2xl ${!props.inline && 'absolute'} bg-white
-              [&_*]:text-sm
+              [&_*]:text-sm ${props.className}
               `}
           >
             {props.children}

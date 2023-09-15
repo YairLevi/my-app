@@ -15,7 +15,8 @@ import LocalStoragePlugin from "@/pages/notes/Lexical/plugins/LocalStoragePlugin
 import CodeHighlightPlugin from '@/pages/notes/Lexical/plugins/CodeHighlightPlugin';
 import { initialConfig } from "./editorConfig";
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
-
+import ImagesPlugin from "@/pages/notes/Lexical/plugins/ImagesPlugin";
+import './index.css'
 
 // Maybe use this in the future for something like shortcuts? "\eq" to "=" for example.
 const handleChange = (editorState: EditorState) => {
@@ -24,6 +25,7 @@ const handleChange = (editorState: EditorState) => {
     const selection = $getSelection();
   })
 }
+
 
 export const Editor = () => {
   // we retrieved the content from local storage in the Editor component
@@ -38,9 +40,9 @@ export const Editor = () => {
       }}
     >
       <div className="w-full p-0 overflow-hidden flex flex-col relative">
-        <Toolbar editable/>
+        <Toolbar/>
         <RichTextPlugin
-          contentEditable={<ContentEditable className="bg-white w-full px-36 py-8 overflow-auto h-full"/>}
+          contentEditable={<ContentEditable id="editor-shell" className="bg-white w-full px-24 py-14 overflow-auto h-full editor-shell"/>}
           placeholder={<p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400">Write something...</p>}
           ErrorBoundary={LexicalErrorBoundary}
         />
@@ -52,6 +54,7 @@ export const Editor = () => {
         <HorizontalRulePlugin/>
         <TabIndentationPlugin/>
         <LinkPlugin/>
+        <ImagesPlugin />
         <CheckListPlugin/>
       </div>
     </LexicalComposer>

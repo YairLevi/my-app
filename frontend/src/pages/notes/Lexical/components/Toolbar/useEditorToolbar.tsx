@@ -16,7 +16,7 @@ import {INSERT_HORIZONTAL_RULE_COMMAND} from '@lexical/react/LexicalHorizontalRu
 import {$selectAll} from '@lexical/selection';
 import {$isHeadingNode} from '@lexical/rich-text';
 import {$isCodeNode, CODE_LANGUAGE_MAP} from '@lexical/code';
-import getSelectedNode from "../../utils/getSelectedNode";
+import getSelectedNode  from "../../utils/getSelectedNode";
 import { blockTypeToBlockName } from "@/pages/notes/Lexical/components/Toolbar/Format/FormatDropdown";
 
 
