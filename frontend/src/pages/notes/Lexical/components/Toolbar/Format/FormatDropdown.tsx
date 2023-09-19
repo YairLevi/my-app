@@ -51,6 +51,7 @@ export function FormatDropdown() {
     selectedOption,
     toggleOpen,
     onSelect,
+    pickerRef
   } = useDropdown(blocks)
 
   useEffect(() => {
@@ -73,6 +74,7 @@ export function FormatDropdown() {
   return (
     <Dropdown>
       <Dropdown.Picker
+        pickerRef={pickerRef}
         onClick={toggleOpen}
         open={open}
         className="hover:bg-gray-300"
@@ -85,7 +87,7 @@ export function FormatDropdown() {
             />
         }
       />
-      <Dropdown.Menu open={open}>
+      <Dropdown.Menu open={open} pickerRef={pickerRef}>
         {options.map((option, idx) => (
           <Dropdown.Item
             isSelected={selectedOption == option}

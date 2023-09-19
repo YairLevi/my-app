@@ -2,7 +2,12 @@ import { Sidebar, SidebarItem } from "@/components/Sidebar"
 import { useEffect, useState } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router";
 import CalendarPage from "@/pages/calendar/Page";
-import { BarChart3, CalendarDays, StickyNote } from "lucide-react";
+import {
+  BarChart3,
+  CalendarDays,
+  StickyNote,
+  LayoutGrid
+} from "lucide-react";
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
@@ -10,11 +15,11 @@ import { GetVersion, IsUpdateAvailable, Update } from "@/wails/go/main/App";
 import { Modal, useModal } from "@/components/Modal";
 import { Button } from "@/components/Button";
 import { Editor } from '@/pages/notes/Lexical/Editor'
+import { Dashboard } from "@/pages/dashboard";
 
 export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [version, setVersion] = useState('')
   const { onOpen, open, onClose } = useModal()
   const [isUpdate, setIsUpdate] = useState(false)
 
@@ -24,13 +29,6 @@ export default function App() {
         const isUpdate = await IsUpdateAvailable()
         if (isUpdate) onOpen()
       }
-    })()
-  }, []);
-
-  useEffect(() => {
-    (async function () {
-      const ver = await GetVersion()
-      setVersion(ver)
     })()
   }, []);
 
@@ -74,14 +72,14 @@ export default function App() {
     <div className="flex h-screen bg-[#1a1c22] overflow-hidden">
       <Sidebar>
         <SidebarItem
+          text="Dashboard"
+          icon={<LayoutGrid/>}
+          onClick={() => navigate('/')}
+        />
+        <SidebarItem
           text="Calendar"
           icon={<CalendarDays/>}
           onClick={() => navigate('/calendar/week')}
-        />
-        <SidebarItem
-          text="Analytics"
-          icon={<BarChart3/>}
-          onClick={() => navigate('/analytics')}
         />
         <SidebarItem
           text="Notes"
@@ -91,9 +89,8 @@ export default function App() {
       </Sidebar>
 
       <Routes>
-        <Route path="/" element={<div className="text-white">Dashboard page {version}</div>}/>
+        <Route path="/" element={<Dashboard/>}/>
         <Route path="/calendar/*" element={<CalendarPage/>}/>
-        <Route path="/analytics/*" element={<div className="text-white">Analytics Page</div>}/>
         <Route path="/notes/*" element={<Editor/>}/>
       </Routes>
 

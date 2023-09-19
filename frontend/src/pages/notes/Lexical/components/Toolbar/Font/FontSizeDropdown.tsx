@@ -248,21 +248,19 @@ export function FontDropDown({
     open,
     selectedOption,
     options,
+    pickerRef
   } = useDropdown(FONT_STYLE)
-
-  useEffect(() => {
-    console.log(open)
-  }, [open]);
 
   return (
     <Dropdown>
       <Dropdown.Picker
+        pickerRef={pickerRef}
         onClick={toggleOpen}
         open={open}
         className="hover:bg-gray-300"
         value={<FontOption name={value}/>}
       />
-      <Dropdown.Menu open={open}>
+      <Dropdown.Menu open={open} pickerRef={pickerRef}>
         {
           options.map((option, idx) => (
             <Dropdown.Item

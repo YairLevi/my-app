@@ -13,13 +13,14 @@ export type InsertDropdownProps = {
 
 export function InsertDropdown(props: InsertDropdownProps) {
   const { activeEditor } = props
-  const { open, toggleOpen } = useDropdown([])
+  const { open, toggleOpen, pickerRef } = useDropdown([])
 
   return (
     <>
       <Dropdown>
         <Dropdown.Picker
           open={open}
+          pickerRef={pickerRef}
           className="w-52"
           onClick={toggleOpen}
           value={
@@ -29,7 +30,7 @@ export function InsertDropdown(props: InsertDropdownProps) {
             </div>
           }
         />
-        <Dropdown.Menu open={open} className="w-52">
+        <Dropdown.Menu open={open} className="w-52" pickerRef={pickerRef}>
           <HorizontalRuleItem activeEditor={activeEditor}/>
           <InsertImageDropdownItem activeEditor={activeEditor}/>
         </Dropdown.Menu>

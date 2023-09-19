@@ -19,7 +19,7 @@ type Props = {
 
 export default function DropdownColorPicker(props: Props) {
   const { disabled = false, stopCloseOnClickSelf = true, color, onChange, value, ...rest } = props
-  const { open, toggleOpen, } = useDropdown([])
+  const { open, toggleOpen, pickerRef } = useDropdown([])
 
   return (
     <Dropdown>
@@ -27,6 +27,7 @@ export default function DropdownColorPicker(props: Props) {
         open={open}
         onClick={toggleOpen}
         className="hover:bg-gray-300"
+        pickerRef={pickerRef}
         value={<div className="flex items-center">
           {value}
           <div
@@ -38,7 +39,7 @@ export default function DropdownColorPicker(props: Props) {
           />
         </div>}
       />
-      <Dropdown.Menu open={open}>
+      <Dropdown.Menu open={open} pickerRef={pickerRef}>
         <ColorPicker color={color} onChange={onChange}/>
       </Dropdown.Menu>
     </Dropdown>

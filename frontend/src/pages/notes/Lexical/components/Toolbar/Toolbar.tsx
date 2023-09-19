@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import "@/pages/notes/Lexical/editorTheme.css";
 import {
@@ -63,6 +63,20 @@ import DropdownColorPicker from './Font/DropdownColorPicker'
 import { $isDecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 import { InsertDropdown } from "@/pages/notes/Lexical/components/Toolbar/Insert/InsertDropdown";
 
+
+function Divider() {
+  return (
+    <div className="h-full bg-gray-300 min-w-[1px]"/>
+  )
+}
+
+function ToolbarSubContainer({ children }: PropsWithChildren) {
+  return (
+    <div className="items-center w-fit flex justify-evenly gap-1">
+      {children}
+    </div>
+  )
+}
 
 function Toolbar() {
   const [editor] = useLexicalComposerContext();
@@ -361,11 +375,12 @@ function Toolbar() {
   function subscriptOnClick() {
     activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'subscript')
   }
-
+  const [op, setop] = useState(false)
 
   return (
-    <div className="flex bg-gray-100 h-fit border-b [&_*]:!text-gray-600 items-center gap-1 p-1">
-      <div id="undo-redo- contianer" className="items-center w-fit flex justify-evenly">
+    <div className="flex bg-gray-100 border-b h-fit [&_*]:!text-gray-600 items-center gap-1 p-1 py-2 overflow-x-auto overflow-y-hidden"
+         onScroll={() => setop(!op)}>
+      <ToolbarSubContainer>
         <RotateCcw
           className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
           size={32}
@@ -376,131 +391,147 @@ function Toolbar() {
           size={32}
           onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         />
-      </div>
-      <div className="h-full bg-gray-300 w-[1px]"/>
-      <FormatDropdown/>
-      <div className="h-full bg-gray-300 w-[1px]"/>
-      <FontDropDown
-        editor={editor}
-        value={fontSize}
-        style={"font-size"}
-      />
-      <FontDropDown
-        editor={editor}
-        value={fontFamily}
-        style={"font-family"}
-      />
-      <div className="h-full bg-gray-300 w-[1px]"/>
-      <Bold
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isBold && "bg-gray-300"}`}
-        strokeWidth={4}
-        size={32}
-        onClick={() => {
-          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');
-        }}
-      />
-      <Italic
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isItalic && "bg-gray-300"}`}
-        size={32}
-        onClick={() => {
-          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
-        }}
-      />
-      <Underline
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isUnderline && "bg-gray-300"}`}
-        size={32}
-        onClick={() => {
-          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
-        }}
-      />
-      <Code
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isCode && "bg-gray-300"}`}
-        size={32}
-        onClick={() => {
-          activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
-        }}
-      />
-      <Link
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
-        size={32}
-        onClick={insertLink}
-      />
-      <div className="h-full bg-gray-300 w-[1px]"/>
-      <DropdownColorPicker
-        disabled={!isEditable}
-        buttonClassName="toolbar-item color-picker"
-        buttonAriaLabel="Formatting text color"
-        buttonIconClassName="icon font-color"
-        color={fontColor}
-        onChange={onFontColorSelect}
-        value={<Type size={32} className="p-2 -ml-2"/>}
-        title="text color"
-      />
-      <DropdownColorPicker
-        disabled={!isEditable}
-        buttonClassName="toolbar-item color-picker"
-        buttonAriaLabel="Formatting background color"
-        buttonIconClassName="icon bg-color"
-        color={bgColor}
-        onChange={onBgColorSelect}
-        value={<Highlighter size={32} className="p-2 -ml-2"/>}
-        title="bg color"
-      />
-      <div className="h-full bg-gray-300 w-[1px]"/>
-      <Superscript
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isSuperscript && "bg-gray-300"}`}
-        size={32}
-        onClick={superscriptOnClick}
-      />
-      <Subscript
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isSubscript && "bg-gray-300"}`}
-        size={32}
-        onClick={subscriptOnClick}
-      />
-      <Strikethrough
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isStrikethrough && "bg-gray-300"}`}
-        size={32}
-        onClick={strikeThroughOnClick}
-      />
-      <Eraser
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600`}
-        size={32}
-        onClick={clearFormattingOnClick}
-      />
-      <div className="h-full bg-gray-300 w-[1px]"/>
-      <AlignLeft
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.left && "bg-gray-300"}`}
-        size={32}
-        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}
-      />
-      <AlignCenter
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.center && "bg-gray-300"}`}
-        size={32}
-        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}
-      />
-      <AlignRight
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.right && "bg-gray-300"}`}
-        size={32}
-        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}
-      />
-      <AlignJustify
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.justify && "bg-gray-300"}`}
-        size={32}
-        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}
-      />
-      <div className="h-full bg-gray-300 w-[1px]"/>
-      <Indent
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
-        size={32}
-        onClick={() => editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)}
-      />
-      <Outdent
-        className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
-        size={32}
-        onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}
-      />
-      <div className="h-full bg-gray-300 w-[1px]"/>
-      <InsertDropdown activeEditor={activeEditor}/>
+      </ToolbarSubContainer>
+      <Divider/>
+      <ToolbarSubContainer>
+        <FormatDropdown/>
+      </ToolbarSubContainer>
+      <Divider/>
+      <ToolbarSubContainer>
+        <FontDropDown
+          editor={editor}
+          value={fontSize}
+          style={"font-size"}
+        />
+        <FontDropDown
+          editor={editor}
+          value={fontFamily}
+          style={"font-family"}
+        />
+      </ToolbarSubContainer>
+      <Divider/>
+      <ToolbarSubContainer>
+        <Bold
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isBold && "bg-gray-300"}`}
+          strokeWidth={4}
+          size={32}
+          onClick={() => {
+            activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold');
+          }}
+        />
+        <Italic
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isItalic && "bg-gray-300"}`}
+          size={32}
+          onClick={() => {
+            activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
+          }}
+        />
+        <Underline
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isUnderline && "bg-gray-300"}`}
+          size={32}
+          onClick={() => {
+            activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
+          }}
+        />
+        <Code
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isCode && "bg-gray-300"}`}
+          size={32}
+          onClick={() => {
+            activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
+          }}
+        />
+        <Link
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
+          size={32}
+          onClick={insertLink}
+        />
+      </ToolbarSubContainer>
+      <Divider/>
+      <ToolbarSubContainer>
+        <DropdownColorPicker
+          disabled={!isEditable}
+          buttonClassName="toolbar-item color-picker"
+          buttonAriaLabel="Formatting text color"
+          buttonIconClassName="icon font-color"
+          color={fontColor}
+          onChange={onFontColorSelect}
+          value={<Type size={32} className="p-2 -ml-2"/>}
+          title="text color"
+        />
+        <DropdownColorPicker
+          disabled={!isEditable}
+          buttonClassName="toolbar-item color-picker"
+          buttonAriaLabel="Formatting background color"
+          buttonIconClassName="icon bg-color"
+          color={bgColor}
+          onChange={onBgColorSelect}
+          value={<Highlighter size={32} className="p-2 -ml-2"/>}
+          title="bg color"
+        />
+      </ToolbarSubContainer>
+      <Divider/>
+      <ToolbarSubContainer>
+        <Superscript
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isSuperscript && "bg-gray-300"}`}
+          size={32}
+          onClick={superscriptOnClick}
+        />
+        <Subscript
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isSubscript && "bg-gray-300"}`}
+          size={32}
+          onClick={subscriptOnClick}
+        />
+        <Strikethrough
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isStrikethrough && "bg-gray-300"}`}
+          size={32}
+          onClick={strikeThroughOnClick}
+        />
+        <Eraser
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600`}
+          size={32}
+          onClick={clearFormattingOnClick}
+        />
+      </ToolbarSubContainer>
+      <Divider/>
+      <ToolbarSubContainer>
+        <AlignLeft
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.left && "bg-gray-300"}`}
+          size={32}
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}
+        />
+        <AlignCenter
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.center && "bg-gray-300"}`}
+          size={32}
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}
+        />
+        <AlignRight
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.right && "bg-gray-300"}`}
+          size={32}
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}
+        />
+        <AlignJustify
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.justify && "bg-gray-300"}`}
+          size={32}
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}
+        />
+      </ToolbarSubContainer>
+      <Divider/>
+      <ToolbarSubContainer>
+        <Indent
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
+          size={32}
+          onClick={() => editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)}
+        />
+        <Outdent
+          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
+          size={32}
+          onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}
+        />
+      </ToolbarSubContainer>
+      <Divider/>
+      <ToolbarSubContainer>
+        <InsertDropdown activeEditor={activeEditor}/>
+      </ToolbarSubContainer>
     </div>
   );
 };

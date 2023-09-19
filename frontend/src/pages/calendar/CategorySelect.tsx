@@ -52,6 +52,7 @@ export function CategorySelect() {
         <Dropdown.Picker
           open={dropdown.open}
           onClick={dropdown.toggleOpen}
+          pickerRef={dropdown.pickerRef}
           value={
             <p>
               pick an option
@@ -60,7 +61,7 @@ export function CategorySelect() {
         />
         {
           categories.length > 0 &&
-            <Dropdown.Menu inline open={dropdown.open}>
+            <Dropdown.Menu inline open={dropdown.open} pickerRef={dropdown.pickerRef}>
               {
                 categories.map((val, index) => (
                   <Dropdown.Item

@@ -13,10 +13,9 @@ export default function CalendarPage() {
     <>
       <div className="w-full h-full overflow-auto flex">
         <div className="w-full h-full flex flex-col">
-          <div className="flex gap-2">
-            <Button onClick={() => navigate('/week', "sibling")} color="#0f0f11">Go to week</Button>
-            <Button onClick={() => navigate('/month', "sibling")} color="#0f0f11">Go to month</Button>
-            <Button onClick={() => navigate('/')} color="#0f0f11">Go to home</Button>
+          <div className="flex gap-2 m-2">
+            <Button onClick={() => navigate('/week', "sibling")} color="#0f0f11">Week</Button>
+            <Button onClick={() => navigate('/month', "sibling")} color="#0f0f11">Month</Button>
           </div>
           <Routes>
             <Route path="/week" element={<WeekCalendar/>}/>
