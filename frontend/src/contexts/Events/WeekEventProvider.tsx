@@ -1,40 +1,17 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
-import { Create, Delete, Read, Update } from '@/wails/go/repositories/WeekCalendar'
+import { Create, Delete, Read, Update } from '@/wails/go/repositories/WeekEventRepository'
 import { repositories } from "@/wails/go/models";
-import { EventProviderExports } from "@/contexts/Events/EventProvider";
+import { WeekEvent, convertToWeekEvent } from './WeekEventTypes'
 
-type WeekEventNoConvert = Omit<repositories.WeekEvent, "convertValues">
-
-type TDateKey =
-  | "createdAt"
-  | "updatedAt"
-  | "deletedAt"
-  | "endDate"
-  | "startDate"
-
-const DateKeyList: TDateKey[] = [
-  "createdAt",
-  "updatedAt",
-  "deletedAt",
-  "endDate",
-  "startDate"
-]
-
-export type WeekEvent = { [K in keyof WeekEventNoConvert]: K extends TDateKey ? Date : WeekEventNoConvert[K] };
-
-const WeekEventsContext = createContext<EventProviderExports<WeekEvent>>({} as EventProviderExports<WeekEvent>)
-
-function convertToWeekEvent(event: repositories.WeekEvent): WeekEvent {
-  const obj: Record<string, any> = {}
-  for (const key of Object.keys(event)) {
-    if (DateKeyList.includes(key as TDateKey)) {
-      obj[key] = new Date(event[key as keyof typeof event])
-    } else {
-      obj[key] = event[key as keyof typeof event]
-    }
-  }
-  return obj as WeekEvent
+type WeekEventProviderExports = {
+  events: WeekEvent[]
+  addEvent: (newEvent: Partial<WeekEvent>) => Promise<void>
+  updateEvent: (updatedEvent: WeekEvent) => Promise<void>
+  deleteEvent: (deletedEvent: WeekEvent) => Promise<void>
+  forceRefresh: () => Promise<void>
 }
+
+const WeekEventsContext = createContext<WeekEventProviderExports>({} as WeekEventProviderExports)
 
 export function useWeekEvents() {
   const { events, ...functions } = useContext(WeekEventsContext)
@@ -44,7 +21,7 @@ export function useWeekEvents() {
   }
 }
 
-export function WeekEventsProvider({ children }: PropsWithChildren) {
+export function WeekEventProvider({ children }: PropsWithChildren) {
   const [events, setEvents] = useState<WeekEvent[]>([])
 
   useEffect(() => {

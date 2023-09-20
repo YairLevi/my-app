@@ -1,26 +1,17 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
-import {Create,Read,Update,Delete} from "@/wails/go/repositories/MonthCalendar"
+import {Create,Read,Update,Delete} from "@/wails/go/repositories/MonthEventRepository"
 import { repositories } from "@/wails/go/models";
-import { EventProviderExports } from "@/contexts/Events/EventProvider";
+import { MonthEvent, convertToMonthEvent } from "@/contexts/Events/MonthEventTypes";
 
-type MonthEventNoConvert = Omit<repositories.MonthEvent, "convertValues">
+type MonthEventProviderExports = {
+  events: MonthEvent[]
+  addEvent: (newEvent: Partial<MonthEvent>) => Promise<void>
+  updateEvent: (updatedEvent: MonthEvent) => Promise<void>
+  deleteEvent: (deletedEvent: MonthEvent) => Promise<void>
+  forceRefresh: () => Promise<void>
+}
 
-type TDateKey =
-  | "createdAt"
-  | "updatedAt"
-  | "deletedAt"
-  | "date"
-
-const DateKeyList: TDateKey[] = [
-  "createdAt",
-  "updatedAt",
-  "deletedAt",
-  "date"
-]
-
-export type MonthEvent = { [K in keyof MonthEventNoConvert]: K extends TDateKey ? Date : MonthEventNoConvert[K] };
-
-const MonthEventsContext = createContext<EventProviderExports<MonthEvent>>({} as EventProviderExports<MonthEvent>)
+const MonthEventsContext = createContext<MonthEventProviderExports>({} as MonthEventProviderExports)
 
 export function useMonthEvents() {
   const { events, ...functions } = useContext(MonthEventsContext)
@@ -30,19 +21,7 @@ export function useMonthEvents() {
   }
 }
 
-function convertToMonthEvent(event: repositories.MonthEvent): MonthEvent {
-  const obj: Record<string, any> = {}
-  for (const key of Object.keys(event)) {
-    if (DateKeyList.includes(key as TDateKey)) {
-      obj[key] = new Date(event[key as keyof typeof event])
-    } else {
-      obj[key] = event[key as keyof typeof event]
-    }
-  }
-  return obj as MonthEvent
-}
-
-export function MonthEventsProvider({ children }: PropsWithChildren) {
+export function MonthEventProvider({ children }: PropsWithChildren) {
   const [events, setEvents] = useState<MonthEvent[]>([])
 
   useEffect(() => {

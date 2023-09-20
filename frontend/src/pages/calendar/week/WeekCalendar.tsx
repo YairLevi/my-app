@@ -3,7 +3,7 @@ import { Tile } from "@/pages/calendar/week/Tile";
 import { calculateDatesFromLayout, getGridPosition, rowHeightInPixels } from "../../../grid";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { useCalendar } from "@/contexts/DateContext";
-import { useWeekEvents, WeekEvent } from "@/contexts/Events/WeekEventsProvider";
+import { useWeekEvents, WeekEvent } from "@/contexts/Events";
 import React, { useEffect, useRef, useState } from "react";
 import { Keys, useKeybind } from "@/hooks/useKeybind";
 import { ContextMenu } from "@/components/ContextMenu";

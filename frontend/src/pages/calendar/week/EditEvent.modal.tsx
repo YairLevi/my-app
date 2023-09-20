@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
-import { WeekEvent, useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
+import { WeekEvent, useWeekEvents } from "@/contexts/Events";
 import { roundToNearest15Minutes } from "../../../time";
 
 interface Props {

@@ -1,4 +1,4 @@
-import { useWeekEvents } from "@/contexts/Events/WeekEventsProvider";
+import { useWeekEvents } from "@/contexts/Events";
 import { prefixZero } from "../../time";
 
 function getHourOfDay(number: number, offset = 7) {

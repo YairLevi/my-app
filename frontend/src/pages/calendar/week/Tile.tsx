@@ -1,6 +1,6 @@
 import React, { forwardRef, HTMLAttributes } from 'react';
 import { getTimeFormat } from "../../../time";
-import { WeekEvent } from "@/contexts/Events/WeekEventsProvider";
+import { WeekEvent } from "@/contexts/Events";
 
 interface TileProps extends HTMLAttributes<HTMLDivElement> {
   color: string

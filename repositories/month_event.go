@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"log"
-	_ "modernc.org/sqlite"
 	"time"
 )
 
@@ -14,27 +13,20 @@ type MonthEvent struct {
 	Date  time.Time `json:"date"`
 }
 
-type MonthCalendar struct {
+type MonthEventRepository struct {
 	db *gorm.DB
 }
 
-type MonthEventRepository interface {
-	Create(event *MonthEvent) *MonthEvent
-	Read() []MonthEvent
-	Update(event *MonthEvent) *MonthEvent
-	Delete(event *MonthEvent)
-}
-
-func NewMonthCalendar(db *gorm.DB) *MonthCalendar {
+func NewMonthCalendar(db *gorm.DB) *MonthEventRepository {
 	err := db.AutoMigrate(&MonthEvent{})
 	if err != nil {
 		log.Println("Failed to migrate struct MonthEvent")
 		log.Fatal(err.Error())
 	}
-	return &MonthCalendar{db}
+	return &MonthEventRepository{db}
 }
 
-func (c *MonthCalendar) Create(event *MonthEvent) *MonthEvent {
+func (c *MonthEventRepository) Create(event *MonthEvent) *MonthEvent {
 	result := c.db.Create(event)
 	if result.Error != nil {
 		log.Println("Failed to create event", event)
@@ -45,8 +37,8 @@ func (c *MonthCalendar) Create(event *MonthEvent) *MonthEvent {
 	return event
 }
 
-func (c *MonthCalendar) Read() []MonthEvent {
-	var monthEvents []MonthEvent
+func (c *MonthEventRepository) Read() []*MonthEvent {
+	var monthEvents []*MonthEvent
 	result := c.db.Find(&monthEvents)
 	if result.Error != nil {
 		log.Println("Failed to read events")
@@ -56,7 +48,7 @@ func (c *MonthCalendar) Read() []MonthEvent {
 	return monthEvents
 }
 
-func (c *MonthCalendar) Update(event *MonthEvent) *MonthEvent {
+func (c *MonthEventRepository) Update(event *MonthEvent) *MonthEvent {
 	result := c.db.Save(event)
 	if result.Error != nil {
 		log.Println("Failed to update event", event)
@@ -65,7 +57,7 @@ func (c *MonthCalendar) Update(event *MonthEvent) *MonthEvent {
 	return event
 }
 
-func (c *MonthCalendar) Delete(event *MonthEvent) {
+func (c *MonthEventRepository) Delete(event *MonthEvent) {
 	result := c.db.Delete(event)
 	if result.Error != nil {
 		log.Println("Failed to delete event", event)

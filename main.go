@@ -22,12 +22,12 @@ const (
 func main() {
 	sqliteDb := repos.InitializeSqlite(DbDestinationString)
 
-	// Create services
+	// Create repositories
 	var (
-		weekCalendar  repos.WeekEventRepository  = repos.NewWeekCalendar(sqliteDb)
-		monthCalendar repos.MonthEventRepository = repos.NewMonthCalendar(sqliteDb)
+		weekEventRepository  repos.Repository[repos.WeekEvent]  = repos.NewWeekCalendar(sqliteDb)
+		monthEventRepository repos.Repository[repos.MonthEvent] = repos.NewMonthCalendar(sqliteDb)
+		noteRepository       repos.Repository[repos.Note]       = repos.NewNoteRepository(sqliteDb)
 	)
-	notes := NewNoteManager()
 
 	app := NewApp()
 	// Create application with options
@@ -48,9 +48,9 @@ func main() {
 		},
 		Bind: []interface{}{
 			app,
-			weekCalendar,
-			monthCalendar,
-			notes,
+			weekEventRepository,
+			monthEventRepository,
+			noteRepository,
 		},
 	})
 
