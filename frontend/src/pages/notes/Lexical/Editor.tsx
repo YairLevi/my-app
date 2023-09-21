@@ -32,18 +32,21 @@ export const Editor = () => {
   const content = localStorage.getItem(initialConfig.namespace);
 
   return (
-    <LexicalComposer
-      initialConfig={{
-        ...initialConfig,
-        editorState: content,
-        nodes: [...initialConfig.nodes!],
-      }}
-    >
-      <div className="w-full p-0 overflow-hidden flex flex-col relative">
+    <div className="flex flex-col relative overflow-auto">
+      <LexicalComposer
+        initialConfig={{
+          ...initialConfig,
+          editorState: content,
+          nodes: [...initialConfig.nodes!],
+        }}
+      >
+
         <Toolbar/>
         <RichTextPlugin
-          contentEditable={<ContentEditable id="editor-shell" className="bg-white w-full px-24 py-14 overflow-auto h-full editor-shell"/>}
-          placeholder={<p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400">Write something...</p>}
+          contentEditable={<ContentEditable id="editor-shell"
+                                            className="bg-white px-24 py-14 h-full editor-shell"/>}
+          placeholder={<p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400">Write
+            something...</p>}
           ErrorBoundary={LexicalErrorBoundary}
         />
         <CodeHighlightPlugin/>
@@ -54,10 +57,11 @@ export const Editor = () => {
         <HorizontalRulePlugin/>
         <TabIndentationPlugin/>
         <LinkPlugin/>
-        <ImagesPlugin />
+        <ImagesPlugin/>
         <CheckListPlugin/>
-      </div>
-    </LexicalComposer>
+
+      </LexicalComposer>
+    </div>
   )
 }
 

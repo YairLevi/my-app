@@ -2,20 +2,15 @@ import { Sidebar, SidebarItem } from "@/components/Sidebar"
 import { useEffect, useState } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router";
 import CalendarPage from "@/pages/calendar/Page";
-import {
-  BarChart3,
-  CalendarDays,
-  StickyNote,
-  LayoutGrid
-} from "lucide-react";
+import { CalendarDays, LayoutGrid, StickyNote } from "lucide-react";
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
-import { GetVersion, IsUpdateAvailable, Update } from "@/wails/go/main/App";
+import { IsUpdateAvailable, Update } from "@/wails/go/main/App";
 import { Modal, useModal } from "@/components/Modal";
 import { Button } from "@/components/Button";
-import { Editor } from '@/pages/notes/Lexical/Editor'
 import { Dashboard } from "@/pages/dashboard";
+import NotesPage from "@/pages/notes";
 
 export default function App() {
   const navigate = useNavigate()
@@ -91,7 +86,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard/>}/>
         <Route path="/calendar/*" element={<CalendarPage/>}/>
-        <Route path="/notes/*" element={<Editor/>}/>
+        <Route path="/notes/*" element={<NotesPage/>}/>
       </Routes>
 
       <Modal
