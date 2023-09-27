@@ -52,6 +52,7 @@ export namespace repositories {
 	    updatedAt: any;
 	    // Go type: gorm
 	    deletedAt: any;
+	    title: string;
 	    content: string;
 	
 	    static createFrom(source: any = {}) {
@@ -64,6 +65,7 @@ export namespace repositories {
 	        this.createdAt = this.convertValues(source["createdAt"], null);
 	        this.updatedAt = this.convertValues(source["updatedAt"], null);
 	        this.deletedAt = this.convertValues(source["deletedAt"], null);
+	        this.title = source["title"];
 	        this.content = source["content"];
 	    }
 	

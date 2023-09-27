@@ -14,6 +14,7 @@ const LocalStoragePlugin: FC<LocalStoragePluginProps> = ({ namespace }) => {
 
     const saveContent = useCallback(
         (content: string) => {
+          console.log('updated')
             localStorage.setItem(namespace, content);
         },
         [namespace]

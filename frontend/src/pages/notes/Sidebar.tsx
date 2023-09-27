@@ -1,21 +1,35 @@
 import { Button } from "@/components/Button";
-import { Note } from "@/pages/notes/Note";
+import { NoteTab } from "@/pages/notes/Note";
+import { AddNoteModal } from "@/pages/notes/AddNote.modal";
+import { useModal } from "@/components/Modal";
+import { useNotes } from "@/contexts/Notes/NoteProvider";
 
 export function Sidebar() {
-  return (
-    <div className="min-w-[20rem] bg-gray-500">
-      <div id="action-bar" className="flex p-2">
-        <Button
-          onClick={() => {
+  const { open, onOpen, onClose } = useModal()
+  const {notes} = useNotes()
 
-          }}
-        >
-          New Note
-        </Button>
+  return (
+    <>
+      <div className="min-w-[20rem] max-w-[20rem] bg-gray-500">
+        <div id="action-bar" className="flex p-2">
+          <Button
+            onClick={() => onOpen()}
+          >
+            New Note
+          </Button>
+        </div>
+        <div id="note-list" className="flex flex-col overflow-y-auto">
+          {
+            notes.map(note => <NoteTab note={note}/>)
+          }
+        </div>
       </div>
-      <div id="note-list" className="flex flex-col overflow-y-auto">
-        <Note/>
-      </div>
-    </div>
+
+      <AddNoteModal
+        title="New Note"
+        open={open}
+        onClose={onClose}
+      />
+    </>
   )
 }

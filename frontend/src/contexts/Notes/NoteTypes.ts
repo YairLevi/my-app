@@ -17,9 +17,9 @@ export type Note = { [K in keyof NoteNoConvert]: K extends TDateKey ? Date : Not
 
 export type NoteProviderExports = {
   notes: Note[]
-  addNote: (newEvent: Partial<Note>) => Promise<void>
-  updateNote: (updatedEvent: Note) => Promise<void>
-  deleteNote: (deletedEvent: Note) => Promise<void>
+  addNote: (newNote: Partial<Note>) => Promise<void>
+  updateNote: (updatedNote: Note) => Promise<void>
+  deleteNote: (deletedNote: Note) => Promise<void>
   forceRefresh: () => Promise<void>
 }
 

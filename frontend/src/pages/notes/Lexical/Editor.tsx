@@ -1,5 +1,5 @@
-import React from 'react';
-import { $getRoot, $getSelection, EditorState, } from 'lexical';
+import React, { useEffect } from 'react';
+import { $getRoot, EditorState, } from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -17,26 +17,62 @@ import { initialConfig } from "./editorConfig";
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import ImagesPlugin from "@/pages/notes/Lexical/plugins/ImagesPlugin";
 import './index.css'
+import { useCurrentNote } from "@/contexts/Notes/CurrentNoteProvider";
+import { DatabasePlugin } from "@/pages/notes/Lexical/plugins/DatabasePlugin";
+import useLexicalEditable from "@lexical/react/useLexicalEditable";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $createRootNode } from "lexical/nodes/LexicalRootNode";
+
+function UpdatePlugin() {
+  const [editor] = useLexicalComposerContext();
+  const { currentNote } = useCurrentNote()
+
+  useEffect(() => {
+    if (!currentNote) return
+
+    editor.update(() => {
+      const editorState = editor.parseEditorState(currentNote.content)
+      editor.setEditorState(editorState)
+    })
+  }, [currentNote])
+
+  return null
+}
 
 // Maybe use this in the future for something like shortcuts? "\eq" to "=" for example.
 const handleChange = (editorState: EditorState) => {
-  editorState.read(() => {
-    const root = $getRoot();
-    const selection = $getSelection();
-  })
+  // const [editor] = useLexicalEditable()
+  // const { currentNote, setCurrentNote } = useCurrentNote()
+  // if (!currentNote) return
+  // setCurrentNote({
+  //   ...currentNote,
+  //   content: JSON.stringify(editorState)
+  // })
+  // editorState.read(() => {
+  //   const root = $getRoot();
+  //   const selection = $getSelection();
+  // })
 }
 
 
 export const Editor = () => {
   // we retrieved the content from local storage in the Editor component
-  const content = localStorage.getItem(initialConfig.namespace);
+  // const content = localStorage.getItem(initialConfig.namespace);
+  const { currentNote } = useCurrentNote()
+
+  if (!currentNote) {
+    return (
+      <div className="flex items-center justify-center w-full">
+        <p className="text-white">No note chosen</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col relative overflow-auto">
       <LexicalComposer
         initialConfig={{
           ...initialConfig,
-          editorState: content,
           nodes: [...initialConfig.nodes!],
         }}
       >
@@ -49,6 +85,8 @@ export const Editor = () => {
             something...</p>}
           ErrorBoundary={LexicalErrorBoundary}
         />
+        <UpdatePlugin/>
+        <DatabasePlugin/>
         <CodeHighlightPlugin/>
         <OnChangePlugin onChange={handleChange}/>
         <HistoryPlugin/>

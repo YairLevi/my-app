@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, useState } from "react";
 import { XIcon } from 'lucide-react'
+import clsx from "clsx";
 
 export interface ModalProps extends PropsWithChildren {
   open: boolean
@@ -36,11 +37,17 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
   return (
     <div
       onClick={onClose}
-      className={`fixed z-[1000] top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center overflow-auto justify-center ${open ? 'scale-1' : 'scale-0'}`}
+      className={clsx(
+        'fixed z-[1000] top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center overflow-auto justify-center',
+        open ? 'scale-1' : 'scale-0'
+      )}
     >
       <div
         onClick={e => e.stopPropagation()}
-        className={`p-5 bg-[#17191f] shadow-xl rounded-lg w-1/4 min-w-[20rem] h-fit duration-100 ease-out ${open ? 'scale-100' : 'scale-50'}`}
+        className={clsx(
+          'p-5 bg-[#17191f] shadow-xl rounded-lg w-1/4 min-w-[20rem] h-fit duration-150 ease-out',
+          open ? 'opacity-100 scale-100' : 'opacity-0 scale-95 invisible',
+        )}
       >
         <header className="flex justify-between items-center [&_*]:text-gray-200">
           <h1 className="text-lg">{title}</h1>

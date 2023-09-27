@@ -11,6 +11,7 @@ import { Modal, useModal } from "@/components/Modal";
 import { Button } from "@/components/Button";
 import { Dashboard } from "@/pages/dashboard";
 import NotesPage from "@/pages/notes";
+import { NotesProvider } from "@/contexts/Notes/NoteProvider";
 
 export default function App() {
   const navigate = useNavigate()
@@ -101,11 +102,11 @@ export default function App() {
               <div className="text-gray-300 text-sm">The application will restart automatically.</div>
             </div>
             : <>
-            <div className="text-gray-300 text-sm py-3">A new update is available.</div>
-            <Modal.Footer>
-              <Button onClick={update} color="#141414">Update</Button>
-              <Button onClick={onClose} color="#141414">Skip</Button>
-            </Modal.Footer>
+              <div className="text-gray-300 text-sm py-3">A new update is available.</div>
+              <Modal.Footer>
+                <Button onClick={update} color="#141414">Update</Button>
+                <Button onClick={onClose} color="#141414">Skip</Button>
+              </Modal.Footer>
             </>
         }
       </Modal>
