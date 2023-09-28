@@ -3,7 +3,7 @@ import { Note } from "@/contexts/Notes/NoteTypes";
 
 type CurrentNoteExports = {
   currentNote: Note | undefined
-  setCurrentNote: (newNote: Note) => void
+  setCurrentNote: (newNote: Note | undefined) => void
 }
 
 const CurrentNoteContext = createContext<CurrentNoteExports>({} as CurrentNoteExports)
@@ -15,7 +15,7 @@ export function useCurrentNote() {
 export function CurrentNoteProvider({ children }: PropsWithChildren) {
   const [note, setNote] = useState<Note | undefined>()
 
-  function setCurrentNote(newNote: Note) {
+  function setCurrentNote(newNote: Note | undefined) {
     setNote(newNote)
   }
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { $getRoot, EditorState, } from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -69,7 +69,7 @@ export const Editor = () => {
   }
 
   return (
-    <div className="flex flex-col relative overflow-auto">
+    <div className="flex flex-col relative overflow-auto" >
       <LexicalComposer
         initialConfig={{
           ...initialConfig,
@@ -86,7 +86,7 @@ export const Editor = () => {
           ErrorBoundary={LexicalErrorBoundary}
         />
         <UpdatePlugin/>
-        <DatabasePlugin/>
+        <DatabasePlugin />
         <CodeHighlightPlugin/>
         <OnChangePlugin onChange={handleChange}/>
         <HistoryPlugin/>

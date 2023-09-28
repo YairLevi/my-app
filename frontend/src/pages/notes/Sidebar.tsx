@@ -18,9 +18,11 @@ export function Sidebar() {
             New Note
           </Button>
         </div>
-        <div id="note-list" className="flex flex-col overflow-y-auto">
+        <div id="note-list" className="flex flex-col overflow-y-auto gap-0.5">
           {
-            notes.map(note => <NoteTab note={note}/>)
+            notes
+              .sort((a, b) => a.updatedAt > b.updatedAt ? -1 : 1)
+              .map(note => <NoteTab note={note}/>)
           }
         </div>
       </div>

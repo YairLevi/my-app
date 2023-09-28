@@ -382,13 +382,6 @@ function Toolbar() {
     <div className="flex bg-gray-100 border-b h-fit [&_*]:!text-gray-600 items-center overflow-y-hidden gap-1 p-1 py-2 overflow-auto"
          onScroll={() => setop(!op)}>
       <ToolbarSubContainer>
-        <Save
-          className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
-          size={32}
-          onClick={() => console.log(editor._editorState)}
-        />
-      </ToolbarSubContainer>
-      <ToolbarSubContainer>
         <RotateCcw
           className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
           size={32}
