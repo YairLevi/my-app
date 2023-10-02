@@ -1,3 +1,5 @@
 export { EventProvider } from './EventProvider'
-export { useWeekEvents, type WeekEvent } from './WeekEventsProvider'
-export { useMonthEvents, type MonthEvent } from './MonthEventsProvider'
+export { useWeekEvents } from './WeekEventProvider'
+export { useMonthEvents } from './MonthEventProvider'
+export { type WeekEvent } from './WeekEventTypes'
+export { type MonthEvent } from './MonthEventTypes'
