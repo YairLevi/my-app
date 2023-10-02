@@ -1,8 +1,8 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
-import { WeekEvent, useWeekEvents } from "@/contexts/Events";
+import { useWeekEvents, WeekEvent } from "@/contexts/Events";
 import { roundToNearest15Minutes } from "../../../time";
+import { Modal } from "@/components/Modal";
+import { Button } from "@/components/Button";
 
 interface Props {
   open: boolean
@@ -42,9 +42,7 @@ export function EditEventModal({ open, onClose, event }: Props) {
   }, [id, currStartDate, currEndDate, currTitle])
 
   function clearAndExit() {
-    startDateRef.current!.value = ''
-    endDateRef.current!.value = ''
-    titleRef.current!.value = ''
+    // No need to clear the refs, since the values come right when we click and not by the user.
     setError('')
     onClose()
   }
@@ -93,72 +91,46 @@ export function EditEventModal({ open, onClose, event }: Props) {
     clearAndExit()
   }
 
+
   return event && (
-    <div
-      onClick={onClose}
-      className={`fixed z-[1000] top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center ${open ? 'scale-1' : 'scale-0'}`}
+    <Modal
+      title="Edit Event"
+      onClose={onClose}
+      open={open}
     >
-      <div
-        onClick={e => e.stopPropagation()}
-        className={`p-5 bg-[#17191f] shadow-xl rounded-lg w-1/4 min-w-[20rem] h-fit duration-75 ease-out ${open ? 'scale-100' : 'scale-50'} [&_*]:text-gray-200`}
-      >
-        <header className="flex justify-between items-center">
-          <h1 className="text-lg">New Event</h1>
-          <FontAwesomeIcon
-            icon={faXmark}
-            onClick={onClose}
-            className="text-xl hover:bg-gray-700 hover:bg-opacity-50 rounded-xl py-2 px-3 hover:cursor-pointer"
-          />
-        </header>
-        <div className="flex flex-col gap-1 my-5">
-          <label className="text-xs !text-gray-400 font-semibold">
-            Title
-          </label>
-          <input
-            style={{ colorScheme: 'dark' }}
-            className="bg-[#0f0f11] px-3 py-1.5 text-sm text-gray-200 rounded-md"
-            placeholder="Meeting with the boys."
-            ref={titleRef}
-          />
-        </div>
-        <div className="flex flex-col gap-1 my-5">
-          <label className="text-xs !text-gray-400 font-semibold">
-            Starts at
-          </label>
-          <input
-            style={{ colorScheme: 'dark' }}
-            className="bg-[#0f0f11] px-3 py-1.5 text-sm text-gray-200 rounded-md"
-            type="datetime-local"
-            ref={startDateRef}
-          />
-        </div>
-        <div className="flex flex-col gap-1 my-5">
-          <label className="text-xs !text-gray-400 font-medium">
-            Ends at
-          </label>
-          <input
-            style={{ colorScheme: 'dark' }}
-            className="bg-[#0f0f11] px-3 py-1.5 text-sm text-gray-200 rounded-md"
-            type="datetime-local"
-            ref={endDateRef}
-          />
-        </div>
-        {error && <p className="text-sm !text-red-400 my-3">{error}</p>}
-        <footer className="flex justify-end items-center gap-3">
-          <button
-            onClick={clearAndExit}
-            className="text-sm px-3 py-2 hover:bg-gray-800 rounded-lg"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onSubmit}
-            className="text-sm px-3 py-2 hover:bg-gray-700 bg-gray-800 rounded-lg"
-          >
-            Edit
-          </button>
-        </footer>
-      </div>
-    </div>
+      <Modal.Group label="Title">
+        <input
+          style={{ colorScheme: 'dark' }}
+          className="bg-[#0f0f11] px-3 py-1.5 text-sm text-gray-200 rounded-md"
+          placeholder="Meeting with the boys."
+          ref={titleRef}
+        />
+      </Modal.Group>
+      <Modal.Group label="Starts At">
+        <input
+          style={{ colorScheme: 'dark' }}
+          className="bg-[#0f0f11] px-3 py-1.5 text-sm text-gray-200 rounded-md"
+          type="datetime-local"
+          ref={startDateRef}
+        />
+      </Modal.Group>
+      <Modal.Group label="Ends At">
+        <input
+          style={{ colorScheme: 'dark' }}
+          className="bg-[#0f0f11] px-3 py-1.5 text-sm text-gray-200 rounded-md"
+          type="datetime-local"
+          ref={endDateRef}
+        />
+      </Modal.Group>
+      {error && <p className="text-sm !text-red-400 my-3">{error}</p>}
+      <Modal.Footer>
+        <Button onClick={clearAndExit} type="ghost">
+          Cancel
+        </Button>
+        <Button onClick={onSubmit}>
+          Edit
+        </Button>
+      </Modal.Footer>
+    </Modal>
   )
 }

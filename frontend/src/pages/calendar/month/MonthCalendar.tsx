@@ -136,9 +136,8 @@ export function MonthCalendar() {
 
   return (
     <>
-      <div>
-        <Button onClick={onOpenAdd} color="#1a6aeb">Add Random event</Button>
-        <Button onClick={monthEventService.forceRefresh} color="#1a6aeb">force refresh</Button>
+      <div className="w-full items-center justify-center flex py-2">
+        <Button onClick={onOpenAdd}>Add Event</Button>
       </div>
       <div className="relative min-w-[45rem] h-full overflow-auto [&_*]:select-none">
 

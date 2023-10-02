@@ -11,6 +11,7 @@ import { useContextMenu } from "@/hooks/useContextMenu";
 import { EditEventModal } from "@/pages/calendar/week/EditEvent.modal";
 import { faCog, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { AddEventModal } from "@/pages/calendar/week/AddEvent.modal";
+import { Button } from "@/components/Button";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const NON_SELECTED = -1
@@ -71,12 +72,11 @@ export function WeekCalendar() {
   return (
     <>
       <div className="w-full flex justify-center gap-5 items-center py-2">
-        <button
-          className="bg-[#17181c] text-white px-4 py-2 text-sm font-medium rounded-lg"
+        <Button
           onClick={() => setOpenAdd(true)}
         >
           Add Event
-        </button>
+        </Button>
       </div>
       <div className="h-full w-full overflow-auto flex [&_*]:text-white">
         <div className="h-fit pt-2">

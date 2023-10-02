@@ -23,6 +23,12 @@ export function AddMonthlyEventModal(props: ModalProps) {
     clearAndClose()
   }
 
+  function clearAndExit() {
+    dateRef.current!.value = ''
+    titleRef.current!.value = ''
+    onClose()
+  }
+
   return (
     <Modal open={open} onClose={onClose} title={title}>
       <Modal.Group label="Title">
@@ -42,7 +48,8 @@ export function AddMonthlyEventModal(props: ModalProps) {
         />
       </Modal.Group>
       <Modal.Footer>
-        <Button color="#0f0f11" onClick={onSubmit}>Add</Button>
+        <Button onClick={clearAndExit} type="ghost">Cancel</Button>
+        <Button onClick={onSubmit}>Add</Button>
       </Modal.Footer>
     </Modal>
   )
