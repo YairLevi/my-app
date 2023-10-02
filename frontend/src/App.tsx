@@ -1,19 +1,21 @@
 import { Sidebar, SidebarItem } from "@/components/Sidebar"
 import { useEffect, useState } from "react"
 import { Route, Routes, useLocation, useNavigate } from "react-router";
-import CalendarPage from "@/components/calendar/Page";
-import { BarChart3, CalendarDays, StickyNote } from "lucide-react";
+import CalendarPage from "@/pages/calendar/Page";
+import { CalendarDays, LayoutGrid, StickyNote } from "lucide-react";
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import './input.css'
-import { GetVersion, IsUpdateAvailable, Update } from "@/wails/go/main/App";
+import { IsUpdateAvailable, Update } from "@/wails/go/main/App";
 import { Modal, useModal } from "@/components/Modal";
 import { Button } from "@/components/Button";
+import { Dashboard } from "@/pages/dashboard";
+import NotesPage from "@/pages/notes";
+import { NotesProvider } from "@/contexts/Notes/NoteProvider";
 
 export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [version, setVersion] = useState('')
   const { onOpen, open, onClose } = useModal()
   const [isUpdate, setIsUpdate] = useState(false)
 
@@ -23,13 +25,6 @@ export default function App() {
         const isUpdate = await IsUpdateAvailable()
         if (isUpdate) onOpen()
       }
-    })()
-  }, []);
-
-  useEffect(() => {
-    (async function () {
-      const ver = await GetVersion()
-      setVersion(ver)
     })()
   }, []);
 
@@ -73,14 +68,14 @@ export default function App() {
     <div className="flex h-screen bg-[#1a1c22] overflow-hidden">
       <Sidebar>
         <SidebarItem
+          text="Dashboard"
+          icon={<LayoutGrid/>}
+          onClick={() => navigate('/')}
+        />
+        <SidebarItem
           text="Calendar"
           icon={<CalendarDays/>}
           onClick={() => navigate('/calendar/week')}
-        />
-        <SidebarItem
-          text="Analytics"
-          icon={<BarChart3/>}
-          onClick={() => navigate('/analytics')}
         />
         <SidebarItem
           text="Notes"
@@ -90,10 +85,9 @@ export default function App() {
       </Sidebar>
 
       <Routes>
-        <Route path="/" element={<div className="text-white">Dashboard page {version}</div>}/>
+        <Route path="/" element={<Dashboard/>}/>
         <Route path="/calendar/*" element={<CalendarPage/>}/>
-        <Route path="/analytics/*" element={<div className="text-white">Analytics Page</div>}/>
-        <Route path="/notes/*" element={<div className="text-white">Notes Page</div>}/>
+        <Route path="/notes/*" element={<NotesPage/>}/>
       </Routes>
 
       <Modal
@@ -108,11 +102,11 @@ export default function App() {
               <div className="text-gray-300 text-sm">The application will restart automatically.</div>
             </div>
             : <>
-            <div className="text-gray-300 text-sm py-3">A new update is available.</div>
-            <Modal.Footer>
-              <Button onClick={update} color="#141414">Update</Button>
-              <Button onClick={onClose} color="#141414">Skip</Button>
-            </Modal.Footer>
+              <div className="text-gray-300 text-sm py-3">A new update is available.</div>
+              <Modal.Footer>
+                <Button onClick={update} color="#141414">Update</Button>
+                <Button onClick={onClose} color="#141414">Skip</Button>
+              </Modal.Footer>
             </>
         }
       </Modal>
