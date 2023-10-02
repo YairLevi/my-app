@@ -63,11 +63,12 @@ import { $isCodeNode, CODE_LANGUAGE_MAP } from "@lexical/code";
 import DropdownColorPicker from './Font/DropdownColorPicker'
 import { $isDecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 import { InsertDropdown } from "@/pages/notes/Lexical/components/Toolbar/Insert/InsertDropdown";
+import clsx from "clsx";
 
 
 function Divider() {
   return (
-    <div className="h-full bg-gray-300 min-w-[1px]"/>
+    <div className="h-full bg-gray-600 min-w-[1px]"/>
   )
 }
 
@@ -379,16 +380,22 @@ function Toolbar() {
   const [op, setop] = useState(false)
 
   return (
-    <div className="flex bg-gray-100 border-b h-fit [&_*]:!text-gray-600 items-center overflow-y-hidden gap-1 p-1 py-2 overflow-auto"
+    <div className="flex bg-transparent border-b border-b-gray-700 h-fit items-center overflow-y-hidden gap-1 p-1 py-2 overflow-auto"
          onScroll={() => setop(!op)}>
       <ToolbarSubContainer>
         <RotateCcw
-          className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer"
+          )}
           size={32}
           onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
         />
         <RotateCw
-          className="p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600"
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer"
+          )}
           size={32}
           onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         />
@@ -413,7 +420,11 @@ function Toolbar() {
       <Divider/>
       <ToolbarSubContainer>
         <Bold
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isBold && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            isBold && "bg-gray-300 bg-opacity-20"
+          )}
           strokeWidth={4}
           size={32}
           onClick={() => {
@@ -421,74 +432,105 @@ function Toolbar() {
           }}
         />
         <Italic
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isItalic && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            isItalic && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={() => {
             activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
           }}
         />
         <Underline
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isUnderline && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            isUnderline && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={() => {
             activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline');
           }}
         />
         <Code
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isCode && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            isCode && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={() => {
             activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
           }}
         />
         <Link
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            isLink && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={insertLink}
         />
       </ToolbarSubContainer>
       <Divider/>
-      <ToolbarSubContainer>
-        <DropdownColorPicker
-          disabled={!isEditable}
-          buttonClassName="toolbar-item color-picker"
-          buttonAriaLabel="Formatting text color"
-          buttonIconClassName="icon font-color"
-          color={fontColor}
-          onChange={onFontColorSelect}
-          value={<Type size={32} className="p-2 -ml-2"/>}
-          title="text color"
-        />
-        <DropdownColorPicker
-          disabled={!isEditable}
-          buttonClassName="toolbar-item color-picker"
-          buttonAriaLabel="Formatting background color"
-          buttonIconClassName="icon bg-color"
-          color={bgColor}
-          onChange={onBgColorSelect}
-          value={<Highlighter size={32} className="p-2 -ml-2"/>}
-          title="bg color"
-        />
-      </ToolbarSubContainer>
-      <Divider/>
+      {/*<ToolbarSubContainer>*/}
+      {/*  <DropdownColorPicker*/}
+      {/*    disabled={!isEditable}*/}
+      {/*    buttonClassName="toolbar-item color-picker"*/}
+      {/*    buttonAriaLabel="Formatting text color"*/}
+      {/*    buttonIconClassName="icon font-color"*/}
+      {/*    color={fontColor}*/}
+      {/*    onChange={onFontColorSelect}*/}
+      {/*    value={<Type size={32} className="p-2 -ml-2"/>}*/}
+      {/*    title="text color"*/}
+      {/*  />*/}
+      {/*  <DropdownColorPicker*/}
+      {/*    disabled={!isEditable}*/}
+      {/*    buttonClassName="toolbar-item color-picker"*/}
+      {/*    buttonAriaLabel="Formatting background color"*/}
+      {/*    buttonIconClassName="icon bg-color"*/}
+      {/*    color={bgColor}*/}
+      {/*    onChange={onBgColorSelect}*/}
+      {/*    value={<Highlighter size={32} className="p-2 -ml-2"/>}*/}
+      {/*    title="bg color"*/}
+      {/*  />*/}
+      {/*</ToolbarSubContainer>*/}
+      {/*<Divider/>*/}
       <ToolbarSubContainer>
         <Superscript
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isSuperscript && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            isLink && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={superscriptOnClick}
         />
         <Subscript
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isSubscript && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            isLink && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={subscriptOnClick}
         />
         <Strikethrough
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isStrikethrough && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            isStrikethrough && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={strikeThroughOnClick}
         />
         <Eraser
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+          )}
           size={32}
           onClick={clearFormattingOnClick}
         />
@@ -496,39 +538,55 @@ function Toolbar() {
       <Divider/>
       <ToolbarSubContainer>
         <AlignLeft
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.left && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            elementFormat == FORMAT_TYPES.left && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}
         />
         <AlignCenter
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.center && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            elementFormat == FORMAT_TYPES.center && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}
         />
         <AlignRight
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.right && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            elementFormat == FORMAT_TYPES.right && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}
         />
         <AlignJustify
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${elementFormat == FORMAT_TYPES.justify && "bg-gray-300"}`}
+          className={clsx(
+            "p-2 rounded-lg text-gray-300",
+            "hover:bg-gray-300 hover:bg-opacity-20 hover:cursor-pointer",
+            elementFormat == FORMAT_TYPES.justify && "bg-gray-300 bg-opacity-20"
+          )}
           size={32}
           onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}
         />
       </ToolbarSubContainer>
-      <Divider/>
-      <ToolbarSubContainer>
-        <Indent
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
-          size={32}
-          onClick={() => editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)}
-        />
-        <Outdent
-          className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-600 ${isLink && "bg-gray-300"}`}
-          size={32}
-          onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}
-        />
-      </ToolbarSubContainer>
+      {/*<Divider/>*/}
+      {/*<ToolbarSubContainer>*/}
+      {/*  <Indent*/}
+      {/*    className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-300 ${isLink && "bg-gray-300"}`}*/}
+      {/*    size={32}*/}
+      {/*    onClick={() => editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)}*/}
+      {/*  />*/}
+      {/*  <Outdent*/}
+      {/*    className={`p-2 rounded-lg hover:bg-gray-300 hover:cursor-pointer text-gray-300 ${isLink && "bg-gray-300"}`}*/}
+      {/*    size={32}*/}
+      {/*    onClick={() => editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)}*/}
+      {/*  />*/}
+      {/*</ToolbarSubContainer>*/}
       <Divider/>
       <ToolbarSubContainer>
         <InsertDropdown activeEditor={activeEditor}/>

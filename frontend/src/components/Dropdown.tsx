@@ -36,8 +36,8 @@ interface ItemProps extends PropsWithChildren {
 
 function DropdownItem(props: ItemProps) {
   return (
-    <li className={`select-none text-black list-none px-2 py-1 my-1 rounded-lg hover:cursor-pointer hover:bg-black hover:bg-opacity-20
-      ${props.isSelected && 'bg-gray-500 bg-opacity-30'}
+    <li className={`select-none text-gray-200 list-none px-2 py-1 my-1 rounded-lg hover:cursor-pointer hover:bg-gray-300 hover:bg-opacity-20
+      ${props.isSelected && 'bg-gray-500'}
     `}
         onClick={props.onClick}
     >
@@ -61,7 +61,7 @@ function DropdownMenu(props: MenuProps) {
     <>
       <div
         className={clsx(
-          'border max-w-[350px] min-w-[5rem] overflow-auto mt-2 p-1 rounded-md z-10 shadow-2xl bg-white ease-out duration-150',
+          'border max-w-[350px] min-w-[5rem] overflow-auto mt-2 p-1 rounded-md z-10 shadow-2xl bg-[#0f0f11] ease-out duration-150',
           '[&_*]:text-sm',
           props.open ? 'opacity-100 scale-100' : 'opacity-0 scale-95 invisible',
           !props.inline && 'fixed',
@@ -109,7 +109,7 @@ function DropdownPicker(props: PickerProps) {
       className={clsx(
         `px-3 py-1 text-sm flex justify-between items-center gap-2 select-none`,
         'hover:cursor-pointer',
-        '[&_*]:text-gray-600',
+        '[&_*]:text-gray-300',
         props.className,
       )}
       onClick={props.onClick}

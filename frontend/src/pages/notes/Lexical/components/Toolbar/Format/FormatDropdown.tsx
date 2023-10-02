@@ -77,7 +77,7 @@ export function FormatDropdown() {
         pickerRef={pickerRef}
         onClick={toggleOpen}
         open={open}
-        className="hover:bg-gray-300"
+        className="hover:bg-gray-300 hover:bg-opacity-20"
         value={
           !selectedOption ?
             "Pick a type format" :

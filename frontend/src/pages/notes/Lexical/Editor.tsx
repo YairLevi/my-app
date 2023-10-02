@@ -69,7 +69,7 @@ export const Editor = () => {
   }
 
   return (
-    <div className="flex flex-col relative overflow-auto" >
+    <div className="flex flex-col relative overflow-auto h-full w-fulldw" >
       <LexicalComposer
         initialConfig={{
           ...initialConfig,
@@ -80,7 +80,7 @@ export const Editor = () => {
         <Toolbar/>
         <RichTextPlugin
           contentEditable={<ContentEditable id="editor-shell"
-                                            className="bg-white px-24 py-14 h-full editor-shell"/>}
+                                            className="bg-transparent text-white px-24 py-14 h-full w-full editor-shell"/>}
           placeholder={<p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400">Write
             something...</p>}
           ErrorBoundary={LexicalErrorBoundary}

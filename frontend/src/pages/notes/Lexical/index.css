@@ -40,10 +40,18 @@
   /*border-radius: 2px;*/
   /*max-width: 1100px;*/
   /*cursor: text;*/
-  /*color: #000;*/
+  /*color: red;*/
   /*position: relative;*/
   /*line-height: 1.7;*/
   /*font-weight: 400;*/
+}
+
+.textCode {
+  background-color: #0e0e10;
+}
+
+blockquote > * {
+  color: #8c98a2;
 }
 
 .editor-shell .editor-container {
