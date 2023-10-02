@@ -1,5 +1,5 @@
 import { Button } from "@/components/Button";
-import { NoteTab } from "@/pages/notes/Note";
+import { NoteTab } from "@/pages/notes/NoteTab";
 import { AddNoteModal } from "@/pages/notes/AddNote.modal";
 import { useModal } from "@/components/Modal";
 import { useNotes } from "@/contexts/Notes/NoteProvider";
@@ -10,15 +10,15 @@ export function Sidebar() {
 
   return (
     <>
-      <div className="min-w-[20rem] max-w-[20rem] bg-gray-500">
-        <div id="action-bar" className="flex p-2">
+      <div className="min-w-[20rem] max-w-[20rem] border-r border-r-gray-700 h-full flex flex-col">
+        <div id="" className="flex p-2 h-fit">
           <Button
             onClick={() => onOpen()}
           >
             New Note
           </Button>
         </div>
-        <div id="note-list" className="flex flex-col overflow-y-auto gap-0.5">
+        <div className="overflow-auto gap-0.5 flex flex-col h-full">
           {
             notes
               .sort((a, b) => a.updatedAt > b.updatedAt ? -1 : 1)

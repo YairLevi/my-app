@@ -7,7 +7,7 @@ export default function NotesPage() {
   return (
     <NotesProvider>
       <CurrentNoteProvider>
-        <div className="flex w-full overflow-hidden">
+        <div className="flex w-full overflow-hidden h-full">
           <Sidebar/>
           <Editor/>
         </div>

@@ -24,7 +24,7 @@ export function NoteTab({ note }: NoteProps) {
   return (
     <div
       className={clsx(
-        "w-full bg-[#202124] h-fit flex flex-col gap-1.5 p-2.5 select-none hover:cursor-pointer group",
+        "w-full bg-[#202124] flex flex-col gap-1.5 p-2.5 select-none hover:cursor-pointer group",
         "relative"
       )}
       onClick={() => setCurrentNote(note)}
@@ -33,7 +33,7 @@ export function NoteTab({ note }: NoteProps) {
         {title}
       </h2>
       <div id="tags">
-        <Tag/>
+        {/*<Tag/>*/}
       </div>
 
       <Trash2
