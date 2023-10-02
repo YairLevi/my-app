@@ -21,8 +21,8 @@ export function SidebarItem({ text, icon, onClick }: ItemProps) {
       {/* Tooltip for the sidebar item */}
       <div
         className={`
-          invisible group-hover:visible z-20
-          absolute ease-out duration-50 top-1/2 -translate-y-1/2 left-16 bg-black px-2.5 py-1.5 rounded w-fit text-sm
+          invisible group-hover:visible z-20 opacity-50 group-hover:opacity-100
+          absolute ease-out top-1/2 -translate-y-1/2 left-16 bg-black px-2.5 py-1.5 rounded w-fit text-sm
         `}
       >
         {text}
@@ -30,7 +30,7 @@ export function SidebarItem({ text, icon, onClick }: ItemProps) {
 
       <div
         className={`
-          invisible group-hover:visible z-10
+          invisible group-hover:visible z-10 opacity-50 group-hover:opacity-100
           absolute w-2 h-2 bg-black -translate-x-1/2 left-16 -translate-y-1/2 top-1/2 rotate-45 
         `}
       />
