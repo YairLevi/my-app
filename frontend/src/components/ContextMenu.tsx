@@ -21,7 +21,7 @@ export const ContextMenu = forwardRef<HTMLDivElement, ContextMenu>(({ top, left,
       ref={ref}
       {...props}
       className={`
-        fixed z-[999] rounded bg-slate-800 p-2 flex flex-col gap-1 w-48
+        fixed z-[999] rounded bg-[#1f1f21] p-2 flex flex-col gap-1 w-48
         ${show ? 'visible' : 'hidden'}
       `}
       style={{

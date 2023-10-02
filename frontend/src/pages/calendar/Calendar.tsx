@@ -38,9 +38,9 @@ function Tile({ children, blurred, date, onClick }: Props) {
     >
       {children}
       <div className="flex gap-0.5 absolute bottom-0">
-        <div className="rounded-full bg-green-600 w-1 h-1 text-transparent">i</div>
-        <div className="rounded-full bg-blue-600 w-1 h-1 text-transparent">i</div>
-        <div className="rounded-full bg-red-600 w-1 h-1 text-transparent">i</div>
+        {/*<div className="rounded-full bg-green-600 w-1 h-1 text-transparent">i</div>*/}
+        {/*<div className="rounded-full bg-blue-600 w-1 h-1 text-transparent">i</div>*/}
+        {/*<div className="rounded-full bg-red-600 w-1 h-1 text-transparent">i</div>*/}
         {/*<div className="rounded-full text-[0.5rem] h-1 flex items-center pb-0.5">+</div>*/}
       </div>
     </div>
