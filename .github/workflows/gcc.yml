@@ -16,7 +16,8 @@ jobs:
           install: mingw-w64-x86_64-toolchain
       - name: msys2 gcc version
         run: |
-          c:\msys64\mingw64\bin\gcc.exe -v
+          cd C:\msys64\mingw64\bin 
+          ./gcc.exe -v
       - name: the global gcc version (supposed to match!!)
         run: |
           gcc -v
