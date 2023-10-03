@@ -26,7 +26,7 @@ jobs:
           go-version: '1.18'
 
       - name: Set up GCC
-        uses: egor-tensin/setup-gcc@v1
+        uses: egor-tensin/setup-mingw
         with:
           version: latest
           platform: x64
