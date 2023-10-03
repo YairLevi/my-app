@@ -16,7 +16,7 @@ jobs:
           install: mingw-w64-x86_64-toolchain
       - name: check something...
         run: |
-          cd D:\a\_temp\setup-msys2
+          cd C:\
           dir
 #      - name: Install Go
 #        uses: actions/setup-go@v2.1.3
