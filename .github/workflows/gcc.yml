@@ -6,24 +6,22 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Check GCC
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: mingw-w64-x86_64-toolchain
+      - name: Install Go
+        uses: actions/setup-go@v2.1.3
+        with:
+          go-version: 1.17.2
+      - name: Build with Go
         run: |
-          gcc -v
-      - name: Setup MSYS2
-        run: |
-          choco install msys2
-      - name: Setup MSYS2 GCC
-        run: |
-          pacman -Syu
-      - name: install gcc
-        run: |
-          pacman -S mingw-w64-x86_64-gcc
-      - name: pathing
-        run: |
-          setx PATH "$env:PATH;C:\msys64\mingw64\bin"
-      - name: check version again
-        run: |
-          gcc -v
+          go build -o app.exe testGCC.go
+
 #      - name: Build with Go
 #        run: |
 #          go build -o app.exe testGCC.go
