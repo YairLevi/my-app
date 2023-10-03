@@ -6,23 +6,30 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: '1.18'
-
       - name: Check GCC
         run: |
           gcc -v
-      - name: Install MinGW
+      - name: Setup MSYS2
         run: |
-          choco install mingw
-      - name: Build with Go
+          choco install msys2
+      - name: Setup MSYS2 GCC
         run: |
-          go build -o app.exe testGCC.go
+          pacman -Syu
+      - name: install gcc
+        run: |
+          pacman -S mingw-w64-x86_64-gcc
+      - name: pathing
+        run: |
+          setx PATH "$env:PATH;C:\msys64\mingw64\bin"
+      - name: check version again
+        run: |
+          gcc -v
+#      - name: Build with Go
+#        run: |
+#          go build -o app.exe testGCC.go
 
+
+######################################################################
 
 #name: Test GORM GCC
 #
