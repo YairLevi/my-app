@@ -26,9 +26,8 @@ jobs:
           go-version: '1.18'
 
       - name: Set up GCC
-        uses: egor-tensin/setup-mingw
+        uses: egor-tensin/setup-mingw@v2
         with:
-          version: latest
           platform: x64
 
       - name: Install Wails
