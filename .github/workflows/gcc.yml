@@ -19,6 +19,8 @@ jobs:
       - name: msys2 gcc version
         run: |
           cd C:\msys64\mingw64\bin
+      - name: contents
+        run: |
           dir
       - name: the global gcc version (supposed to match!!)
         run: |
