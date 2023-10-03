@@ -25,10 +25,8 @@ jobs:
         with:
           go-version: '1.18'
 
-      - name: Set up GCC
+      - name: Set up MinGW
         uses: egor-tensin/setup-mingw@v2
-        with:
-          platform: x64
 
       - name: Install Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
