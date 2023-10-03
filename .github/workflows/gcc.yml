@@ -12,9 +12,6 @@ jobs:
       - name: choco updage mingw
         run: |
           choco upgrade mingw --version=13.1
-      - name: the global gcc version (supposed to match!!)
-        run: |
-          gcc -v
 
       - name: Install MSYS2
         uses: msys2/setup-msys2@v2
@@ -22,9 +19,15 @@ jobs:
           msystem: MINGW64
           update: true
           install: mingw-w64-x86_64-toolchain
+
+      - name: the global gcc version (supposed to match!!)
+        run: |
+          gcc -v
+
+
       - name: msys2 gcc version
         run: |
-          dir C:\msys64\mingw64\bin
+          dir "C:\msys64\mingw64\bin"
 
       - name: Install Go
         uses: actions/setup-go@v2.1.3
