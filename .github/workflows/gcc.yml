@@ -1,0 +1,16 @@
+name: Test Presence of GCC
+
+on: [push]
+
+jobs:
+  build:
+    permissions: write-all
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Check GCC
+        run: |
+          gcc --version
