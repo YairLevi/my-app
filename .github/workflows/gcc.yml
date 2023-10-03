@@ -12,11 +12,19 @@ jobs:
         uses: actions/setup-go@v2.1.3
         with:
           go-version: 1.17.2
-      - name: Install GCC
-        uses: egor-tensin/setup-gcc@v1.3
-        with:
-          version: latest
-          platform: x64
+      - name: Set up MSYS2
+        uses: shibayan/setup-msys2@v1
+
+      - name: Install dependencies and switch to GCC 64-bit
+        run: |
+          # Update the package database and core packages
+          pacman -Syu --noconfirm
+
+          # Install the 64-bit GCC and set it as the default
+          pacman -S --noconfirm mingw-w64-x86_64-gcc
+
+          # Check the installed GCC version
+          g++ --version
       - name: Build with Go
         run: |
           go build -o app.exe .
