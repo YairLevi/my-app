@@ -8,13 +8,12 @@ jobs:
     steps:
       - name: root dir
         run: |
-          dir C:\msys64
-      - name: Checkout
-        uses: actions/checkout@v2
+          C:\msys64\msys2.exe -c "pacman -S mingw-w64-x86_64-gcc"
+#      - name: Checkout
+#        uses: actions/checkout@v2
       - name: root dir
         run: |
-          cd C:\
-          dir
+          dir C:\msys64\mingw64\bin
 #      - name: choco updage mingw
 #        run: |
 #          choco upgrade mingw --version=13.1
