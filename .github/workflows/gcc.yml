@@ -8,7 +8,7 @@ jobs:
     steps:
       - name: root dir
         run: |
-          dir C:\msys64\mingw64\bin
+          dir C:\msys64\mingw64
       - name: Checkout
         uses: actions/checkout@v2
       - name: root dir
