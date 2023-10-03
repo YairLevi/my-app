@@ -6,20 +6,12 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Install MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          install: mingw-w64-x86_64-toolchain
-      - name: root dir
-        run: |
-          C:\msys64\msys2.exe -c "pacman -S mingw-w64-x86_64-gcc"
+      
 #      - name: Checkout
 #        uses: actions/checkout@v2
       - name: root dir
         run: |
-          dir C:\msys64\mingw64\bin
+          dir C:\msys64\mingw64
 #      - name: choco updage mingw
 #        run: |
 #          choco upgrade mingw --version=13.1
