@@ -8,11 +8,13 @@ jobs:
     steps:
       - name: root dir
         run: |
+          dir C:\
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: root dir
+        run: |
           cd C:\
           dir
-#      - name: Checkout
-#        uses: actions/checkout@v2
-
 #      - name: choco updage mingw
 #        run: |
 #          choco upgrade mingw --version=13.1
