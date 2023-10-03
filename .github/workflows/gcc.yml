@@ -1,16 +1,22 @@
-name: Test Presence of GCC
+name: Test GORM GCC
 
 on: [push]
 
 jobs:
   build:
-    permissions: write-all
     runs-on: windows-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Check GCC
+      - name: Install Go
+        uses: actions/setup-go@v2.1.3
+        with:
+          go-version: 1.17.2
+      - name: Install GCC
+        uses: egor-tensin/setup-gcc@v1.3
+        with:
+          version: latest
+          platform: x64
+      - name: Build with Go
         run: |
-          gcc -v
+          go build -o app.exe .
