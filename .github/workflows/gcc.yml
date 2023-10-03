@@ -9,6 +9,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: PATH PRINT
+        run: |
+          echo %PATH%
+
       - name: choco updage mingw
         run: |
           choco upgrade mingw --version=13.1
