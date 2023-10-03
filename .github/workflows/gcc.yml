@@ -1,6 +1,6 @@
 name: Test GORM GCC
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
@@ -12,19 +12,29 @@ jobs:
         uses: actions/setup-go@v2.1.3
         with:
           go-version: 1.17.2
+
       - name: Set up MSYS2
-        uses: shibayan/setup-msys2@v1
-
-      - name: Install dependencies and switch to GCC 64-bit
         run: |
-          # Update the package database and core packages
+          # Download MSYS2 installer
+          curl -L -o msys2-installer.exe https://github.com/msys2/msys2-installer/releases/latest/download/msys2-x86_64-latest.exe
+          
+          # Install MSYS2 silently
+          ./msys2-installer.exe -d
+          
+          # Initialize MSYS2
+          source ${{ runner.workspace }}/msys64/msys2_shell.cmd -mingw64 -defterm -no-start -here -l -c "echo Hello from MSYS2"
+
+      - name: Install GCC 64-bit
+        run: |
+          # Update MSYS2 package databases
           pacman -Syu --noconfirm
-
-          # Install the 64-bit GCC and set it as the default
+          
+          # Install GCC 64-bit
           pacman -S --noconfirm mingw-w64-x86_64-gcc
-
+          
           # Check the installed GCC version
           g++ --version
+
       - name: Build with Go
         run: |
           go build -o app.exe .
