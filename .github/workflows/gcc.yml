@@ -13,4 +13,4 @@ jobs:
 
       - name: Check GCC
         run: |
-          gcc --version
+          gcc -v
