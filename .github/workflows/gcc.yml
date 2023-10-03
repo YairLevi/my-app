@@ -13,7 +13,7 @@ jobs:
         with:
           go-version: 1.17.2
       - name: Install MinGW
-        uses: egor-tensin/setup-mingw@v1.0.0
+        uses: egor-tensin/setup-mingw@v2
       - name: Build with Go
         run: |
           // #cgo LDFLAGS: -lmsvcrt
