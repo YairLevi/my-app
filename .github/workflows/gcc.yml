@@ -19,15 +19,21 @@ jobs:
           msystem: MINGW64
           update: true
           install: mingw-w64-x86_64-toolchain
+      - name: msys2 gcc version
+        run: |
+          dir "C:\msys64\mingw64\bin"
+
+      - name: add to path
+        run: |
+          setx PATH "%PATH%;C:\msys64\mingw64\bin"
+          
 
       - name: the global gcc version (supposed to match!!)
         run: |
           gcc -v
 
 
-      - name: msys2 gcc version
-        run: |
-          dir "C:\msys64\mingw64\bin"
+     
 
       - name: Install Go
         uses: actions/setup-go@v2.1.3
