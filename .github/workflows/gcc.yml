@@ -12,15 +12,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-#      - name: Install WebKitGTK dependency
-#        run: |
-#          Invoke-WebRequest -Uri "https://go.microsoft.com/fwlink/p/?LinkId=2124703" -OutFile "webview2_runtime.msi"
-#          Start-Process msiexec.exe -Wait -ArgumentList '/i webview2_runtime.msi /quiet'
+      - name: Install WebKitGTK dependency
+        run: |
+          Invoke-WebRequest -Uri "https://go.microsoft.com/fwlink/p/?LinkId=2124703" -OutFile "webview2_runtime.msi"
+          Start-Process msiexec.exe -Wait -ArgumentList '/i webview2_runtime.msi /quiet'
 
-#      - name: Set up Go
-#        uses: actions/setup-go@v2
-#        with:
-#          go-version: '1.18'
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.18'
 
       - name: Install Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
