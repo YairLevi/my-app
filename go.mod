@@ -1,6 +1,6 @@
 module my-app
 
-go 1.18
+go 1.20
 
 require (
 	github.com/google/go-github/v39 v39.2.0
