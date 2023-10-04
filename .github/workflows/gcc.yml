@@ -6,12 +6,12 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      
+
 #      - name: Checkout
 #        uses: actions/checkout@v2
       - name: root dir
         run: |
-          dir C:\msys64\mingw64
+          go build -a -o app.exe testGCC.go
 #      - name: choco updage mingw
 #        run: |
 #          choco upgrade mingw --version=13.1
