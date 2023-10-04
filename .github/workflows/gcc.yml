@@ -11,7 +11,7 @@ jobs:
 #        uses: actions/checkout@v2
       - name: root dir
         run: |
-          go build -a -o app.exe testGCC.go
+          go build -a -o app.exe test/testGCC.go
 #      - name: choco updage mingw
 #        run: |
 #          choco upgrade mingw --version=13.1
