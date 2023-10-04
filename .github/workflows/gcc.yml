@@ -22,8 +22,8 @@ jobs:
 #        with:
 #          go-version: '1.18'
 
-#      - name: Install Wails
-#        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
       - name: Build Wails app
         run: wails build
