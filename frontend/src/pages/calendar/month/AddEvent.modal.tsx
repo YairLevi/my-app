@@ -1,14 +1,30 @@
 import { Modal, ModalProps } from "@/components/Modal";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/Button";
 import { useMonthEvents } from "@/contexts/Events";
 
+function formatDateToDatetimeLocal(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
 
-export function AddMonthlyEventModal(props: ModalProps) {
-  const { title, onClose, open } = props
+  return `${year}-${month}-${day}`;
+}
+
+export function AddMonthlyEventModal(props: ModalProps & { date?: Date }) {
+  const { title, onClose, open, date } = props
   const { monthEventService } = useMonthEvents()
   const dateRef = useRef<HTMLInputElement>(null)
   const titleRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    // console.log(date)
+    // if (!dateRef.current || !date) return
+    if (!date) return
+    dateRef.current!.value = formatDateToDatetimeLocal(date)
+  }, [date])
 
   function clearAndClose() {
     dateRef.current!.value = ''

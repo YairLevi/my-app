@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import React, { MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { For } from "@/components/For";
 import { useCalendar } from "@/contexts/DateContext";
@@ -53,6 +53,8 @@ function generateCalendarGrid(currentDate: Date): Date[] {
 export function MonthCalendar() {
   const { date } = useCalendar()
   const { monthEvents, monthEventService } = useMonthEvents()
+
+  const [clickDate, setClickDate] = useState<Date>()
 
   const {
     open: openAdd,
@@ -131,6 +133,36 @@ export function MonthCalendar() {
       prev[idx] = Math.max(0, prev[idx] - (3 - (eventCount - startingIdxArr[idx])))
       return [...prev]
     })
+  }
+
+  useEffect(() => {
+    if (!clickDate) {
+      return
+    }
+    onOpenAdd()
+  }, [clickDate]);
+
+  function calculateDate(event: MouseEvent<HTMLDivElement>) {
+    const div = event.currentTarget
+
+    const cellWidth = Math.floor(div.clientWidth / 7);  // 7 columns
+    // const cellHeight = Math.floor(div.clientHeight / 6); // 6 rows
+
+    const cellHeight = rowHeightPixels*5
+
+    // Get the relative position of the click within the div
+    const x = event.clientX - div.getBoundingClientRect().left;
+    const y = event.clientY - div.getBoundingClientRect().top;
+
+
+    // Calculate the 0-indexed cell
+    const columnIndex = Math.floor(x / cellWidth);
+    const rowIndex = Math.floor(y / cellHeight);
+    // Calculate the cell number
+    const cellNumber = rowIndex * 7 + columnIndex;
+    // Log the relative position
+    const day = days[cellNumber]
+    setClickDate(day)
   }
 
   return (
@@ -217,69 +249,81 @@ export function MonthCalendar() {
             </div>
           )}/>
         </div>
-
-        <ResponsiveGridLayout
-          className="h-full w-full min-w-[45rem] layout monthly-grid"
-          breakpoints={{ lg: 1200 }}
-          preventCollision={true}
-          cols={{ 'lg': GRID_COLS }}
-          rowHeight={rowHeightPixels}
-          useCSSTransforms={true}
-          maxRows={GRID_ROWS}
-          compactType={null}
-          allowOverlap={false}
-          isBounded={true}
-          margin={[0, 0]}
-          onDragStop={dragStopHandle}
+        <div className="h-full w-full min-w-[45rem]"
+             onClick={(e) => calculateDate(e)}
         >
-          {
-            days.map((day, index) => {
-              const dayEvents = dateToEvents.get(day.toDateString())!
-              const Nodes: ReactNode[] = []
-              for (let i = startingIdxArr[index]; i < Math.min(dayEvents.length, startingIdxArr[index] + 3); i++) {
-                const event = dayEvents[i]
-                const y = Math.floor(index / COL_COUNT) * ROWS_PER_CELL + 1 + i - startingIdxArr[index]
-                const x = event.date.getDay()
-                Nodes.push(
-                  <Tile
-                    event={event}
-                    selectedId={selectedId}
-                    key={`${event.id};${uuid()}`}
-                    data-grid={{ w: 1, h: 1, x, y, isResizable: false }}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      updateSelected(event.id!)
-                    }}
-                  />
-                )
-              }
+          <ResponsiveGridLayout
+            className="h-full w-full min-w-[45rem] layout monthly-grid relative"
+            breakpoints={{ lg: 1200 }}
+            preventCollision={true}
+            cols={{ 'lg': GRID_COLS }}
+            rowHeight={rowHeightPixels}
+            useCSSTransforms={true}
+            maxRows={GRID_ROWS}
+            compactType={null}
+            allowOverlap={false}
+            isBounded={true}
 
-              return Nodes
-            })
-          }
+            margin={[0, 0]}
+            onDragStop={dragStopHandle}
+          >
 
-          {/* HIDDEN CELLS, TO STRETCH THE GRID */}
-          <div
-            key="item-top"
-            className="hidden"
-            data-grid={{ w: 0, h: 0, x: 0, y: 0, static: true, minH: -1, minW: -1 }}
-          >
-            This is the top item, hidden, to stretch the grid.
-          </div>
-          <div
-            key="item-bottom"
-            className="hidden"
-            data-grid={{ w: 0, h: 1, x: 0, y: GRID_ROWS - 1, static: true, minH: -1, minW: -1 }}
-          >
-            This is the bottom item, hidden, to stretch the grid.
-          </div>
-        </ResponsiveGridLayout>
+            {
+              days.map((day, index) => {
+                const dayEvents = dateToEvents.get(day.toDateString())!
+                const Nodes: ReactNode[] = []
+                for (let i = startingIdxArr[index]; i < Math.min(dayEvents.length, startingIdxArr[index] + 3); i++) {
+                  const event = dayEvents[i]
+                  const y = Math.floor(index / COL_COUNT) * ROWS_PER_CELL + 1 + i - startingIdxArr[index]
+                  const x = event.date.getDay()
+                  Nodes.push(
+                    <Tile
+                      event={event}
+                      selectedId={selectedId}
+                      key={`${event.id};${uuid()}`}
+                      data-grid={{ w: 1, h: 1, x, y, isResizable: false }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        updateSelected(event.id!)
+                      }}
+                    />
+                  )
+                }
+
+                return Nodes
+              })
+            }
+
+            {/* HIDDEN CELLS, TO STRETCH THE GRID */}
+            <div
+              key="item-top"
+              className="hidden"
+              data-grid={{ w: 0, h: 0, x: 0, y: 0, static: true, minH: -1, minW: -1 }}
+            >
+              This is the top item, hidden, to stretch the grid.
+            </div>
+            <div
+              key="item-bottom"
+              className="hidden"
+              data-grid={{ w: 0, h: 1, x: 0, y: GRID_ROWS - 1, static: true, minH: -1, minW: -1 }}
+            >
+              This is the bottom item, hidden, to stretch the grid.
+            </div>
+          </ResponsiveGridLayout>
+
+        </div>
+
       </div>
+
 
       <AddMonthlyEventModal
         open={openAdd}
-        onClose={onCloseAdd}
+        onClose={() => {
+          onCloseAdd()
+          setClickDate(undefined)
+        }}
         title="Add Event"
+        date={clickDate}
       />
     </>
   )
