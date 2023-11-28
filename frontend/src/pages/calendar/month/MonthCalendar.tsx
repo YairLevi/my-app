@@ -2,12 +2,11 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { For } from "@/components/For";
 import { useCalendar } from "@/contexts/DateContext";
-import { MonthEvent, WeekEvent } from "@/contexts/Events";
+import { MonthEvent, useMonthEvents, WeekEvent } from "@/contexts/Events";
 import { Tile } from "@/pages/calendar/month/Tile";
 import uuid from "react-uuid";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/Button";
-import { useMonthEvents } from "@/contexts/Events";
 import { AddMonthlyEventModal } from "@/pages/calendar/month/AddEvent.modal";
 import { useModal } from "@/components/Modal";
 import { Keys, useKeybind } from "@/hooks/useKeybind";
@@ -53,6 +52,8 @@ function generateCalendarGrid(currentDate: Date): Date[] {
 
 export function MonthCalendar() {
   const { date } = useCalendar()
+  const { monthEvents, monthEventService } = useMonthEvents()
+
   const {
     open: openAdd,
     onClose: onCloseAdd,
@@ -76,8 +77,9 @@ export function MonthCalendar() {
   useKeybind(() => {
     if (selectedRef.current == NON_SELECTED) return
     const monthEventToDelete = monthEvents.find(ev => ev.id == selectedRef.current)!
+    if (!monthEventToDelete) return
     monthEventService.deleteEvent(monthEventToDelete)
-  }, [], [Keys.delete], [Keys.backspace])
+  }, [monthEvents], [Keys.delete], [Keys.backspace])
 
   useEffect(() => {
     function onClickHandle() {
@@ -87,9 +89,6 @@ export function MonthCalendar() {
     window.addEventListener('click', onClickHandle)
     return () => window.removeEventListener('click', onClickHandle)
   }, [])
-
-
-  const { monthEvents, monthEventService } = useMonthEvents()
 
 
   const dateToEvents: Map<string, MonthEvent[]> = new Map<string, MonthEvent[]>()
