@@ -22,8 +22,10 @@ export function AddMonthlyEventModal(props: ModalProps & { date?: Date }) {
   useEffect(() => {
     // console.log(date)
     // if (!dateRef.current || !date) return
-    if (!date) return
-    dateRef.current!.value = formatDateToDatetimeLocal(date)
+    if (!date)
+      dateRef.current!.value = ''
+    else
+      dateRef.current!.value = formatDateToDatetimeLocal(date)
   }, [date])
 
   function clearAndClose() {
@@ -35,7 +37,7 @@ export function AddMonthlyEventModal(props: ModalProps & { date?: Date }) {
   async function onSubmit() {
     const title = titleRef.current!.value
     const date = new Date(dateRef.current!.value)
-    await monthEventService.addEvent({ date, title })
+    await monthEventService.addEvent({ startDate: date, endDate: date, title })
     clearAndClose()
   }
 

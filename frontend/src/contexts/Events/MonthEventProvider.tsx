@@ -43,6 +43,7 @@ export function MonthEventProvider({ children }: PropsWithChildren) {
   }
 
   async function updateEvent(updatedEvent: MonthEvent) {
+    setEvents(prev => [...prev.filter(ev => ev.id != updatedEvent.id), updatedEvent])
     const repoEvent = new repositories.MonthEvent()
     Object.assign(repoEvent, updatedEvent)
     repoEvent.deletedAt = undefined

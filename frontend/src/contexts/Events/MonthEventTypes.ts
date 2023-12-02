@@ -6,13 +6,15 @@ type TDateKeyMonth =
   | "createdAt"
   | "updatedAt"
   | "deletedAt"
-  | "date"
+  | "startDate"
+  | "endDate"
 
 const DateKeyListForMonth: TDateKeyMonth[] = [
   "createdAt",
   "updatedAt",
   "deletedAt",
-  "date"
+  "startDate",
+  "endDate"
 ]
 
 export type MonthEvent = { [K in keyof MonthEventNoConvert]: K extends TDateKeyMonth ? Date : MonthEventNoConvert[K] };

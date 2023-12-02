@@ -3,17 +3,26 @@ import { MonthEvent } from "@/contexts/Events";
 
 interface TileProps2 extends HTMLAttributes<HTMLDivElement> {
   selectedId: number
+  setDrag: (id: string) => void
   event: MonthEvent
 }
 
 export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, event, selectedId, ...props}, ref) => {
-  const { title, date, id } = event
+  const { title, startDate, id } = event
 
   return (
     <div
       ref={ref}
       className="![&_*]:select-none"
       {...props}
+      // onMouseDown={(ev) => {
+      //   if (props.onMouseDown)
+      //     props.onMouseDown(ev)
+      //   console.log('mouse down')
+      // }}
+      onMouseDown={(e) => {
+        e.stopPropagation()
+      }}
     >
       <div className={`bg-[#0f0f11] h-full rounded mx-1 !text-black px-1 py-1 flex gap-2
         active:cursor-grabbing hover:cursor-grab overflow-hidden border-t-gray-800 border-t items-center

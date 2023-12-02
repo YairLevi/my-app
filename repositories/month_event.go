@@ -9,8 +9,10 @@ import (
 
 type MonthEvent struct {
 	Model
-	Title string    `json:"title"`
-	Date  time.Time `json:"date"`
+	Title     string `json:"title"`
+	Date      time.Time
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
 }
 
 type MonthEventRepository struct {

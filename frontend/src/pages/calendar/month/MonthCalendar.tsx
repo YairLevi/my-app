@@ -1,4 +1,4 @@
-import React, { MouseEvent, ReactNode, useEffect, useRef, useState } from "react";
+import React, { MouseEvent, useEffect, useRef, useState } from "react";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { For } from "@/components/For";
 import { useCalendar } from "@/contexts/DateContext";
@@ -10,6 +10,8 @@ import { Button } from "@/components/Button";
 import { AddMonthlyEventModal } from "@/pages/calendar/month/AddEvent.modal";
 import { useModal } from "@/components/Modal";
 import { Keys, useKeybind } from "@/hooks/useKeybind";
+import { createLayout } from "@/pages/calendar/month/Sorting";
+import { mockMonthEvents } from "@/pages/calendar/month/MockMonthEvents";
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -106,7 +108,7 @@ export function MonthCalendar() {
     const eventId = Number(newItem.i.split(';')[0])
 
     const monthEvent = monthEvents.find(ev => ev.id == eventId)!
-    const newMonthEvent: MonthEvent = { ...monthEvent, date: newDate }
+    const newMonthEvent: MonthEvent = { ...monthEvent, startDate: newDate, endDate: newDate }
     await monthEventService.updateEvent(newMonthEvent)
     updateStartingIndex(oldItem.x, oldItem.y)
   }
@@ -115,7 +117,7 @@ export function MonthCalendar() {
     .set(day.toDateString(), [])
   )
   monthEvents.forEach(event => {
-    const key = event.date.toDateString()
+    const key = event.startDate.toDateString()
     const eventList = dateToEvents.get(key)
     if (!eventList) return
     eventList.push(event)
@@ -148,7 +150,7 @@ export function MonthCalendar() {
     const cellWidth = Math.floor(div.clientWidth / 7);  // 7 columns
     // const cellHeight = Math.floor(div.clientHeight / 6); // 6 rows
 
-    const cellHeight = rowHeightPixels*5
+    const cellHeight = rowHeightPixels * 5
 
     // Get the relative position of the click within the div
     const x = event.clientX - div.getBoundingClientRect().left;
@@ -165,10 +167,15 @@ export function MonthCalendar() {
     setClickDate(day)
   }
 
+  const [dragging, setDragging] = useState('')
+
   return (
     <>
       <div className="w-full items-center justify-center flex py-2">
-        <Button onClick={onOpenAdd}>Add Event</Button>
+        <Button onClick={() => {
+          setClickDate(undefined)
+          onOpenAdd()
+        }}>Add Event</Button>
       </div>
       <div className="relative min-w-[45rem] h-full overflow-auto [&_*]:select-none">
 
@@ -269,30 +276,48 @@ export function MonthCalendar() {
           >
 
             {
-              days.map((day, index) => {
-                const dayEvents = dateToEvents.get(day.toDateString())!
-                const Nodes: ReactNode[] = []
-                for (let i = startingIdxArr[index]; i < Math.min(dayEvents.length, startingIdxArr[index] + 3); i++) {
-                  const event = dayEvents[i]
-                  const y = Math.floor(index / COL_COUNT) * ROWS_PER_CELL + 1 + i - startingIdxArr[index]
-                  const x = event.date.getDay()
-                  Nodes.push(
-                    <Tile
-                      event={event}
-                      selectedId={selectedId}
-                      key={`${event.id};${uuid()}`}
-                      data-grid={{ w: 1, h: 1, x, y, isResizable: false }}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        updateSelected(event.id!)
-                      }}
-                    />
-                  )
-                }
-
-                return Nodes
-              })
+              createLayout(mockMonthEvents, days)
+                .map(tile => (
+                  <Tile
+                    setDrag={(id) => setDragging(id)}
+                    event={tile.event}
+                    selectedId={selectedId}
+                    key={tile.layout.i}
+                    data-grid={{...tile.layout, isResizable: false }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      updateSelected(tile.event.id!)
+                    }}
+                  />
+                ))
             }
+
+            {/*{*/}
+            {/*  days.map((day, index) => {*/}
+            {/*    const dayEvents = dateToEvents.get(day.toDateString())!*/}
+            {/*    const Nodes: ReactNode[] = []*/}
+            {/*    for (let i = startingIdxArr[index]; i < Math.min(dayEvents.length, startingIdxArr[index] + 3); i++) {*/}
+            {/*      const event = dayEvents[i]*/}
+            {/*      const y = Math.floor(index / COL_COUNT) * ROWS_PER_CELL + 1 + i - startingIdxArr[index]*/}
+            {/*      const x = event.startDate.getDay()*/}
+            {/*      Nodes.push(*/}
+            {/*        <Tile*/}
+            {/*          setDrag={(id) => setDragging(id)}*/}
+            {/*          event={event}*/}
+            {/*          selectedId={selectedId}*/}
+            {/*          key={`${event.id};${uuid()}`}*/}
+            {/*          data-grid={{ w: 1, h: 1, x, y, isResizable: false }}*/}
+            {/*          onClick={(e) => {*/}
+            {/*            e.stopPropagation()*/}
+            {/*            updateSelected(event.id!)*/}
+            {/*          }}*/}
+            {/*        />*/}
+            {/*      )*/}
+            {/*    }*/}
+
+            {/*    return Nodes*/}
+            {/*  })*/}
+            {/*}*/}
 
             {/* HIDDEN CELLS, TO STRETCH THE GRID */}
             <div
@@ -312,7 +337,6 @@ export function MonthCalendar() {
           </ResponsiveGridLayout>
 
         </div>
-
       </div>
 
 

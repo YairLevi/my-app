@@ -10,7 +10,9 @@ export namespace repositories {
 	    deletedAt: any;
 	    title: string;
 	    // Go type: time
-	    date: any;
+	    startDate: any;
+	    // Go type: time
+	    endDate: any;
 	
 	    static createFrom(source: any = {}) {
 	        return new MonthEvent(source);
@@ -23,7 +25,8 @@ export namespace repositories {
 	        this.updatedAt = this.convertValues(source["updatedAt"], null);
 	        this.deletedAt = this.convertValues(source["deletedAt"], null);
 	        this.title = source["title"];
-	        this.date = this.convertValues(source["date"], null);
+	        this.startDate = this.convertValues(source["startDate"], null);
+	        this.endDate = this.convertValues(source["endDate"], null);
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
