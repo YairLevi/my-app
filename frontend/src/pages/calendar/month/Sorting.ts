@@ -88,31 +88,35 @@ export function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
 
     const start = event.startDate > days[0] ? event.startDate : days[0]
     const end = (event.endDate < days.at(-1)! ? event.endDate : days.at(-1))! // might be null
-
     // 0(Sunday) - (7 - 0 + 1) = 6
     // 6(Tuesday) - (7 - 6 + 1) =
 
     let startOfTile = start
     let endOfTile
 
-    while (true) {
+    let tapout = 0
+    while (tapout < 10) {
       let tileX, tileY, tileW, tileH
 
       if (startOfTile > end) {
         break
       }
 
-      const row = Math.floor(days.indexOf(startOfTile) / 7)
+
+      const row = Math.floor(days.findIndex(ev => ev.toDateString() == startOfTile.toDateString()) / 7)
       tileY = row*5 + 1 + slotIdx
 
       tileX = startOfTile.getDay()
       tileH = 1
 
-      endOfTile = days[tileY * 7 - 1] < end ? days[tileY * 7 - 1] : end
+      endOfTile = days[Math.ceil(tileY/5) * 7 - 1] < end ? days[Math.ceil(tileY/5) * 7 - 1] : end
       tileW = endOfTile.getDay() - startOfTile.getDay() + 1
 
+
+      console.log({endOfTile, startOfTile})
+
       const layout: ReactGridLayout.Layout = {
-        i: event.id + event.startDate.toString(),
+        i: event.id + startOfTile.toDateString(),
         x: tileX,
         y: tileY,
         w: tileW,
@@ -123,7 +127,6 @@ export function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
         event, layout
       })
 
-      if (tileY * 7 >= days.length) break
       startOfTile.setDate(endOfTile.getDate() + 1)
       /**
        * if start is more than end: break
@@ -137,6 +140,7 @@ export function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
        *
        * set start to be the sunday of the next week
        */
+      tapout++
     }
   })
 
