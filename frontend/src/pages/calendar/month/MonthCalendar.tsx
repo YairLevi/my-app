@@ -5,13 +5,11 @@ import { useCalendar } from "@/contexts/DateContext";
 import { MonthEvent, useMonthEvents, WeekEvent } from "@/contexts/Events";
 import { Tile } from "@/pages/calendar/month/Tile";
 import uuid from "react-uuid";
-import { ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@/components/Button";
 import { AddMonthlyEventModal } from "@/pages/calendar/month/AddEvent.modal";
 import { useModal } from "@/components/Modal";
 import { Keys, useKeybind } from "@/hooks/useKeybind";
 import { createTiles, dateToEvents, generateCalendarGrid } from "@/pages/calendar/month/Sorting";
-import { mockMonthEvents } from "@/pages/calendar/month/MockMonthEvents";
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -24,12 +22,10 @@ const RowHeightRem = 2
 const rowHeightPixels = RowHeightRem * 16
 
 
-
-
-
 export function MonthCalendar() {
   const { date } = useCalendar()
   const { monthEvents, monthEventService } = useMonthEvents()
+  let clickOnGrid = false
 
   const [clickDate, setClickDate] = useState<Date>()
 
@@ -85,32 +81,8 @@ export function MonthCalendar() {
     const monthEvent = monthEvents.find(ev => ev.id == eventId)!
     const newMonthEvent: MonthEvent = { ...monthEvent, startDate: newDate, endDate: newDate }
     await monthEventService.updateEvent(newMonthEvent)
-    // updateStartingIndex(oldItem.x, oldItem.y)
   }
 
-  // days.forEach(day => dateToEvents
-  //   .set(day.toDateString(), [])
-  // )
-  // monthEvents.forEach(event => {
-  //   const key = event.startDate.toDateString()
-  //   const eventList = dateToEvents.get(key)
-  //   if (!eventList) return
-  //   eventList.push(event)
-  // })
-  // days.forEach(day => dateToEvents
-  //   .get(day.toDateString())!
-  //   .sort((e1, e2) => e1.title.localeCompare(e2.title))
-  // )
-
-  // function updateStartingIndex(x: number, y: number) {
-  //   const idx = Math.floor(y / ROWS_PER_CELL) * COL_COUNT + x
-  //   const eventCount = dateToEvents.get(days[idx].toDateString())!.length - 1
-  //   setStartingIdxArr(prev => {
-  //     if (eventCount - startingIdxArr[idx] >= 3) return [...prev]
-  //     prev[idx] = Math.max(0, prev[idx] - (3 - (eventCount - startingIdxArr[idx])))
-  //     return [...prev]
-  //   })
-  // }
 
   useEffect(() => {
     if (!clickDate) {
@@ -142,7 +114,7 @@ export function MonthCalendar() {
     setClickDate(day)
   }
 
-  const [dragging, setDragging] = useState('')
+  const [dragging, setDragging] = useState(false)
 
   return (
     <>
@@ -167,7 +139,9 @@ export function MonthCalendar() {
                 return (
                   <div
                     key={uuid()}
-                    className={`min-h-[7rem] w-full border-r border-r-gray-700 relative flex flex-col justify-between`}
+                    className={`min-h-[7rem] w-full border-r border-r-gray-700 relative flex flex-col justify-between
+                    ${dragging && 'bg-blue-400'}
+                    `}
                   >
                     <p
                       className={`text-xs text-center pt-1 ${currentDate.getMonth() == date.getMonth() ? "text-white" : "text-gray-500"}`}
@@ -188,7 +162,18 @@ export function MonthCalendar() {
           )}/>
         </div>
         <div className="h-full w-full min-w-[45rem]"
-             onClick={(e) => calculateDate(e)}
+             onMouseDown={e => {
+               clickOnGrid = true
+             }}
+             onMouseUp={e => {
+               if (clickOnGrid) {
+                 console.log('Clicked on thing')
+                 calculateDate(e)
+               }
+
+               setDragging(false)
+               clickOnGrid = false
+             }}
         >
           <ResponsiveGridLayout
             className="h-full w-full min-w-[45rem] layout monthly-grid relative"
@@ -213,7 +198,8 @@ export function MonthCalendar() {
               createTiles(monthEvents, days)
                 .map(tile => (
                   <Tile
-                    setDrag={(id) => setDragging(id)}
+                    onTileDragStart={e => setDragging(true)}
+                    onTileDragStop={e => setDragging(false)}
                     event={tile.event}
                     selectedId={selectedId}
                     key={tile.layout.i + date.toDateString()}
@@ -242,7 +228,6 @@ export function MonthCalendar() {
               This is the bottom item, hidden, to stretch the grid.
             </div>
           </ResponsiveGridLayout>
-
         </div>
       </div>
 

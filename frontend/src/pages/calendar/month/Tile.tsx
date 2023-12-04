@@ -1,27 +1,29 @@
-import React, { forwardRef, HTMLAttributes } from "react";
+import React, { forwardRef, HTMLAttributes, MouseEvent } from "react";
 import { MonthEvent } from "@/contexts/Events";
 
 interface TileProps2 extends HTMLAttributes<HTMLDivElement> {
   selectedId: number
-  setDrag: (id: string) => void
+  onTileDragStart: (e: MouseEvent) => void
+  onTileDragStop: (e: MouseEvent) => void
   event: MonthEvent
 }
 
 export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, event, selectedId, ...props}, ref) => {
   const { title, startDate, id } = event
+  const { onTileDragStart, onTileDragStop } = props
 
   return (
     <div
       ref={ref}
       className="![&_*]:select-none"
       {...props}
-      // onMouseDown={(ev) => {
-      //   if (props.onMouseDown)
-      //     props.onMouseDown(ev)
-      //   console.log('mouse down')
-      // }}
-      onMouseDown={(e) => {
+      onMouseDown={e => {
         e.stopPropagation()
+        onTileDragStart(e)
+      }}
+      onMouseUp={e => {
+        e.stopPropagation()
+        onTileDragStop(e)
       }}
     >
       <div className={`bg-[#0f0f11] h-full rounded mx-1 !text-black px-1 py-1 flex gap-2
