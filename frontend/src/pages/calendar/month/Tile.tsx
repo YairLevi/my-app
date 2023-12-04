@@ -31,7 +31,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, event, se
       >
         <div className={`border rounded-lg border-l-4 h-full`} style={{borderColor: "#0e9426"}}/>
         <section>
-          <span className="font-medium text-white text-[0.8rem] line-clamp-1">{title}</span>
+          <span className="font-medium text-white text-[0.8rem] line-clamp-1">{id} {title}</span>
         </section>
       </div>
 

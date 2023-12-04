@@ -2,9 +2,36 @@ import { MonthEvent } from "@/contexts/Events";
 
 export const mockMonthEvents: MonthEvent[] = [
   {
-    "id": 1,
+    "id": 15,
     "startDate": new Date("2023-12-05"),
     "endDate": new Date("2023-12-05"),
+    "title": "Team Meeting",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: new Date()
+  },
+  {
+    "id": 111,
+    "startDate": new Date("2023-11-24"),
+    "endDate": new Date("2023-11-28"),
+    "title": "Team Meeting",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: new Date()
+  },
+  {
+    "id": 112,
+    "startDate": new Date("2024-01-04"),
+    "endDate": new Date("2024-01-08"),
+    "title": "Team Meeting",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: new Date()
+  },
+  {
+    "id": 113,
+    "startDate": new Date("2023-12-29"),
+    "endDate": new Date("2024-01-03"),
     "title": "Team Meeting",
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -63,6 +90,14 @@ export const mockMonthEvents: MonthEvent[] = [
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: new Date()
+  },{
+    "id": 67,
+    "startDate": new Date("2023-12-25"),
+    "endDate": new Date("2023-12-28"),
+    "title": "Team Building Event",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: new Date()
   },
   {
     "id": 7,
@@ -96,6 +131,24 @@ export const mockMonthEvents: MonthEvent[] = [
     "startDate": new Date("2023-12-28"),
     "endDate": new Date("2023-12-31"),
     "title": "Coffee Break with Team",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: new Date()
+  },
+  {
+    "id": 12,
+    "startDate": new Date("2023-12-28"),
+    "endDate": new Date("2023-12-31"),
+    "title": "Event 1",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: new Date()
+  },
+  {
+    "id": 13,
+    "startDate": new Date("2023-12-28"),
+    "endDate": new Date("2023-12-31"),
+    "title": "Event 2",
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: new Date()

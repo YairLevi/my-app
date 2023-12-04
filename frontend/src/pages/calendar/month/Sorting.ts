@@ -1,27 +1,6 @@
 import { MonthEvent } from "@/contexts/Events";
 import ReactGridLayout from "react-grid-layout";
 
-const dateToEvents: Map<Date, MonthEvent[]> = new Map<Date, MonthEvent[]>()
-const days: Date[] = []
-
-/**
- * Result of function:
- * [
- *   [ev1, ev3, ...], // day 1 of currently displayed days
- *   [ev2, ...],      // day 2 of  '' '' '' ''
- *   ...
- * ]
- * @param events
- */
-
-function populateMap(events: MonthEvent[]) {
-  events.forEach(event => {
-    for (let day = event.startDate; day <= event.endDate; day.setDate(day.getDate() + 1)) {
-      dateToEvents.set(day, [...dateToEvents.get(day)!, event]) // assuming we already had an empty list at least.
-    }
-  })
-}
-
 function sortEvents(events: MonthEvent[]): MonthEvent[] {
   return events.sort((a, b) => {
     // Priority 1: Earliest startDate
@@ -41,55 +20,106 @@ function sortEvents(events: MonthEvent[]): MonthEvent[] {
   });
 }
 
-function fillAndPopulate(slots: MonthEvent[][], event: MonthEvent) {
-  for (let day = event.startDate; day <= event.endDate; day.setDate(day.getDate() + 1)) {
-    dateToEvents.set(day, [...dateToEvents.get(day)!, event]) // assuming we already had an empty list at least.
-
-  }
-}
-
-function dayDifference(startDate: Date, endDate: Date): number {
-  // Convert both dates to UTC to avoid timezone-related issues
-  const startUTC = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-  const endUTC = Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-
-  // Calculate the difference in milliseconds
-  const msPerDay = 24 * 60 * 60 * 1000;
-  return Math.floor((endUTC - startUTC) / msPerDay);
-}
-
 type Tile = {
   event: MonthEvent
   layout: ReactGridLayout.Layout
 }
 
-export function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
+const NOT_FOUND = -1
+const FREE = false
+export let dateToEvents = new Map<string, MonthEvent[]>()
+
+export function createTiles(events: MonthEvent[], monthDays: Date[]): Tile[] {
+  // reset global - requires refactoring...
+  dateToEvents = new Map<string, MonthEvent[]>()
+
   const sortedEvents = sortEvents(events)
-  const slots = days.map(_ => new Array<MonthEvent>(3))
+  let tiles: Tile[] = []
+
+  for (let i = 0; i < monthDays.length; i+=7) {
+    // if (i != 4*7) continue // testing purposes
+    const weekDays = monthDays.slice(i, i+7)
+    const eventsInWeek = sortedEvents.filter(event => event.startDate <= weekDays[6] && event.endDate >= weekDays[0])
+    const weekTiles = tilesInWeek(eventsInWeek, weekDays).map(tile => {
+      return {
+        event: tile.event,
+        layout: {
+          ...tile.layout,
+          y: tile.layout.y + 5 * (i/7)
+        }
+      }
+    })
+    tiles = [...tiles, ...weekTiles]
+  }
+
+  return tiles
+}
+
+function tilesInWeek(eventsInWeek: MonthEvent[], weekDays: Date[]): Tile[] {
   const tiles: Tile[] = []
+  const slots = Array.from({ length: 7 }, () => [FREE, FREE, FREE])
+
+  eventsInWeek.forEach(event => {
+    const start = event.startDate > weekDays[0] ? event.startDate : weekDays[0]
+    const end = event.endDate < weekDays[6] ? event.endDate : weekDays[6]
+
+    const startIdx = weekDays.findIndex(day => day.toDateString() == start.toDateString())
+    const endIdx = weekDays.findIndex(day => day.toDateString() == end.toDateString())
+
+    if (startIdx == NOT_FOUND || endIdx == NOT_FOUND) {
+      return
+    }
+
+    for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+      const dateStringKey = date.toDateString()
+      const newEventList = [...dateToEvents.get(dateStringKey) || [], event]
+      dateToEvents.set(dateStringKey, newEventList)
+    }
+
+    const slotIdx = slots[startIdx].findIndex(slot => slot == FREE)
+    if (slotIdx == NOT_FOUND) {
+      for (let i = startIdx; i <= endIdx; i++) {
+        slots[i][slotIdx] = !FREE
+      }
+      return
+    }
+
+    for (let i = startIdx; i <= endIdx; i++) {
+      slots[i][slotIdx] = !FREE
+    }
+
+    tiles.push({
+      event: event,
+      layout: {
+        i: `${event.id}-${start.toDateString()}`,
+        x: start.getDay(),
+        y: slotIdx + 1,
+        w: end.getDay() - start.getDay() + 1,
+        h: 1
+      }
+    })
+  })
+
+  return tiles
+}
+
+function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
+  const sortedEvents = sortEvents(events)
+  const tiles: Tile[] = []
+
+  const counters = new Map<string, number>()
+
   sortedEvents.forEach(event => {
+    if (event.id == 10) {
+      console.log(counters)
+    }
+
     let dayIdx = days.findIndex(day => day.toDateString() == event.startDate.toDateString())
     if (dayIdx == -1)
       return
-    // if (dayIdx > slots.length) {
-    //   console.log(dayIdx)
-    //   console.log(slots)
-    //   console.log(days)
-    //   return
-    // }
-    // try {
-    const slotIdx = slots[dayIdx].findIndex(item => !item)
-    // } catch (e) {
-    //   console.log(dayIdx)
-    // }
-    const slotAvailable = slotIdx != -1
-
-    if (!slotAvailable) return
 
     const start = event.startDate > days[0] ? event.startDate : days[0]
     const end = (event.endDate < days.at(-1)! ? event.endDate : days.at(-1))! // might be null
-    // 0(Sunday) - (7 - 0 + 1) = 6
-    // 6(Tuesday) - (7 - 6 + 1) =
 
     let startOfTile = start
     let endOfTile
@@ -102,18 +132,20 @@ export function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
         break
       }
 
-
       const row = Math.floor(days.findIndex(ev => ev.toDateString() == startOfTile.toDateString()) / 7)
-      tileY = row*5 + 1 + slotIdx
+      endOfTile = days[Math.ceil((row*5 + 1)/5) * 7 - 1] < end ? days[Math.ceil((row*5 + 1)/5) * 7 - 1] : end
 
+
+
+      if (counters.get(startOfTile.toDateString())! > 3) {
+        startOfTile.setDate(endOfTile.getDate() + 1)
+        continue
+      }
+
+      tileY = row*5 + 1
       tileX = startOfTile.getDay()
       tileH = 1
-
-      endOfTile = days[Math.ceil(tileY/5) * 7 - 1] < end ? days[Math.ceil(tileY/5) * 7 - 1] : end
       tileW = endOfTile.getDay() - startOfTile.getDay() + 1
-
-
-      console.log({endOfTile, startOfTile})
 
       const layout: ReactGridLayout.Layout = {
         i: event.id + startOfTile.toDateString(),
@@ -126,6 +158,14 @@ export function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
       tiles.push({
         event, layout
       })
+
+      for (let date = startOfTile; date <= endOfTile; date.setDate(date.getDate() + 1)) {
+        const dateStringKey = date.toDateString()
+        if (!counters.has(dateStringKey)) {
+          counters.set(dateStringKey, 0)
+        }
+        counters.set(dateStringKey, counters.get(dateStringKey)! + 1)
+      }
 
       startOfTile.setDate(endOfTile.getDate() + 1)
       /**
@@ -159,3 +199,31 @@ export function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
  *    assign that event to all [start, ..., end] days at that index.
  *
  */
+
+
+export function generateCalendarGrid(currentDate: Date): Date[] {
+  const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+  const prevMonthLastDays = [];
+  const startDay = firstDayOfMonth.getDay(); // Starting from Sunday
+  for (let i = startDay === 0 ? 6 : startDay - 1; i >= 0; i--) {
+    const prevDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), -i);
+    prevMonthLastDays.push(prevDay);
+  }
+
+  const daysToAdd = 42 - daysInMonth - prevMonthLastDays.length;
+  const nextMonthCompletingDays = [];
+  for (let i = 1; i <= daysToAdd; i++) {
+    const nextDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, i);
+    nextMonthCompletingDays.push(nextDay);
+  }
+
+  return [
+    ...prevMonthLastDays,
+    ...Array.from({ length: daysInMonth },
+      (_, i) => new Date(currentDate.getFullYear(), currentDate.getMonth(), i + 1)),
+    ...nextMonthCompletingDays
+  ];
+}

@@ -10,7 +10,7 @@ import { Button } from "@/components/Button";
 import { AddMonthlyEventModal } from "@/pages/calendar/month/AddEvent.modal";
 import { useModal } from "@/components/Modal";
 import { Keys, useKeybind } from "@/hooks/useKeybind";
-import { createLayout } from "@/pages/calendar/month/Sorting";
+import { createTiles, dateToEvents, generateCalendarGrid } from "@/pages/calendar/month/Sorting";
 import { mockMonthEvents } from "@/pages/calendar/month/MockMonthEvents";
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
@@ -24,32 +24,7 @@ const RowHeightRem = 2
 const rowHeightPixels = RowHeightRem * 16
 
 
-function generateCalendarGrid(currentDate: Date): Date[] {
-  const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
-  const prevMonthLastDays = [];
-  const startDay = firstDayOfMonth.getDay(); // Starting from Sunday
-  for (let i = startDay === 0 ? 6 : startDay - 1; i >= 0; i--) {
-    const prevDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), -i);
-    prevMonthLastDays.push(prevDay);
-  }
-
-  const daysToAdd = 42 - daysInMonth - prevMonthLastDays.length;
-  const nextMonthCompletingDays = [];
-  for (let i = 1; i <= daysToAdd; i++) {
-    const nextDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, i);
-    nextMonthCompletingDays.push(nextDay);
-  }
-
-  return [
-    ...prevMonthLastDays,
-    ...Array.from({ length: daysInMonth },
-      (_, i) => new Date(currentDate.getFullYear(), currentDate.getMonth(), i + 1)),
-    ...nextMonthCompletingDays
-  ];
-}
 
 
 export function MonthCalendar() {
@@ -95,7 +70,7 @@ export function MonthCalendar() {
   }, [])
 
 
-  const dateToEvents: Map<string, MonthEvent[]> = new Map<string, MonthEvent[]>()
+  // const dateToEvents: Map<string, MonthEvent[]> = new Map<string, MonthEvent[]>()
 
   const [startingIdxArr, setStartingIdxArr] = useState(new Array(ROW_COUNT * COL_COUNT).fill(0))
 
@@ -110,32 +85,32 @@ export function MonthCalendar() {
     const monthEvent = monthEvents.find(ev => ev.id == eventId)!
     const newMonthEvent: MonthEvent = { ...monthEvent, startDate: newDate, endDate: newDate }
     await monthEventService.updateEvent(newMonthEvent)
-    updateStartingIndex(oldItem.x, oldItem.y)
+    // updateStartingIndex(oldItem.x, oldItem.y)
   }
 
-  days.forEach(day => dateToEvents
-    .set(day.toDateString(), [])
-  )
-  monthEvents.forEach(event => {
-    const key = event.startDate.toDateString()
-    const eventList = dateToEvents.get(key)
-    if (!eventList) return
-    eventList.push(event)
-  })
-  days.forEach(day => dateToEvents
-    .get(day.toDateString())!
-    .sort((e1, e2) => e1.title.localeCompare(e2.title))
-  )
+  // days.forEach(day => dateToEvents
+  //   .set(day.toDateString(), [])
+  // )
+  // monthEvents.forEach(event => {
+  //   const key = event.startDate.toDateString()
+  //   const eventList = dateToEvents.get(key)
+  //   if (!eventList) return
+  //   eventList.push(event)
+  // })
+  // days.forEach(day => dateToEvents
+  //   .get(day.toDateString())!
+  //   .sort((e1, e2) => e1.title.localeCompare(e2.title))
+  // )
 
-  function updateStartingIndex(x: number, y: number) {
-    const idx = Math.floor(y / ROWS_PER_CELL) * COL_COUNT + x
-    const eventCount = dateToEvents.get(days[idx].toDateString())!.length - 1
-    setStartingIdxArr(prev => {
-      if (eventCount - startingIdxArr[idx] >= 3) return [...prev]
-      prev[idx] = Math.max(0, prev[idx] - (3 - (eventCount - startingIdxArr[idx])))
-      return [...prev]
-    })
-  }
+  // function updateStartingIndex(x: number, y: number) {
+  //   const idx = Math.floor(y / ROWS_PER_CELL) * COL_COUNT + x
+  //   const eventCount = dateToEvents.get(days[idx].toDateString())!.length - 1
+  //   setStartingIdxArr(prev => {
+  //     if (eventCount - startingIdxArr[idx] >= 3) return [...prev]
+  //     prev[idx] = Math.max(0, prev[idx] - (3 - (eventCount - startingIdxArr[idx])))
+  //     return [...prev]
+  //   })
+  // }
 
   useEffect(() => {
     if (!clickDate) {
@@ -187,59 +162,15 @@ export function MonthCalendar() {
               <For limit={COL_COUNT} mapFunc={colIndex => {
                 const currentDateIndex = rowIndex * COL_COUNT + colIndex
                 const currentDate = days[currentDateIndex]!
-                const eventCount = dateToEvents.get(currentDate.toDateString())!.length
+                const eventCount = dateToEvents.get(currentDate.toDateString())?.length || 0
 
                 return (
                   <div
                     key={uuid()}
-                    className={`min-h-[7rem] w-full border-r border-r-gray-700 flex flex-col justify-between relative`}
+                    className={`min-h-[7rem] w-full border-r border-r-gray-700 relative flex flex-col justify-between`}
                   >
-                    {
-                      eventCount > 3 &&
-                        <div
-                            className="absolute right-0 pl-1 top-1/2 h-full bg-red-200 -translate-y-1/2 z-[1] flex items-center"
-                            style={{
-                              background: "linear-gradient(to left, #1a1c22 50%, rgba(255, 0, 0, 0))"
-                            }}
-                        >
-                            <div>
-                                <ArrowUp
-                                    className={`
-                              text-white rounded p-0.5
-                              hover:bg-white hover:bg-opacity-20
-                              `}
-                                    width={20}
-                                    height={20}
-                                    onClick={() => {
-                                      setStartingIdxArr(prev => {
-                                        prev[currentDateIndex] = Math.max(0, prev[currentDateIndex] - 1)
-                                        return [...prev]
-                                      })
-                                    }}
-                                />
-                                <ArrowDown
-                                    className={`
-                              text-white rounded p-0.5
-                              hover:bg-white hover:bg-opacity-20
-                              `}
-                                    width={20}
-                                    height={20}
-                                    onClick={() => {
-                                      setStartingIdxArr(prev => {
-                                        prev[currentDateIndex] = Math.min(prev[currentDateIndex] + 1, eventCount - 3)
-                                        return [...prev]
-                                      })
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    }
-
                     <p
-                      className={`
-                    text-xs text-center pt-1
-                    ${currentDate.getMonth() == date.getMonth() ? "text-white" : "text-gray-500"}
-                    `}
+                      className={`text-xs text-center pt-1 ${currentDate.getMonth() == date.getMonth() ? "text-white" : "text-gray-500"}`}
                       style={{ height: RowHeightRem + "rem" }}
                     >
                       {currentDate.toDateString().substring(4, 10)}
@@ -247,7 +178,7 @@ export function MonthCalendar() {
                     {
                       eventCount > 3 &&
                         <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded">
-                          {eventCount} events...
+                          {eventCount-3} more events...
                         </p>
                     }
                   </div>
@@ -268,21 +199,24 @@ export function MonthCalendar() {
             useCSSTransforms={true}
             maxRows={GRID_ROWS}
             compactType={null}
-            allowOverlap={false}
+            allowOverlap={true}
             isBounded={true}
 
             margin={[0, 0]}
             onDragStop={dragStopHandle}
           >
-
+            {/*
+            The grid UI library requires the key to change in order for the tiles to
+            be re-rendered. so, I added date.toDateString() to the key
+            */}
             {
-              createLayout(mockMonthEvents, days)
+              createTiles(monthEvents, days)
                 .map(tile => (
                   <Tile
                     setDrag={(id) => setDragging(id)}
                     event={tile.event}
                     selectedId={selectedId}
-                    key={tile.layout.i}
+                    key={tile.layout.i + date.toDateString()}
                     data-grid={{...tile.layout, isResizable: false }}
                     onClick={(e) => {
                       e.stopPropagation()
@@ -291,33 +225,6 @@ export function MonthCalendar() {
                   />
                 ))
             }
-
-            {/*{*/}
-            {/*  days.map((day, index) => {*/}
-            {/*    const dayEvents = dateToEvents.get(day.toDateString())!*/}
-            {/*    const Nodes: ReactNode[] = []*/}
-            {/*    for (let i = startingIdxArr[index]; i < Math.min(dayEvents.length, startingIdxArr[index] + 3); i++) {*/}
-            {/*      const event = dayEvents[i]*/}
-            {/*      const y = Math.floor(index / COL_COUNT) * ROWS_PER_CELL + 1 + i - startingIdxArr[index]*/}
-            {/*      const x = event.startDate.getDay()*/}
-            {/*      Nodes.push(*/}
-            {/*        <Tile*/}
-            {/*          setDrag={(id) => setDragging(id)}*/}
-            {/*          event={event}*/}
-            {/*          selectedId={selectedId}*/}
-            {/*          key={`${event.id};${uuid()}`}*/}
-            {/*          data-grid={{ w: 1, h: 1, x, y, isResizable: false }}*/}
-            {/*          onClick={(e) => {*/}
-            {/*            e.stopPropagation()*/}
-            {/*            updateSelected(event.id!)*/}
-            {/*          }}*/}
-            {/*        />*/}
-            {/*      )*/}
-            {/*    }*/}
-
-            {/*    return Nodes*/}
-            {/*  })*/}
-            {/*}*/}
 
             {/* HIDDEN CELLS, TO STRETCH THE GRID */}
             <div

@@ -2,6 +2,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import {Create,Read,Update,Delete} from "@/wails/go/repositories/MonthEventRepository"
 import { repositories } from "@/wails/go/models";
 import { MonthEvent, convertToMonthEvent } from "@/contexts/Events/MonthEventTypes";
+import { mockMonthEvents } from "@/pages/calendar/month/MockMonthEvents";
 
 type MonthEventProviderExports = {
   events: MonthEvent[]
@@ -22,10 +23,11 @@ export function useMonthEvents() {
 }
 
 export function MonthEventProvider({ children }: PropsWithChildren) {
-  const [events, setEvents] = useState<MonthEvent[]>([])
+  const [events, setEvents] = useState<MonthEvent[]>(mockMonthEvents)
 
   useEffect(() => {
-    getEvents()
+    // getEvents()
+    setEvents(mockMonthEvents)
   }, [])
 
   async function getEvents() {
