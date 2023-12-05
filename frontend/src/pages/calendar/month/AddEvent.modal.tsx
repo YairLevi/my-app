@@ -13,36 +13,43 @@ function formatDateToDatetimeLocal(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-export function AddMonthlyEventModal(props: ModalProps & { date?: Date }) {
-  const { title, onClose, open, date } = props
+export function AddMonthlyEventModal(props: ModalProps & { startDate?: Date, endDate?: Date }) {
+  const { title, onClose, open, startDate, endDate } = props
   const { monthEventService } = useMonthEvents()
-  const dateRef = useRef<HTMLInputElement>(null)
+  const startDateRef = useRef<HTMLInputElement>(null)
+  const endDateRef = useRef<HTMLInputElement>(null)
   const titleRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     // console.log(date)
     // if (!dateRef.current || !date) return
-    if (!date)
-      dateRef.current!.value = ''
-    else
-      dateRef.current!.value = formatDateToDatetimeLocal(date)
-  }, [date])
+    if (!startDate || !endDate) {
+      startDateRef.current!.value = ''
+      endDateRef.current!.value = ''
+    } else {
+      startDateRef.current!.value = formatDateToDatetimeLocal(startDate)
+      endDateRef.current!.value = formatDateToDatetimeLocal(endDate)
+    }
+  }, [startDate, endDate])
 
   function clearAndClose() {
-    dateRef.current!.value = ''
+    startDateRef.current!.value = ''
+    endDateRef.current!.value = ''
     titleRef.current!.value = ''
     onClose()
   }
 
   async function onSubmit() {
     const title = titleRef.current!.value
-    const date = new Date(dateRef.current!.value)
-    await monthEventService.addEvent({ startDate: date, endDate: date, title })
+    const startDate = new Date(startDateRef.current!.value)
+    const endDate = new Date(endDateRef.current!.value)
+    await monthEventService.addEvent({ startDate, endDate, title })
     clearAndClose()
   }
 
   function clearAndExit() {
-    dateRef.current!.value = ''
+    endDateRef.current!.value = ''
+    startDateRef.current!.value = ''
     titleRef.current!.value = ''
     onClose()
   }
@@ -57,9 +64,17 @@ export function AddMonthlyEventModal(props: ModalProps & { date?: Date }) {
           className="bg-[#0f0f11] px-3 py-1.5 text-gray-200 rounded-md text-sm"
         />
       </Modal.Group>
-      <Modal.Group label="Date">
+      <Modal.Group label="Start">
         <input
-          ref={dateRef}
+          ref={startDateRef}
+          style={{ colorScheme: "dark" }}
+          type="date"
+          className="bg-[#0f0f11] px-3 py-1.5 text-gray-200 rounded-md text-sm"
+        />
+      </Modal.Group>
+      <Modal.Group label="End">
+        <input
+          ref={endDateRef}
           style={{ colorScheme: "dark" }}
           type="date"
           className="bg-[#0f0f11] px-3 py-1.5 text-gray-200 rounded-md text-sm"

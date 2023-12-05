@@ -1,6 +1,14 @@
 import { MonthEvent } from "@/contexts/Events";
 import ReactGridLayout from "react-grid-layout";
 
+export function daysBetweenDates(date1: Date, date2: Date): number {
+  // Calculate the time difference in milliseconds
+  const timeDifference: number = date1.getTime() - date2.getTime()
+
+  // Convert the time difference to days
+  return Math.floor(timeDifference / (1000 * 3600 * 24));
+}
+
 function sortEvents(events: MonthEvent[]): MonthEvent[] {
   return events.sort((a, b) => {
     // Priority 1: Earliest startDate
@@ -39,6 +47,14 @@ export function createTiles(events: MonthEvent[], monthDays: Date[]): Tile[] {
   for (let i = 0; i < monthDays.length; i+=7) {
     // if (i != 4*7) continue // testing purposes
     const weekDays = monthDays.slice(i, i+7)
+
+    // this is because weekDays[6] is the last day, but from the start of it, not the end.
+    // we need to be clear that 2022-01-01 is not the same as 2022-01-01 if the hours don't match.
+    const startOfWeek = weekDays[0]
+    startOfWeek.setHours(0, 0, 0)
+    const endOfWeek = weekDays[6]
+    endOfWeek.setHours(2, 0, 0)
+
     const eventsInWeek = sortedEvents.filter(event => event.startDate <= weekDays[6] && event.endDate >= weekDays[0])
     const weekTiles = tilesInWeek(eventsInWeek, weekDays).map(tile => {
       return {
@@ -53,6 +69,22 @@ export function createTiles(events: MonthEvent[], monthDays: Date[]): Tile[] {
   }
 
   return tiles
+}
+
+export function tilesFromTwoDates(date1: Date, date2: Date, monthDays: Date[]): Tile[] {
+  const start = date1 < date2 ? date1 : date2
+  const end = date1 > date2 ? date1 : date2
+  return createTiles([{
+    startDate: start,
+    endDate: end,
+
+    // some dummy data that's not even going to be used.
+    id: 1,
+    title: "",
+    updatedAt: new Date(),
+    createdAt: new Date(),
+    deletedAt: new Date(),
+  }], monthDays)
 }
 
 function tilesInWeek(eventsInWeek: MonthEvent[], weekDays: Date[]): Tile[] {

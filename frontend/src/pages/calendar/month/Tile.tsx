@@ -8,14 +8,14 @@ interface TileProps2 extends HTMLAttributes<HTMLDivElement> {
   event: MonthEvent
 }
 
-export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, event, selectedId, ...props}, ref) => {
+export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, event, selectedId, className, ...props}, ref) => {
   const { title, startDate, id } = event
   const { onTileDragStart, onTileDragStop } = props
 
   return (
     <div
       ref={ref}
-      className="![&_*]:select-none"
+      className={`![&_*]:select-none ${className}`}
       {...props}
       onMouseDown={e => {
         e.stopPropagation()
@@ -33,7 +33,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, event, se
       >
         <div className={`border rounded-lg border-l-4 h-full`} style={{borderColor: "#0e9426"}}/>
         <section>
-          <span className="font-medium text-white text-[0.8rem] line-clamp-1">{id} {title}</span>
+          <span className="font-medium text-white text-[0.8rem] line-clamp-1">{title}</span>
         </section>
       </div>
 

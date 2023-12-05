@@ -11,6 +11,15 @@ export const mockMonthEvents: MonthEvent[] = [
     deletedAt: new Date()
   },
   {
+    "id": 152,
+    "startDate": new Date("2023-12-09"),
+    "endDate": new Date("2023-12-09"),
+    "title": "Dec 9 event",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    deletedAt: new Date()
+  },
+  {
     "id": 111,
     "startDate": new Date("2023-11-24"),
     "endDate": new Date("2023-11-28"),

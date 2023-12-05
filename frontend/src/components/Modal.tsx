@@ -38,7 +38,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
     <div
       onClick={onClose}
       className={clsx(
-        'fixed z-[1000] top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center overflow-auto justify-center',
+        'fixed z-[1000] top-0 left-0 w-screen h-screen bg-black bg-opacity-40 backdrop-blur-sm flex items-center overflow-auto justify-center',
         open ? 'scale-1' : 'scale-0'
       )}
     >
