@@ -50,8 +50,6 @@ export function MonthCalendar() {
   const selectedRef = useRef<number>(NON_SELECTED)
   const [selectedId, setSelectedId] = useState(NON_SELECTED)
 
-  const [edited, setEdited] = useState<WeekEvent | undefined>()
-
   function updateSelected(id: number) {
     selectedRef.current = id
     setSelectedId(id)
@@ -73,23 +71,6 @@ export function MonthCalendar() {
     return () => window.removeEventListener('click', onClickHandle)
   }, [])
 
-
-  // const dateToEvents: Map<string, MonthEvent[]> = new Map<string, MonthEvent[]>()
-
-  const [startingIdxArr, setStartingIdxArr] = useState(new Array(ROW_COUNT * COL_COUNT).fill(0))
-
-  const dragStopHandle: ItemCallback = async (layout, oldItem, newItem, placeholder, event, element) => {
-    const { x, y } = newItem
-    const newDate = days[Math.floor(y / ROWS_PER_CELL) * COL_COUNT + x]
-
-    // To rerender programmatically, I added to the key some random
-    // element... so, to get the ID, I need to split and take the first.
-    const eventId = Number(newItem.i.split(';')[0])
-
-    const monthEvent = monthEvents.find(ev => ev.id == eventId)!
-    const newMonthEvent: MonthEvent = { ...monthEvent, startDate: newDate, endDate: newDate }
-    await monthEventService.updateEvent(newMonthEvent)
-  }
 
   function calculateDate(event: MouseEvent): Date {
     const div = gridRef.current
@@ -115,99 +96,95 @@ export function MonthCalendar() {
   }
 
 
-  const [_, setDragging] = useState(false)
-
   const gridRef = useRef<HTMLDivElement>(null)
   const someFarDate = new Date('3000-03-03')
   const [dragEvent, setDragEvent] = useState<DragEvent>(DragEvent.None)
-  const [initialDate, setInitialDate] = useState<Date>(someFarDate)
-  const [currDate, setCurrDate] = useState<Date>(someFarDate)
+  const [firstDate, setFirstDate] = useState<Date>(someFarDate)
+  const [secondDate, setSecondDate] = useState<Date>(someFarDate)
 
-  // useEffect(() => {
-  //   if (dragEvent == DragEvent.None) return
-  //   console.log('initial: ',initialDate)
-  //   console.log('curr: ',currDate)
-  // }, [initialDate, currDate])
+  // for updating an existing event
+  const [movingEvent, setMovingEvent] = useState<MonthEvent>()
+  const [initiallyClickedOnDate, setInitiallyClickedOnDate] = useState<Date>(new Date())
 
 
-  function mouseOutOfBounds(e: MouseEvent): boolean {
-    const mouseX = e.clientX
-    const mouseY = e.clientY
-
-    if (gridRef.current) {
-      const { left, top, right, bottom } = gridRef.current.getBoundingClientRect();
-      return mouseX < left || mouseX > right || mouseY < top || mouseY > bottom;
-    }
-    return false;
-  }
-
-  const [moveState, setMoveState] = useState<MonthEvent>()
-  const [clickedOn, setClickedOn] = useState<Date>(new Date())
+  // function mouseOutOfBounds(e: MouseEvent): boolean {
+  //   const mouseX = e.clientX
+  //   const mouseY = e.clientY
+  //
+  //   if (gridRef.current) {
+  //     const { left, top, right, bottom } = gridRef.current.getBoundingClientRect();
+  //     return mouseX < left || mouseX > right || mouseY < top || mouseY > bottom;
+  //   }
+  //   return false;
+  // }
 
   const onMouseMove = (e: MouseEvent) => {
-    if (dragEvent == DragEvent.None) return
-    // if (mouseOutOfBounds(e)) return console.log('mouse out of bounds!')
-    if (dragEvent == DragEvent.Create) {
-      setCurrDate(calculateDate(e))
-    } else if (dragEvent == DragEvent.Move) {
-      const hoverDate = calculateDate(e)
-      const dbd = daysBetweenDates(hoverDate, clickedOn)
-      if (!moveState) return
-      setInitialDate(prev => {
-        const nDate = new Date(moveState.startDate)
-        nDate.setDate(nDate.getDate() + dbd)
-        return nDate
-      })
-      setCurrDate(prev => {
-        const nDate = new Date(moveState.endDate)
-        nDate.setDate(nDate.getDate() + dbd)
-        return nDate
-      })
+    switch (dragEvent) {
+      case DragEvent.None:
+        return
+      case DragEvent.Move:
+        onTileDrag(e)
+        break
+      case DragEvent.Create:
+        onGridDrag(e)
+        break
     }
   }
 
 
   function onGridDragStart(e: MouseEvent) {
-    if (e.button != 0) {
-      return
-    }
+    if (e.button != 0) return
     setDragEvent(DragEvent.Create)
+
     const start = calculateDate(e)
-    setInitialDate(start)
-    setCurrDate(start)
+    setFirstDate(start)
+    setSecondDate(start)
   }
 
   function onGridDragStop(e: MouseEvent) {
     setDragEvent(DragEvent.None)
-    setCurrDate(someFarDate)
-    setInitialDate(someFarDate)
+    setSecondDate(someFarDate)
+    setFirstDate(someFarDate)
+    onOpenAdd()
   }
 
-  function isDateInRange(d: Date, date1: Date, date2: Date): boolean {
-    return (
-      Math.min(date1.getTime(), date2.getTime()) <= d.getTime() &&
-      d.getTime() <= Math.max(date1.getTime(), date2.getTime())
-    )
+  function onGridDrag(e: MouseEvent) {
+    setSecondDate(calculateDate(e))
   }
-
 
   function onTileDragStart(e: MouseEvent, event: MonthEvent) {
-    if (e.button != 0) {
-      return
-    }
+    if (e.button != 0) return
     setDragEvent(DragEvent.Move)
 
-    const a = calculateDate(e)
-    setClickedOn(a)
-    setInitialDate(event.startDate)
-    setCurrDate(event.endDate)
-    setMoveState(event)
+    const initialDate = calculateDate(e)
+    setInitiallyClickedOnDate(initialDate)
+    setFirstDate(event.startDate)
+    setSecondDate(event.endDate)
+    setMovingEvent(event)
   }
 
   function onTileDragStop(e: MouseEvent) {
     setDragEvent(DragEvent.None)
-    setCurrDate(someFarDate)
-    setInitialDate(someFarDate)
+    setSecondDate(someFarDate)
+    setFirstDate(someFarDate)
+  }
+
+  function onTileDrag(e: MouseEvent) {
+    if (!movingEvent) return
+
+    const hoverOnDate = calculateDate(e)
+    const daysBetween = daysBetweenDates(hoverOnDate, initiallyClickedOnDate)
+
+    setFirstDate(prev => {
+      const nDate = new Date(movingEvent.startDate)
+      nDate.setDate(nDate.getDate() + daysBetween)
+      return nDate
+    })
+    setSecondDate(prev => {
+      const nDate = new Date(movingEvent.endDate)
+      nDate.setDate(nDate.getDate() + daysBetween)
+      return nDate
+    })
   }
 
   return (
@@ -278,13 +255,11 @@ export function MonthCalendar() {
             compactType={null}
             allowOverlap={true}
             isBounded={true}
-
             margin={[0, 0]}
-            onDragStop={dragStopHandle}
           >
             {
               dragEvent != DragEvent.None &&
-              tilesFromTwoDates(initialDate, currDate, days)
+              tilesFromTwoDates(firstDate, secondDate, days)
                 .map(tile => (
                   <Tile
                     selectedId={-1}
