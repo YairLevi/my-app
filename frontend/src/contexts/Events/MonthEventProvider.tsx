@@ -1,8 +1,7 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
-import {Create,Read,Update,Delete} from "@/wails/go/repositories/MonthEventRepository"
+import { Create, Delete, Read, Update } from "@/wails/go/repositories/MonthEventRepository"
 import { repositories } from "@/wails/go/models";
-import { MonthEvent, convertToMonthEvent } from "@/contexts/Events/MonthEventTypes";
-import { mockMonthEvents } from "@/pages/calendar/month/MockMonthEvents";
+import { convertToMonthEvent, MonthEvent } from "@/contexts/Events/MonthEventTypes";
 
 type MonthEventProviderExports = {
   events: MonthEvent[]
@@ -23,11 +22,10 @@ export function useMonthEvents() {
 }
 
 export function MonthEventProvider({ children }: PropsWithChildren) {
-  const [events, setEvents] = useState<MonthEvent[]>(mockMonthEvents)
+  const [events, setEvents] = useState<MonthEvent[]>([])
 
   useEffect(() => {
-    // getEvents()
-    setEvents(mockMonthEvents)
+    getEvents()
   }, [])
 
   async function getEvents() {
@@ -45,12 +43,12 @@ export function MonthEventProvider({ children }: PropsWithChildren) {
   }
 
   async function updateEvent(updatedEvent: MonthEvent) {
-    // setEvents(prev => [...prev.filter(ev => ev.id != updatedEvent.id), updatedEvent])
-    // const repoEvent = new repositories.MonthEvent()
-    // Object.assign(repoEvent, updatedEvent)
-    // repoEvent.deletedAt = undefined
-    // const updatedRepoEvent = await Update(repoEvent)
-    // const updatedWeekEvent = convertToMonthEvent(updatedRepoEvent)
+    setEvents(prev => [...prev.filter(ev => ev.id != updatedEvent.id), updatedEvent])
+    const repoEvent = new repositories.MonthEvent()
+    Object.assign(repoEvent, updatedEvent)
+    repoEvent.deletedAt = undefined
+    const updatedRepoEvent = await Update(repoEvent)
+    const updatedWeekEvent = convertToMonthEvent(updatedRepoEvent)
     setEvents(prev => [...prev.filter(ev => ev.id != updatedEvent.id), updatedEvent])
   }
 

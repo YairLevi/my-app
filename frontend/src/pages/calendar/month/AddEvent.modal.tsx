@@ -23,8 +23,6 @@ export function AddMonthlyEventModal(props: AddEventModalProps) {
   const titleRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    // console.log(date)
-    // if (!dateRef.current || !date) return
     if (!startDate || !endDate) {
       startDateRef.current!.value = ''
       endDateRef.current!.value = ''
