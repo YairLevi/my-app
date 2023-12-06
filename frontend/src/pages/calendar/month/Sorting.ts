@@ -3,10 +3,13 @@ import ReactGridLayout from "react-grid-layout";
 
 export function daysBetweenDates(date1: Date, date2: Date): number {
   // Calculate the time difference in milliseconds
-  const timeDifference: number = date1.getTime() - date2.getTime()
+  const d1 = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate())
+  const d2 = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate())
+  const timeDifference: number = d1.getTime() - d2.getTime()
 
   // Convert the time difference to days
-  return Math.floor(timeDifference / (1000 * 3600 * 24));
+  const dayInMilliSeconds = 1000 * 3600 * 24
+  return Math.floor(timeDifference / dayInMilliSeconds);
 }
 
 function sortEvents(events: MonthEvent[]): MonthEvent[] {

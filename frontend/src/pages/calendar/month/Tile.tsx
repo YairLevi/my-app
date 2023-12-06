@@ -21,19 +21,14 @@ export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, event, se
         e.stopPropagation()
         onTileDragStart(e)
       }}
-      onMouseUp={e => {
-        e.stopPropagation()
-        onTileDragStop(e)
-      }}
     >
       <div className={`bg-[#0f0f11] h-full rounded mx-1 !text-black px-1 py-1 flex gap-2
         active:cursor-grabbing hover:cursor-grab overflow-hidden border-t-gray-800 border-t items-center
         ${selectedId == id && 'border border-white'}
         `}
       >
-        <div className={`border rounded-lg border-l-4 h-full`} style={{borderColor: "#0e9426"}}/>
         <section>
-          <span className="font-medium text-white text-[0.8rem] line-clamp-1">{title}</span>
+          <span className="font-medium text-white text-[0.8rem] line-clamp-1 px-1.5">{title}</span>
         </section>
       </div>
 

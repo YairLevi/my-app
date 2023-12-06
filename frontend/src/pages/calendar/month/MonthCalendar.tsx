@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useRef, useState } from "react";
+import React, { MouseEvent, useCallback, useEffect, useRef, useState } from "react";
 import { ItemCallback, Responsive, WidthProvider } from "react-grid-layout";
 import { For } from "@/components/For";
 import { useCalendar } from "@/contexts/DateContext";
@@ -37,6 +37,9 @@ enum DragEvent {
 export function MonthCalendar() {
   const { date } = useCalendar()
   const { monthEvents, monthEventService } = useMonthEvents()
+  const [rerender, setRerender] = useState(1)
+
+  const forceRerender = useCallback(() => setRerender(prev => prev+1), [])
 
   const {
     open: openAdd,
@@ -44,7 +47,7 @@ export function MonthCalendar() {
     onOpen: onOpenAdd
   } = useModal()
   const days = generateCalendarGrid(date)
-  const NON_SELECTED = -1
+  const NON_SELECTED = -2
 
   // need both ref => for persistence of value in event listeners
   // and need state => for UI change detection.
@@ -98,24 +101,12 @@ export function MonthCalendar() {
   const gridRef = useRef<HTMLDivElement>(null)
   const someFarDate = new Date('3000-03-03')
   const [dragEvent, setDragEvent] = useState<DragEvent>(DragEvent.None)
-  const [firstDate, setFirstDate] = useState<Date>(someFarDate)
-  const [secondDate, setSecondDate] = useState<Date>(someFarDate)
+  const [firstDate, setFirstDate] = useState<Date>(new Date())
+  const [secondDate, setSecondDate] = useState<Date>(new Date())
 
   // for updating an existing event
   const [movingEvent, setMovingEvent] = useState<MonthEvent>()
   const [initiallyClickedOnDate, setInitiallyClickedOnDate] = useState<Date>(new Date())
-
-
-  // function mouseOutOfBounds(e: MouseEvent): boolean {
-  //   const mouseX = e.clientX
-  //   const mouseY = e.clientY
-  //
-  //   if (gridRef.current) {
-  //     const { left, top, right, bottom } = gridRef.current.getBoundingClientRect();
-  //     return mouseX < left || mouseX > right || mouseY < top || mouseY > bottom;
-  //   }
-  //   return false;
-  // }
 
   const onMouseMove = (e: MouseEvent) => {
     switch (dragEvent) {
@@ -130,6 +121,18 @@ export function MonthCalendar() {
     }
   }
 
+  function onMouseUp(e: MouseEvent) {
+    switch (dragEvent) {
+      case DragEvent.None:
+        return
+      case DragEvent.Move:
+        onTileDragStop(e)
+        break
+      case DragEvent.Create:
+        onGridDragStop(e)
+        break
+    }
+  }
 
   function onGridDragStart(e: MouseEvent) {
     if (e.button != 0) return
@@ -141,6 +144,7 @@ export function MonthCalendar() {
   }
 
   function onGridDragStop(e: MouseEvent) {
+    if (dragEvent != DragEvent.Create) return
     setDragEvent(DragEvent.None)
     onOpenAdd()
   }
@@ -161,8 +165,14 @@ export function MonthCalendar() {
   }
 
   function onTileDragStop(e: MouseEvent) {
-    console.log('stopping drag tile')
     setDragEvent(DragEvent.None)
+    monthEventService.updateEvent({
+      ...movingEvent!,
+      startDate: firstDate,
+      endDate: secondDate,
+    })
+    forceRerender()
+    setMovingEvent(undefined)
   }
 
   function onTileDrag(e: MouseEvent) {
@@ -185,6 +195,7 @@ export function MonthCalendar() {
 
   return (
     <>
+      <p className="absolute invisible">{rerender}</p>
       <div className="w-full items-center justify-center flex py-2">
         <Button onClick={() => {
           onOpenAdd()
@@ -232,7 +243,7 @@ export function MonthCalendar() {
         </div>
         <div className="h-full w-full min-w-[45rem]"
           onMouseDown={onGridDragStart}
-          onMouseUp={onGridDragStop}
+          onMouseUp={onMouseUp}
           onMouseMove={onMouseMove}
         >
           <ResponsiveGridLayout
@@ -254,15 +265,17 @@ export function MonthCalendar() {
                 .map(tile => (
                   <Tile
                     selectedId={-1}
-                    className="[&_*]:!bg-opacity-70 [&_*]:!opacity-70 !z-[999] [&>*]:bg-red-500"
+                    className="[&_*]:!bg-opacity-40 [&_*]:!opacity-70 !z-[999] [&>*]:bg-gray-500"
                     onTileDragStart={() => {
                     }}
                     onTileDragStop={(e) => {
                       switch (dragEvent) {
                         case DragEvent.Create:
                           onGridDragStop(e)
+                          break
                         case DragEvent.Move:
                           onTileDragStop(e)
+                          break
                       }
                     }}
                     key={JSON.stringify(tile.layout)} // again... for re-rendering purposes.
@@ -281,10 +294,10 @@ export function MonthCalendar() {
                 .map(tile => (
                   <Tile
                     onTileDragStart={e => onTileDragStart(e, tile.event)}
-                    onTileDragStop={onTileDragStop}
+                    onTileDragStop={() => {}}
                     event={tile.event}
                     selectedId={selectedId}
-                    key={tile.layout.i + date.toDateString()}
+                    key={tile.layout.i + `${rerender}` + date.toDateString()}
                     data-grid={{ ...tile.layout, isResizable: false }}
                     onClick={(e) => {
                       e.stopPropagation()
@@ -318,6 +331,7 @@ export function MonthCalendar() {
         open={openAdd}
         onClose={() => {
           onCloseAdd()
+          forceRerender()
           setSecondDate(someFarDate)
           setFirstDate(someFarDate)
         }}
