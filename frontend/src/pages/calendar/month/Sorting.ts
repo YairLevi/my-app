@@ -36,17 +36,19 @@ type Tile = {
 const NOT_FOUND = -1
 const FREE = false
 export let dateToEvents = new Map<string, MonthEvent[]>()
+export let dateToSlots = new Map<string, number>()
 
 export function createTiles(events: MonthEvent[], monthDays: Date[]): Tile[] {
   // reset global - requires refactoring...
   dateToEvents = new Map<string, MonthEvent[]>()
+  dateToSlots = new Map<string, number>()
 
   const sortedEvents = sortEvents(events)
   let tiles: Tile[] = []
 
-  for (let i = 0; i < monthDays.length; i+=7) {
+  for (let i = 0; i < monthDays.length; i += 7) {
     // if (i != 4*7) continue // testing purposes
-    const weekDays = monthDays.slice(i, i+7)
+    const weekDays = monthDays.slice(i, i + 7)
 
     // this is because weekDays[6] is the last day, but from the start of it, not the end.
     // we need to be clear that 2022-01-01 is not the same as 2022-01-01 if the hours don't match.
@@ -61,7 +63,7 @@ export function createTiles(events: MonthEvent[], monthDays: Date[]): Tile[] {
         event: tile.event,
         layout: {
           ...tile.layout,
-          y: tile.layout.y + 5 * (i/7)
+          y: tile.layout.y + 5 * (i / 7)
         }
       }
     })
@@ -102,6 +104,7 @@ function tilesInWeek(eventsInWeek: MonthEvent[], weekDays: Date[]): Tile[] {
       return
     }
 
+    // date holds a reference.
     for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
       const dateStringKey = date.toDateString()
       const newEventList = [...dateToEvents.get(dateStringKey) || [], event]
@@ -110,14 +113,15 @@ function tilesInWeek(eventsInWeek: MonthEvent[], weekDays: Date[]): Tile[] {
 
     const slotIdx = slots[startIdx].findIndex(slot => slot == FREE)
     if (slotIdx == NOT_FOUND) {
-      for (let i = startIdx; i <= endIdx; i++) {
-        slots[i][slotIdx] = !FREE
-      }
+      // for (let i = startIdx; i <= endIdx; i++) {
+      //   slots[i][slotIdx] = !FREE
+      // }
       return
     }
 
     for (let i = startIdx; i <= endIdx; i++) {
       slots[i][slotIdx] = !FREE
+      dateToSlots.set(weekDays[i].toDateString(), (dateToSlots.get(weekDays[i].toDateString()) || 0) + 1)
     }
 
     tiles.push({
@@ -165,7 +169,7 @@ function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
       }
 
       const row = Math.floor(days.findIndex(ev => ev.toDateString() == startOfTile.toDateString()) / 7)
-      endOfTile = days[Math.ceil((row*5 + 1)/5) * 7 - 1] < end ? days[Math.ceil((row*5 + 1)/5) * 7 - 1] : end
+      endOfTile = days[Math.ceil((row * 5 + 1) / 5) * 7 - 1] < end ? days[Math.ceil((row * 5 + 1) / 5) * 7 - 1] : end
 
 
 
@@ -174,7 +178,7 @@ function createLayout(events: MonthEvent[], days: Date[]): Tile[] {
         continue
       }
 
-      tileY = row*5 + 1
+      tileY = row * 5 + 1
       tileX = startOfTile.getDay()
       tileH = 1
       tileW = endOfTile.getDay() - startOfTile.getDay() + 1

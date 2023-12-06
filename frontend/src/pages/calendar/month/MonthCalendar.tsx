@@ -12,6 +12,7 @@ import { Keys, useKeybind } from "@/hooks/useKeybind";
 import {
   createTiles,
   dateToEvents,
+  dateToSlots,
   daysBetweenDates,
   generateCalendarGrid,
   tilesFromTwoDates
@@ -24,8 +25,8 @@ const COL_COUNT = 7
 const ROWS_PER_CELL = 5
 const GRID_COLS = COL_COUNT
 const GRID_ROWS = ROW_COUNT * ROWS_PER_CELL
-const RowHeightRem = 2
-const rowHeightPixels = RowHeightRem * 16
+const ROW_HEIGHT_IN_REM = 2
+const ROW_HEIGHT_IN_PIXELS = ROW_HEIGHT_IN_REM * 16
 
 enum DragEvent {
   None,
@@ -55,13 +56,6 @@ export function MonthCalendar() {
     setSelectedId(id)
   }
 
-  useKeybind(() => {
-    if (selectedRef.current == NON_SELECTED) return
-    const monthEventToDelete = monthEvents.find(ev => ev.id == selectedRef.current)!
-    if (!monthEventToDelete) return
-    monthEventService.deleteEvent(monthEventToDelete)
-  }, [monthEvents], [Keys.delete], [Keys.backspace])
-
   useEffect(() => {
     function onClickHandle() {
       updateSelected(-1)
@@ -71,15 +65,20 @@ export function MonthCalendar() {
     return () => window.removeEventListener('click', onClickHandle)
   }, [])
 
+  useKeybind(() => {
+    if (selectedRef.current == NON_SELECTED) return
+    const monthEventToDelete = monthEvents.find(ev => ev.id == selectedRef.current)!
+    if (!monthEventToDelete) return
+    monthEventService.deleteEvent(monthEventToDelete)
+  }, [monthEvents], [Keys.delete], [Keys.backspace])
+
 
   function calculateDate(event: MouseEvent): Date {
     const div = gridRef.current
-    if (!div) return new Date()
+    if (!div) return new Date('3000-03-03')
 
-    const cellWidth = Math.floor(div.clientWidth / 7);  // 7 columns
-    // const cellHeight = Math.floor(div.clientHeight / 6); // 6 rows
-
-    const cellHeight = rowHeightPixels * 5
+    const cellWidth = Math.floor(div.clientWidth / 7)
+    const cellHeight = ROW_HEIGHT_IN_PIXELS * ROWS_PER_CELL
 
     // Get the relative position of the click within the div
     const x = event.clientX - div.getBoundingClientRect().left;
@@ -143,8 +142,6 @@ export function MonthCalendar() {
 
   function onGridDragStop(e: MouseEvent) {
     setDragEvent(DragEvent.None)
-    setSecondDate(someFarDate)
-    setFirstDate(someFarDate)
     onOpenAdd()
   }
 
@@ -164,9 +161,8 @@ export function MonthCalendar() {
   }
 
   function onTileDragStop(e: MouseEvent) {
+    console.log('stopping drag tile')
     setDragEvent(DragEvent.None)
-    setSecondDate(someFarDate)
-    setFirstDate(someFarDate)
   }
 
   function onTileDrag(e: MouseEvent) {
@@ -175,7 +171,7 @@ export function MonthCalendar() {
     const hoverOnDate = calculateDate(e)
     const daysBetween = daysBetweenDates(hoverOnDate, initiallyClickedOnDate)
 
-    setFirstDate(prev => {
+    setFirstDate(_ => {
       const nDate = new Date(movingEvent.startDate)
       nDate.setDate(nDate.getDate() + daysBetween)
       return nDate
@@ -202,54 +198,49 @@ export function MonthCalendar() {
         <div className="w-full absolute h-full" ref={gridRef}>
           <For limit={ROW_COUNT} mapFunc={rowIndex => (
             <div className="flex border-b border-b-gray-700"
-                 style={{ height: ROWS_PER_CELL * RowHeightRem + "rem" }}>
+              style={{ height: ROWS_PER_CELL * ROW_HEIGHT_IN_REM + "rem" }}>
               <For limit={COL_COUNT} mapFunc={colIndex => {
                 const currentDateIndex = rowIndex * COL_COUNT + colIndex
                 const currentDate = days[currentDateIndex]!
                 const eventCount = dateToEvents.get(currentDate.toDateString())?.length || 0
+                const slotCount = dateToSlots.get(currentDate.toDateString()) || 0
 
                 return (
-                  <div
-                    key={uuid()}
-                    //${isDateInRange(currentDate, initialDate, currDate) && dragEvent == DragEvent.Create && 'bg-sky-600'}
-                    // ${isDateInRange(currentDate, initialDate, currDate) && dragEvent == DragEvent.Move && 'bg-red-600'}
-                    className={`min-h-[7rem] w-full border-r border-r-gray-700 relative flex flex-col justify-between
-                    `}
-                    onClick={e => {
-                      // e.stopPropagation()
-                      console.log(calculateDate(e))
-                      console.log('1')
-                    }}
-                  >
+                  <div key={uuid()} className={`min-h-[7rem] w-full border-r border-r-gray-700 relative flex flex-col justify-between`}>
                     <p
                       className={`text-xs text-center pt-1 ${currentDate.getMonth() == date.getMonth() ? "text-white" : "text-gray-500"}`}
-                      style={{ height: RowHeightRem + "rem" }}
+                      style={{ height: ROW_HEIGHT_IN_REM + "rem" }}
                     >
                       {currentDate.toDateString().substring(4, 10)}
                     </p>
                     {
-                      eventCount > 3 &&
-                        <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded">
-                          {eventCount - 3} more events...
-                        </p>
+                      slotCount != eventCount &&
+                      <p className="text-xs text-gray-300 mx-1 px-1 my-1 py-1 rounded z-[100] hover:bg-white hover:bg-opacity-20 transition-colors"
+                        onClick={e => {
+                          e.stopPropagation()
+                          // TODO: open a dialog with all the events of the current date
+                        }}
+                      >
+                        {eventCount - slotCount} more events...
+                      </p>
                     }
                   </div>
                 )
-              }}/>
+              }} />
             </div>
-          )}/>
+          )} />
         </div>
         <div className="h-full w-full min-w-[45rem]"
-             onMouseDown={onGridDragStart}
-             onMouseUp={onGridDragStop}
-             onMouseMove={onMouseMove}
+          onMouseDown={onGridDragStart}
+          onMouseUp={onGridDragStop}
+          onMouseMove={onMouseMove}
         >
           <ResponsiveGridLayout
             className="h-full w-full min-w-[45rem] layout monthly-grid relative"
             breakpoints={{ lg: 1200 }}
             preventCollision={true}
             cols={{ 'lg': GRID_COLS }}
-            rowHeight={rowHeightPixels}
+            rowHeight={ROW_HEIGHT_IN_PIXELS}
             useCSSTransforms={true}
             maxRows={GRID_ROWS}
             compactType={null}
@@ -266,7 +257,13 @@ export function MonthCalendar() {
                     className="[&_*]:!bg-opacity-70 [&_*]:!opacity-70 !z-[999] [&>*]:bg-red-500"
                     onTileDragStart={() => {
                     }}
-                    onTileDragStop={() => {
+                    onTileDragStop={(e) => {
+                      switch (dragEvent) {
+                        case DragEvent.Create:
+                          onGridDragStop(e)
+                        case DragEvent.Move:
+                          onTileDragStop(e)
+                      }
                     }}
                     key={JSON.stringify(tile.layout)} // again... for re-rendering purposes.
                     data-grid={{ ...tile.layout, isResizable: false }}
@@ -321,7 +318,11 @@ export function MonthCalendar() {
         open={openAdd}
         onClose={() => {
           onCloseAdd()
+          setSecondDate(someFarDate)
+          setFirstDate(someFarDate)
         }}
+        startDate={firstDate.getTime() < secondDate.getTime() ? firstDate : secondDate}
+        endDate={firstDate.getTime() > secondDate.getTime() ? firstDate : secondDate}
         title="Add Event"
       />
     </>
