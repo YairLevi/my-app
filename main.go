@@ -15,7 +15,7 @@ var assets embed.FS
 const (
 	Owner               = "YairLevi"
 	Repo                = "my-app"
-	AppVersion          = "v0.2.1"
+	AppVersion          = "v0.2.2"
 	DbDestinationString = "database.db"
 )
 
