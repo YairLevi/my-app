@@ -1,26 +1,116 @@
 import { WeekEvent } from "@/contexts/Events";
+import ReactGridLayout from "react-grid-layout";
 
-export { }
+export const CALENDAR_COLUMN_COUNT = 7
+export const GRID_COLUMN_COUNT = 8
+export const FIRST_EVENT_COLLECTION_COLUMN_SPAN = 6
+export const SECOND_EVENT_COLLECTION_COLUMN_SPAN = 4
 
-function sortWeekEventsByStartDate(weekEvents: WeekEvent[]): WeekEvent[] {
+type Tile = {
+  event: WeekEvent
+  layout: ReactGridLayout.Layout
+}
+
+
+function sortByStartDate(weekEvents: WeekEvent[]): WeekEvent[] {
   return weekEvents.sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
 }
 
-function extractNonOverlapEvents(weekEvents: WeekEvent[]): WeekEvent[] {
-  if (weekEvents.length == 0) return []
+function extractNonOverlapEvents(weekEvents: WeekEvent[]): { nonOverlappingEvents: WeekEvent[], restOfEvents: WeekEvent[] } {
+  if (weekEvents.length == 0) return { nonOverlappingEvents: [], restOfEvents: [] }
 
   const nonOverlappingEvents: WeekEvent[] = [weekEvents[0]]
+  const restOfEvents: WeekEvent[] = []
+
   for (let i = 1; i < weekEvents.length; i++) {
     const currEventStartDate = weekEvents[i].startDate
-    const prevEventEndDate = weekEvents.at(-1)!.startDate
+    const prevEventEndDate = nonOverlappingEvents.at(-1)!.endDate
 
-    if (currEventStartDate.getTime() >= prevEventEndDate.getTime()) {
+    if (currEventStartDate.getTime() > prevEventEndDate.getTime()) {
       nonOverlappingEvents.push(weekEvents[i])
-      weekEvents.splice(i, 1)
+    } else {
+      restOfEvents.push(weekEvents[i])
     }
   }
 
-  return nonOverlappingEvents
+  return { nonOverlappingEvents, restOfEvents }
+}
+
+function getEventsInWeek(events: WeekEvent[], weekDays: Date[]): WeekEvent[] {
+  const startOfWeek = new Date(weekDays[0])
+  startOfWeek.setHours(0,0,0)
+  const endOfWeek = new Date(weekDays[6])
+  endOfWeek.setHours(0,0,0)
+  endOfWeek.setDate(endOfWeek.getDate() + 1)
+
+  return events.filter(event => {
+    return event.startDate.getTime() <= endOfWeek.getTime() && event.endDate.getTime() >= startOfWeek.getTime()
+  })
+}
+
+function getEventsInDay(events: WeekEvent[], day: Date): WeekEvent[] {
+  const startOfDay = new Date(day)
+  startOfDay.setHours(0, 0, 0, 0)
+  const endOfDay = new Date(startOfDay)
+  endOfDay.setDate(endOfDay.getDate() + 1)
+
+  return events.filter(event => {
+    if (event.startDate.getTime() == endOfDay.getTime() || event.endDate.getTime() == startOfDay.getTime()) {
+      return false
+    }
+    return event.startDate.getTime() <= endOfDay.getTime() && event.endDate.getTime() >= startOfDay.getTime()
+  })
+}
+
+function createEventTileAtDay(event: WeekEvent, day: Date, isFirstCollection: boolean): Tile {
+  const startOfDay = new Date(day)
+  startOfDay.setHours(0, 0, 0)
+  const endOfDay = new Date(startOfDay)
+  endOfDay.setDate(endOfDay.getDate() + 1)
+
+  const startDate = startOfDay.getTime() > event.startDate.getTime() ? startOfDay : event.startDate
+  const endDate = endOfDay.getTime() < event.endDate.getTime() ? endOfDay : event.endDate
+
+  const x = startDate.getDay() * GRID_COLUMN_COUNT
+  const y = Math.ceil((startDate.getTime() - startOfDay.getTime()) / 1000 / 60 / 15)
+  const w = isFirstCollection ? FIRST_EVENT_COLLECTION_COLUMN_SPAN : SECOND_EVENT_COLLECTION_COLUMN_SPAN
+  const h = Math.max(Math.round((endDate.getTime() - startDate.getTime()) / 1000 / 60 / 15), 1)
+
+  const xDelta = isFirstCollection ? 0 : SECOND_EVENT_COLLECTION_COLUMN_SPAN-1
+
+  return {
+    event,
+    layout: {i: `${event.id}-${startDate.toString()}`,x: x + xDelta,y,w,h}
+  }
+}
+
+export function createWeekCalendarLayout(events: WeekEvent[], weekDays: Date[]): Tile[] {
+  const eventsInWeek = getEventsInWeek(events, weekDays)
+  const sortedEvents = sortByStartDate(eventsInWeek)
+  const {restOfEvents: restOfEventsTemp, nonOverlappingEvents: firstCollection} = extractNonOverlapEvents(sortedEvents)
+  const {restOfEvents, nonOverlappingEvents: secondCollection} = extractNonOverlapEvents(restOfEventsTemp)
+
+  const tiles: Tile[] = []
+
+  weekDays.forEach(day => {
+    const eventsInDay = getEventsInDay(firstCollection, day)
+    const tilesForDay: Tile[] = eventsInDay.map(event => createEventTileAtDay(event, day, true))
+    tiles.push(...tilesForDay)
+  })
+
+  weekDays.forEach(day => {
+    const eventsInDay = getEventsInDay(secondCollection, day)
+    const tilesForDay: Tile[] = eventsInDay.map(event => createEventTileAtDay(event, day, false))
+    tiles.push(...tilesForDay)
+  })
+
+  // weekDays.forEach(day => {
+  //   const eventsInDay = getEventsInDay(restOfEvents, day)
+  //   const tilesForDay: Tile[] = eventsInDay.map(event => createEventTileAtDay(event, day, true))
+  //   tiles.push(...tilesForDay)
+  // })
+
+  return tiles
 }
 
 /*

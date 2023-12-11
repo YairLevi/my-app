@@ -2,7 +2,7 @@ import React, { forwardRef, HTMLAttributes } from 'react';
 import { getTimeFormat } from "../../../time";
 import { WeekEvent } from "@/contexts/Events";
 
-interface TileProps extends HTMLAttributes<HTMLDivElement> {
+type TileProps = HTMLAttributes<HTMLDivElement> & {
   color: string
   event: WeekEvent
   selectedId: number
@@ -11,8 +11,8 @@ interface TileProps extends HTMLAttributes<HTMLDivElement> {
 export const Tile = forwardRef<HTMLDivElement, TileProps>(({ event, color, children, selectedId, ...props }, ref) => {
   const { title, startDate, endDate, id } = event
 
-  const isFifteenMin = 1000 * 60 * 15 == endDate.getTime() - startDate.getTime()
-  const isThirtyMin =  1000 * 60 * 30 == endDate.getTime() - startDate.getTime()
+  const is15Min = 1000 * 60 * 15 == endDate.getTime() - startDate.getTime()
+  const is30Min = 1000 * 60 * 30 == endDate.getTime() - startDate.getTime()
 
   return (
     <div
@@ -20,28 +20,28 @@ export const Tile = forwardRef<HTMLDivElement, TileProps>(({ event, color, child
       className="[&_*]:select-none"
       {...props}
     >
-      <div className={`bg-[#0f0f11] h-full rounded-lg mx-1 !text-black px-1 py-1 flex gap-2
-        active:cursor-grab overflow-hidden border-t-gray-800 border-t
+      <div className={`bg-[#0f0f11] h-full overflow-hidden rounded-lg mx-1 !text-black px-1 py-0.5 flex gap-2
+        active:cursor-grab border-gray-800 border
         ${selectedId == id && 'border border-white'}
         `}
       >
-        <div className={`border rounded-lg border-l-4 h-full`} style={{ borderColor: color }}/>
-        <section>
+        {/*<div className={`border rounded-lg border-l-4 h-full`} style={{ borderColor: color }}/>*/}
+        <section className="px-1.5">
           <span
             className={`
             line-clamp-2
-            ${isFifteenMin && "-mt-1 !line-clamp-1"}
-            ${isThirtyMin && "-mt-0.5 !line-clamp-1"}
+            break-words
+            ${is15Min && "-mt-1"}
+            ${is30Min && "-mt-0.5"}
             font-medium !text-xs
+            overflow-ellipsis
+            whitespace-normal
+            break-after-auto
             `}
           >
             {title}
           </span>
-          <p
-            className={`
-            !text-gray-400 !text-[0.7rem] -mt-0.5
-            `}
-          >
+          <p className={`!text-gray-400 !text-[0.7rem] -mt-0.5 line-clamp-1`}>
             {getTimeFormat(startDate)} - {getTimeFormat(endDate)}
           </p>
         </section>

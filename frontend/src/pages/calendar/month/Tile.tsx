@@ -23,7 +23,7 @@ export const Tile = forwardRef<HTMLDivElement, TileProps2>(({children, event, se
       }}
     >
       <div className={`bg-[#0f0f11] h-full rounded mx-1 !text-black px-1 py-1 flex gap-2
-        active:cursor-grabbing hover:cursor-grab overflow-hidden border-t-gray-800 border-t items-center
+        active:cursor-grabbing hover:cursor-grab overflow-hidden border-gray-800 border items-center
         ${selectedId == id && 'border border-white'}
         `}
       >

@@ -12,6 +12,8 @@ import { EditEventModal } from "@/pages/calendar/week/EditEvent.modal";
 import { faCog, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { AddEventModal } from "@/pages/calendar/week/AddEvent.modal";
 import { Button } from "@/components/Button";
+import { createWeekCalendarLayout, GRID_COLUMN_COUNT } from "@/pages/calendar/week/WeekSorting";
+import { mockWeekEvents } from "@/pages/calendar/week/MockWeekEvents";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 const NON_SELECTED = -1
@@ -84,17 +86,14 @@ export function WeekCalendar() {
           {
             [...new Array(24).keys()].map((val, i) => (
               <div key={`t${i}`}>
-                <div key={`time${i}`} className="h-8 text-center text-xs">
+                <div key={`time${i}`} className="h-16 text-center text-xs">
                   {prefixZero(val)}:00
-                </div>
-                <div key={`time-half${i}`} className="h-8 !text-gray-600 text-center text-xs">
-                  {prefixZero(val)}:30
                 </div>
               </div>
             ))
           }
         </div>
-        <div className="h-fit w-full">
+        <div className="h-fit w-full min-w-[59rem]">
           <div className="flex w-full h-full">
             {
               weekDays.map((day, i) => (
@@ -107,15 +106,15 @@ export function WeekCalendar() {
           <div className="w-full h-full relative pt-4">
             <div className="w-full min-h-full absolute">
               {
-                [...new Array(24 * 2).keys()].map((val, i) => (
+                [...new Array(24).keys()].map((val, i) => (
                   <div key={`grid-row${i}`} className="flex">
                     {
                       [...new Array(7).keys()].map((val, j) => (
                         <div key={`grid-slot${i}${j}`}
                              className={`
-                             h-8 min-w-[7rem] w-full 
+                             h-16 min-w-[7rem] w-full 
                              border-b border-b-gray-800 
-                             border-r border-r-gray-700 
+                             border-r border-r-gray-700
                              ${i == 0 && 'border-t border-t-gray-800'}
                              `}
                         />
@@ -126,70 +125,67 @@ export function WeekCalendar() {
               }
             </div>
             <ResponsiveGridLayout
-              className="h-full w-full min-w-[49rem] layout"
+              className="h-full w-full layout"
               breakpoints={{ lg: 1200, }}
               width={500}
               preventCollision={true}
-              cols={{ 'lg': 7 }}
+              cols={{ 'lg': 7 * GRID_COLUMN_COUNT }}
               rowHeight={rowHeightInPixels * 0.4}
               resizeHandles={['n', 's']}
               maxRows={24 * 4}
               compactType={null}
               isBounded={true}
               margin={[0, 0]}
+              allowOverlap={true}
               onResizeStop={resizeHandler}
               onDragStop={resizeHandler}
             >
               {
-                weekEvents
-                  .filter(event => weekDays.some(day => day.toDateString() == event.startDate.toDateString()))
-                  .map(event => {
-                    const key = `${event.id};${new Date(event.startDate).getTime()};${new Date(event.endDate).getTime()}`
-                    return (
-                      <Tile
-                        selectedId={selectedId}
-                        event={event}
-                        key={key}
-                        data-grid={getGridPosition(event.startDate, event.endDate)}
-                        color={"#0fa12f"}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          updateSelected(event.id!)
-                        }}
-                        onContextMenu={(e) => {
-                          openMenu(e)
-                          setEdited(event)
-                        }}
-                      />
-                    )
-                  })
+                createWeekCalendarLayout(mockWeekEvents, weekDays)
+                  .map((tile, i) => (
+                    <Tile
+                      key={tile.layout.i + i}
+                      data-grid={{...tile.layout, isResizable: false}}
+                      color={"#5c1f7f"}
+                      event={tile.event}
+                      selectedId={-1}
+                    />
+                  ))
+                // weekEvents
+                //   .filter(event => weekDays.some(day => day.toDateString() == event.startDate.toDateString()))
+                //   .map(event => {
+                //     const key = `${event.id};${new Date(event.startDate).getTime()};${new Date(event.endDate).getTime()}`
+                //     return (
+                //       <Tile
+                //         selectedId={selectedId}
+                //         event={event}
+                //         key={key}
+                //         data-grid={getGridPosition(event.startDate, event.endDate)}
+                //         color={"#0fa12f"}
+                //         onClick={(e) => {
+                //           e.stopPropagation()
+                //           updateSelected(event.id!)
+                //         }}
+                //         onContextMenu={(e) => {
+                //           openMenu(e)
+                //           setEdited(event)
+                //         }}
+                //       />
+                //     )
+                //   })
               }
-              <div key="item-top-week" className="hidden"
-                   data-grid={{
-                     w: 0,
-                     h: 0,
-                     x: 0,
-                     y: 0,
-                     isResizable: false,
-                     isDraggable: false,
-                     static: true,
-                     minH: -1,
-                     minW: -1
-                   }}>
+              <div
+                key="item-top-week"
+                className="hidden"
+                data-grid={{ w: 0, h: 0, x: 0, y: 0, static: true, minH: -1, minW: -1 }}
+              >
                 This is the top item, hidden, to stretch the grid.
               </div>
-              <div key="item-bottom-week" className="hidden"
-                   data-grid={{
-                     w: 0,
-                     h: 0,
-                     x: 0,
-                     y: 24 * 4,
-                     isResizable: false,
-                     isDraggable: false,
-                     static: true,
-                     minH: -1,
-                     minW: -1
-                   }}>
+              <div
+                key="item-bottom-week"
+                className="hidden"
+                data-grid={{ w: 0, h: 0, x: 0, y: 24 * 4, static: true, minH: -1, minW: -1 }}
+              >
                 This is the bottom item, hidden, to stretch the grid.
               </div>
             </ResponsiveGridLayout>
