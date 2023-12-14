@@ -380,7 +380,7 @@ function Toolbar() {
   const [op, setop] = useState(false)
 
   return (
-    <div className="flex bg-transparent border-b border-b-gray-700 h-fit items-center overflow-y-hidden gap-1 p-1 py-2 overflow-auto"
+    <div className="flex bg-transparent border-b border-b-gray-700 min-h-fit items-center gap-1 p-1 py-2 overflow-y-hidden"
          onScroll={() => setop(!op)}>
       <ToolbarSubContainer>
         <RotateCcw
